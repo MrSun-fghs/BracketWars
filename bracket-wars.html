@@ -351,6 +351,24 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .vote-total-strip{height:7px;background:var(--md-surface-container-high);border-radius:var(--shape-full);overflow:hidden;display:flex;margin-bottom:.6rem;}
 .vote-total-a{height:100%;background:var(--md-primary);transition:width .6s var(--motion-decel);}
 .vote-total-b{height:100%;background:var(--md-secondary);flex:1;}
+/* Vote float animation */
+@keyframes voteFloat{0%{opacity:1;transform:translateY(0) scale(1);}60%{opacity:1;transform:translateY(-50px) scale(1.2);}100%{opacity:0;transform:translateY(-90px) scale(.8);}}
+.vote-float{position:fixed;font-size:1.6rem;font-weight:900;pointer-events:none;z-index:999;animation:voteFloat .9s ease-out forwards;}
+/* Countdown overlay */
+@keyframes countPop{0%{transform:scale(2);opacity:0;}30%{transform:scale(1);opacity:1;}80%{transform:scale(1);opacity:1;}100%{transform:scale(.5);opacity:0;}}
+.countdown-overlay{position:fixed;inset:0;background:rgba(8,0,32,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:600;}
+.countdown-num{font-size:11rem;font-weight:900;color:#fff;line-height:1;animation:countPop .9s ease-in-out forwards;}
+.countdown-label{font-size:.9rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:1.5rem;}
+/* Enhanced celebration */
+.vote-result-overlay{background:linear-gradient(160deg,#0E006B,#4A3AFF 50%,#7C5CBF);border:none;position:relative;overflow:hidden;}
+.vote-result-overlay::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 60%);pointer-events:none;}
+@keyframes trophyBounce{0%,100%{transform:translateY(0) scale(1);}40%{transform:translateY(-16px) scale(1.15);}70%{transform:translateY(-8px) scale(1.05);}}
+.vr-trophy{font-size:3.5rem;display:inline-block;animation:trophyBounce 1.8s ease-in-out infinite;}
+.vr-stat-card{background:rgba(255,255,255,.12);border-radius:12px;padding:.65rem 1rem;flex:1;text-align:center;border:1px solid rgba(255,255,255,.15);}
+.vr-stat-num{font-size:1.6rem;font-weight:800;color:#fff;font-family:monospace;line-height:1;}
+.vr-stat-label{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);margin-top:.2rem;}
+/* Pill submitting state */
+.vote-pill-btn.submitting{opacity:.6;cursor:wait;}
 /* DIALOGS */
 .dialog-scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:200;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(2px);}
 .dialog-scrim.open{display:flex;}
@@ -620,13 +638,13 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 
 <!-- VOTE RESULT CELEBRATION -->
 <div class="dialog-scrim" id="voteResultDialog">
-  <div class="dialog" style="max-width:400px;text-align:center;background:linear-gradient(145deg,#4A3AFF,#7C5CBF);border:none;">
-    <div style="font-size:3rem;margin-bottom:.5rem" id="vrTrophy">🏆</div>
-    <div style="font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:.4rem">Round Winner</div>
-    <div style="font-size:1.6rem;font-weight:800;color:#fff;margin-bottom:1rem;line-height:1.2" id="vrWinnerName"></div>
-    <div style="display:flex;gap:.75rem;justify-content:center;margin-bottom:1.25rem" id="vrStats"></div>
-    <div style="font-size:.8rem;color:rgba(255,255,255,.65);margin-bottom:1.25rem" id="vrLoser"></div>
-    <button class="btn-filled" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);width:100%" onclick="document.getElementById('voteResultDialog').classList.remove('open')">Continue</button>
+  <div class="dialog vote-result-overlay" style="max-width:420px;text-align:center;">
+    <div class="vr-trophy">🏆</div>
+    <div style="font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);margin:.6rem 0 .3rem">Round Winner</div>
+    <div style="font-size:1.75rem;font-weight:800;color:#fff;line-height:1.15;margin-bottom:1rem" id="vrWinnerName"></div>
+    <div style="display:flex;gap:.5rem;margin-bottom:.75rem" id="vrStats"></div>
+    <div style="font-size:.75rem;color:rgba(255,255,255,.55);margin-bottom:1.25rem;padding:.5rem .75rem;background:rgba(0,0,0,.2);border-radius:8px;" id="vrLoser"></div>
+    <button class="btn-filled" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.25);width:100%;font-size:.95rem;padding:.8rem" onclick="document.getElementById('voteResultDialog').classList.remove('open')">Continue →</button>
   </div>
 </div>
 
@@ -652,7 +670,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     <div class="dialog-body" id="closeVotingBody">Vote counts will pre-fill the score entry. You can still adjust before saving.</div>
     <div class="dialog-actions" style="justify-content:center;gap:.75rem">
       <button class="btn-outlined" onclick="document.getElementById('closeVotingConfirmDialog').classList.remove('open')">Cancel</button>
-      <button class="btn-filled" onclick="confirmCloseVoting()">Close &amp; Record</button>
+      <button class="btn-filled" onclick="showCountdownThenClose()">Close &amp; Record</button>
     </div>
   </div>
 </div>
@@ -1388,6 +1406,7 @@ let liveVoteCounts = [0, 0];
 let pendingVotingKey = null;
 let pendingVoteChoice = null;
 let pendingCelebrationData = null;
+let submittingVote = false;
 
 function ensureVoting(app) {
   if (!app.voting) app.voting = {open:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
@@ -1418,16 +1437,90 @@ function openVotingSetup(key, pA, pB) {
   document.getElementById('openVotingDialog').classList.add('open');
   setTimeout(()=>document.getElementById('studentCountInput').focus(), 120);
 }
+// ── Audio ──
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playSound(type) {
+  try {
+    const ctx = getAudio(); const now = ctx.currentTime;
+    if (type === 'pop') {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+      o.type='sine'; o.frequency.setValueAtTime(900,now); o.frequency.exponentialRampToValueAtTime(300,now+.12);
+      g.gain.setValueAtTime(.35,now); g.gain.exponentialRampToValueAtTime(.001,now+.14);
+      o.start(now); o.stop(now+.14);
+    } else if (type === 'whoosh') {
+      const buf=ctx.createBuffer(1,ctx.sampleRate*.5,ctx.sampleRate),d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+      const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();
+      s.buffer=buf; f.type='bandpass'; f.frequency.setValueAtTime(300,now); f.frequency.exponentialRampToValueAtTime(4000,now+.5);
+      f.Q.value=.5; g.gain.setValueAtTime(.5,now); g.gain.exponentialRampToValueAtTime(.001,now+.5);
+      s.connect(f); f.connect(g); g.connect(ctx.destination); s.start(now);
+    } else if (type === 'tick') {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+      o.type='square'; o.frequency.value=700;
+      g.gain.setValueAtTime(.18,now); g.gain.exponentialRampToValueAtTime(.001,now+.06);
+      o.start(now); o.stop(now+.06);
+    } else if (type === 'fanfare') {
+      [523,659,784,1047].forEach((freq,i)=>{
+        const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+        o.type='triangle'; o.frequency.value=freq; const t=now+i*.13;
+        g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.28,t+.04); g.gain.exponentialRampToValueAtTime(.001,t+.3);
+        o.start(t); o.stop(t+.3);
+      });
+    }
+  } catch(e) {}
+}
+
+// ── +1 Float ──
+function showVoteFloat(sideIndex) {
+  const block = document.getElementById('votePoemBlock'+sideIndex); if (!block) return;
+  const rect = block.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'vote-float';
+  el.textContent = '+1';
+  el.style.cssText += `left:${rect.left+rect.width/2-20}px;top:${rect.top+20}px;color:${sideIndex===0?'var(--md-primary)':'var(--md-secondary)'};`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
+
+// ── Countdown ──
+function showCountdownThenClose() {
+  document.getElementById('closeVotingConfirmDialog').classList.remove('open');
+  const overlay = document.createElement('div'); overlay.className='countdown-overlay';
+  const numEl = document.createElement('div'); numEl.className='countdown-num';
+  const lbl = document.createElement('div'); lbl.className='countdown-label'; lbl.textContent='Polls closing…';
+  overlay.appendChild(numEl); overlay.appendChild(lbl);
+  document.body.appendChild(overlay);
+  let count=3;
+  const tick=()=>{
+    if (count===0) {
+      playSound('whoosh');
+      overlay.style.transition='opacity .4s'; overlay.style.opacity='0';
+      setTimeout(()=>{ overlay.remove(); confirmCloseVoting(); },420);
+      return;
+    }
+    numEl.style.animation='none'; void numEl.offsetWidth; numEl.style.animation='countPop .9s ease-in-out forwards';
+    numEl.textContent=count; playSound('tick'); count--;
+    setTimeout(tick,1000);
+  };
+  tick();
+}
+
 function showVoteResultCelebration(r) {
   if (!r) return;
   document.getElementById('vrWinnerName').textContent = r.winnerName;
   document.getElementById('vrStats').innerHTML = `
-    <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:.6rem 1rem;flex:1"><div style="font-size:1.5rem;font-weight:800;color:#fff;font-family:monospace">${r.winPct}%</div><div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.7)">of votes</div></div>
-    <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:.6rem 1rem;flex:1"><div style="font-size:1.5rem;font-weight:800;color:#fff;font-family:monospace">${r.winVotes}</div><div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.7)">votes won</div></div>
-    <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:.6rem 1rem;flex:1"><div style="font-size:1.5rem;font-weight:800;color:#fff;font-family:monospace">+${r.winVotes-r.loseVotes}</div><div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.7)">margin</div></div>`;
-  document.getElementById('vrLoser').textContent = `Defeated: ${r.loserName} (${r.loseVotes} votes)`;
+    <div class="vr-stat-card"><div class="vr-stat-num">${r.winPct}%</div><div class="vr-stat-label">of votes</div></div>
+    <div class="vr-stat-card"><div class="vr-stat-num">${r.winVotes}</div><div class="vr-stat-label">votes</div></div>
+    <div class="vr-stat-card"><div class="vr-stat-num">+${r.winVotes-r.loseVotes}</div><div class="vr-stat-label">margin</div></div>`;
+  document.getElementById('vrLoser').innerHTML = `⚔️ Defeated: <strong style="color:rgba(255,255,255,.8)">${esc(r.loserName)}</strong> &nbsp;·&nbsp; ${r.loseVotes} votes`;
   document.getElementById('voteResultDialog').classList.add('open');
-  launchConfetti();
+  playSound('fanfare');
+  setTimeout(launchConfetti, 200);
 }
 function closeOpenVotingDialog() { document.getElementById('openVotingDialog').classList.remove('open'); pendingVotingKey=null; }
 
@@ -1489,6 +1582,11 @@ async function fetchVoteCounts(sessionId) {
       const newCounts = [0, 0];
       data.forEach(v => newCounts[v.choice]++);
       if (newCounts[0] !== liveVoteCounts[0] || newCounts[1] !== liveVoteCounts[1]) {
+        if (currentView === 'vote') {
+          const d0 = newCounts[0]-liveVoteCounts[0], d1 = newCounts[1]-liveVoteCounts[1];
+          for (let i=0;i<d0;i++) setTimeout(()=>showVoteFloat(0), i*180);
+          for (let i=0;i<d1;i++) setTimeout(()=>showVoteFloat(1), i*180);
+        }
         liveVoteCounts = newCounts;
         updateVoteLiveUI();
       }
@@ -1581,20 +1679,25 @@ function renderVoteView() {
 }
 
 async function submitStudentVote(choice) {
+  if (submittingVote) return;
   const sessionId = app.voting?.sessionId; if (!sessionId) return;
   const storageKey = 'voted-'+sessionId;
   if (localStorage.getItem(storageKey)!==null) return;
-  // Optimistic update — show voted state immediately
-  localStorage.setItem(storageKey, String(choice));
-  pendingVoteChoice=null;
-  renderVoteView();
+  submittingVote = true;
+  document.querySelectorAll('.vote-pill-btn').forEach(p=>p.classList.add('submitting'));
   try {
-    await db.from('votes').insert({session_id:sessionId,choice});
+    const { error } = await db.from('votes').insert({session_id:sessionId,choice});
+    if (error) throw error;
+    localStorage.setItem(storageKey, String(choice));
+    pendingVoteChoice=null;
+    playSound('pop');
+    renderVoteView();
     showSnack('Vote submitted! 🗳️');
   } catch(e) {
-    localStorage.removeItem(storageKey);
-    renderVoteView();
-    showSnack('Error submitting. Try again.');
+    document.querySelectorAll('.vote-pill-btn').forEach(p=>p.classList.remove('submitting'));
+    showSnack('Vote failed — please try again.');
+  } finally {
+    submittingVote = false;
   }
 }
 
