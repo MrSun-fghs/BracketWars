@@ -353,7 +353,10 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .m3-snackbar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--md-on-surface);color:var(--md-surface);font-size:.875rem;padding:.75rem 1.25rem;border-radius:var(--shape-sm);box-shadow:var(--elev-3);z-index:300;opacity:0;transition:transform .3s var(--motion-decel),opacity .3s;white-space:nowrap;pointer-events:none;display:flex;align-items:center;}
 .m3-snackbar.show{transform:translateX(-50%) translateY(0);opacity:1;}
 /* HOME VIEW */
-.home-view{padding:0 0 3rem;}
+.home-view{padding:0 0 3rem; background:#EDE9FF; min-height:100%;}
+.m3-tab.home-tab{background:var(--md-primary-container);color:var(--md-on-primary-container);}
+.m3-tab.home-tab:hover{background:#DDD8FF;}
+.m3-tab.home-tab.active{background:#ffffff;color:var(--md-primary);}
 .home-hero{background:transparent;padding:2rem 2rem 1.5rem;text-align:center;position:relative;}
 .home-hero::before{display:none;}
 @keyframes royalEntrance{
@@ -939,7 +942,7 @@ function renderTabs() {
   if (MODE === 'student') {
     const homeTab = document.createElement('button');
     homeTab.id = 'btnHomeTab';
-    homeTab.className = 'm3-tab' + (currentView === 'home' ? ' active' : '');
+    homeTab.className = 'm3-tab home-tab' + (currentView === 'home' ? ' active' : '');
     homeTab.innerHTML = '🏠 Home';
     homeTab.onclick = () => setView('home');
     bar.appendChild(homeTab);
