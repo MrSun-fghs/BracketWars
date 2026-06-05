@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bracket Wars · Poetry Madness</title>
+<style>
+:root {
+  color-scheme: light;
+  --md-primary:#4A3AFF;--md-on-primary:#FFFFFF;--md-primary-container:#E4DFFF;--md-on-primary-container:#0E006B;
+  --md-secondary:#7C5CBF;--md-on-secondary:#FFFFFF;--md-secondary-container:#ECDCFF;--md-on-secondary-container:#290057;
+  --md-tertiary:#006874;--md-on-tertiary:#FFFFFF;--md-tertiary-container:#97F0FF;--md-on-tertiary-container:#001F24;
+  --md-error:#BA1A1A;--md-error-container:#FFDAD6;--md-on-error:#FFFFFF;
+  --md-surface:#FFFBFF;--md-surface-variant:#E5E0EC;--md-surface-container-lowest:#FDFCFE;--md-surface-container-low:#F5F0FA;--md-surface-container:#EFE9F4;--md-surface-container-high:#E9E3EF;--md-surface-container-highest:#E4DEEA;--md-on-surface:#1C1B1F;--md-on-surface-variant:#49454E;--md-outline:#7A757F;--md-outline-variant:#CBC4D0;
+  --cat-a-seed:#1565C0;--cat-b-seed:#6A1B9A;--cat-c-seed:#2E7D32;--cat-d-seed:#C62828;
+  --gold:#F59E0B;
+  --shape-xs:4px;--shape-sm:8px;--shape-md:12px;--shape-lg:16px;--shape-xl:28px;--shape-full:9999px;
+  --elev-1:0 1px 2px rgba(0,0,0,.10),0 1px 3px 1px rgba(0,0,0,.07);
+  --elev-2:0 1px 2px rgba(0,0,0,.12),0 2px 6px 2px rgba(0,0,0,.09);
+  --elev-3:0 4px 8px 3px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.12);
+  --elev-4:0 6px 10px 4px rgba(0,0,0,.10),0 2px 3px rgba(0,0,0,.12);
+  --motion-std:cubic-bezier(0.2,0,0,1);--motion-decel:cubic-bezier(0,0,0,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--md-surface-container-high);color:var(--md-on-surface);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden;}
+.app-bar{background:var(--md-surface-container);position:sticky;top:0;z-index:50;box-shadow:var(--elev-2);}
+.app-bar-inner{display:flex;align-items:center;justify-content:space-between;padding:0 1rem;height:64px;gap:.75rem;}
+.app-bar-title{font-size:1.25rem;font-weight:700;color:var(--md-on-surface);letter-spacing:-.01em;line-height:1;flex:1;}
+.app-bar-subtitle{font-size:.72rem;color:var(--md-on-surface-variant);letter-spacing:.05em;margin-top:.15rem;position:relative;top:3px;}
+.app-bar-actions{display:flex;align-items:center;gap:.5rem;}
+.btn-tonal{display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:500;padding:.5rem 1.25rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:var(--md-secondary-container);color:var(--md-on-secondary-container);transition:filter .15s;white-space:nowrap;}
+.btn-tonal:hover{filter:brightness(.95);}
+.btn-filled{display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:500;padding:.5rem 1.5rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:var(--md-primary);color:var(--md-on-primary);box-shadow:var(--elev-1);transition:filter .15s;white-space:nowrap;}
+.btn-filled:hover{filter:brightness(1.08);}
+.btn-outlined{display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:500;padding:.5rem 1.25rem;border-radius:var(--shape-full);border:1px solid var(--md-outline);cursor:pointer;background:transparent;color:var(--md-primary);}
+.btn-outlined:hover{background:rgba(74,58,255,.08);}
+.btn-text{display:inline-flex;align-items:center;gap:.3rem;font-size:.875rem;font-weight:500;padding:.4rem .75rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:transparent;color:var(--md-primary);}
+.btn-text:hover{background:rgba(74,58,255,.08);}
+.live-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:500;padding:.3rem .75rem;border-radius:var(--shape-full);background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--md-tertiary);animation:livePulse 1.8s ease-in-out infinite;}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.3;transform:scale(.75);}}
+/* Overlapping card tabs — reference style */
+.tabs-surface{background:var(--md-surface-container-high);border-bottom:none;overflow-x:auto;scrollbar-width:none;padding-top:.5rem;}
+@keyframes contentFadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes contentFadeOut{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(-6px);}}
+@keyframes viewFadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.content-switching{animation:contentFadeOut .15s var(--motion-accel) forwards;}
+.content-entering{animation:contentFadeIn .22s var(--motion-decel) forwards;}
+.view-fade-in{animation:viewFadeIn .3s var(--motion-decel) both;}
+.tabs-surface::-webkit-scrollbar{display:none;}
+.tabs-row{display:flex;align-items:flex-end;padding:.6rem 1rem 0;min-height:56px;position:relative;}
+.m3-tab{
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+  padding:.65rem 1.6rem;
+  font-size:.9rem;font-weight:500;
+  color:var(--md-on-surface-variant);
+  cursor:pointer;
+  background:var(--md-surface-container-highest);
+  border:none;
+  border-radius:18px 18px 0 0;
+  position:relative;
+  margin-right:-16px;
+  transition:background .18s,color .18s,transform .18s,box-shadow .18s;
+  white-space:nowrap;letter-spacing:.006em;
+  box-shadow:-4px 0 8px rgba(0,0,0,.09), 4px 0 8px rgba(0,0,0,.09), 0 -2px 4px rgba(0,0,0,.04);
+  min-width:90px;
+  text-align:center;
+}
+.m3-tab:hover{background:var(--md-surface-container);color:var(--md-on-surface);}
+.m3-tab.active{
+  background:#ffffff;
+  color:var(--md-primary);
+  font-weight:700;
+  z-index:10 !important;
+  box-shadow:none;
+  position:relative;
+}
+@keyframes glowPop{
+  0%{box-shadow:0 0 0 0 rgba(74,58,255,0);}
+  40%{box-shadow:0 0 32px 14px rgba(74,58,255,.45);}
+  100%{box-shadow:0 0 16px 5px rgba(74,58,255,.16);}
+}
+.m3-tab.active::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:18px 18px 0 0;
+  box-shadow:0 0 16px 5px rgba(74,58,255,.16);
+  z-index:-1;
+  animation:glowPop .6s ease forwards;
+}
+/* Tab stacking order — Block 1 in front, each tab to the right sits behind */
+.m3-tab:nth-child(1){z-index:5;}
+.m3-tab:nth-child(2){z-index:4;}
+.m3-tab:nth-child(3){z-index:3;}
+.m3-tab:nth-child(4){z-index:2;}
+.m3-tab:nth-child(5){z-index:1;}
+.m3-tab.active{z-index:10 !important;}
+.tab-indicator{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;display:none;}
+.tab-indicator.show{display:block;}
+.add-tab-btn{
+  display:flex;align-items:center;gap:.3rem;
+  padding:.6rem .9rem;
+  font-size:.8rem;font-weight:600;
+  color:var(--md-primary);
+  cursor:pointer;border:1.5px dashed var(--md-primary);
+  background:transparent;
+  white-space:nowrap;
+  border-radius:18px 18px 0 0;
+  margin-right:-16px;
+  z-index:0;
+  transition:background .15s;
+}
+.add-tab-btn:hover{background:rgba(74,58,255,.08);}
+.combined-bar{background:#ffffff;}
+.combined-bar-inner{display:flex;align-items:center;justify-content:space-between;padding:.65rem 1.25rem;gap:1rem;}
+.toolbar-status-stack{display:flex;flex-direction:column;gap:.3rem;flex:1;min-width:0;}
+.status-label{font-size:.85rem;font-weight:500;color:var(--md-on-surface);}
+.toolbar-progress-track{height:6px;background:var(--md-surface-container-highest);border-radius:var(--shape-full);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.1);}
+.toolbar-pct-label{font-size:.65rem;font-weight:600;color:var(--md-on-surface-variant);letter-spacing:.03em;}
+.progress-pct-label{display:none;}
+.progress-indicator{height:100%;background:linear-gradient(90deg,var(--md-primary),var(--md-secondary),#97F0FF);border-radius:var(--shape-full);transition:width .8s var(--motion-decel);box-shadow:0 0 8px rgba(74,58,255,.5);position:relative;}
+.progress-indicator::after{content:'';position:absolute;top:1px;left:4px;right:4px;height:3px;background:rgba(255,255,255,.4);border-radius:var(--shape-full);}
+/* M3 Expressive nav bar */
+.seg-btn-container{
+  display:flex;align-items:center;justify-content:center;
+  padding:.65rem 1.25rem;
+  background:var(--md-surface-container-low);
+  border-bottom:1px solid var(--md-outline-variant);
+}
+.seg-btn-track{
+  display:flex;align-items:center;gap:.3rem;
+}
+.seg-btn{
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;
+  font-size:.72rem;font-weight:600;
+  padding:.4rem .9rem;
+  border-radius:var(--shape-lg);
+  border:none;cursor:pointer;
+  background:transparent;
+  color:var(--md-on-surface-variant);
+  transition:background .2s var(--motion-std),color .2s,box-shadow .2s,transform .15s var(--motion-std);
+  letter-spacing:.01em;
+  white-space:nowrap;
+  min-width:64px;
+  position:relative;
+}
+.seg-btn:hover{background:rgba(74,58,255,.08);color:var(--md-primary);}
+.seg-btn.active{
+  background:var(--md-primary);
+  color:var(--md-on-primary);
+  box-shadow:var(--elev-2);
+  font-weight:700;
+  transform:scale(1.04);
+}
+.seg-btn.active:hover{filter:brightness(1.08);}
+.seg-btn .nav-icon{font-size:1.25rem;line-height:1;transition:transform .2s var(--motion-std);}
+.seg-btn.active .nav-icon{transform:scale(1.15);}
+/* BRACKET */
+.bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;}
+.mm-bracket{display:grid;grid-template-columns:1fr 1fr 1fr 190px 1fr 1fr 1fr;grid-template-rows:auto 1fr;min-width:1080px;align-items:stretch;}
+.col-header{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;}
+.col-header span{display:block;font-size:.65rem;font-weight:400;text-transform:none;color:var(--md-outline);margin-top:.1rem;}
+.bc{display:flex;flex-direction:column;padding:.6rem .3rem 0;height:100%;}
+.bc.right{align-items:flex-end;}
+.cat-banner{display:flex;align-items:center;font-size:.7rem;font-weight:700;letter-spacing:.04em;padding:.28rem .75rem;border-radius:var(--shape-full);margin:.4rem .35rem .25rem;width:calc(100% - .7rem);}
+.mg{width:100%;position:relative;margin:4px 0;}
+.matchup{border-radius:var(--shape-lg);background:var(--md-surface-container-lowest);box-shadow:var(--elev-1);overflow:hidden;margin:0 .3rem;border:1px solid var(--md-outline-variant);transition:box-shadow .2s,transform .15s;}
+.matchup.clickable{cursor:pointer;}
+.matchup.clickable:hover{box-shadow:var(--elev-3);transform:translateY(-1px);border-color:var(--md-primary);}
+.poem-slot{display:flex;align-items:center;padding:.5rem .7rem;gap:.4rem;position:relative;transition:background .2s;}
+.poem-slot:not(:last-child){border-bottom:1px solid var(--md-outline-variant);}
+.poem-slot.winner-slot{background:var(--md-primary-container);}
+.poem-slot.loser-slot{opacity:.4;background:var(--md-surface-container-high);}
+.poem-slot.pending{background:var(--md-surface-container);}
+.poem-slot.winner-slot.alive::after{content:'›';font-size:1rem;font-weight:700;color:var(--md-primary);margin-left:.15rem;animation:nudge 1.2s ease-in-out infinite;}
+@keyframes nudge{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
+.seed{font-family:monospace;font-size:.58rem;font-weight:500;color:var(--md-on-surface-variant);min-width:1rem;text-align:right;flex-shrink:0;background:var(--md-surface-container-high);padding:.1rem .3rem;border-radius:var(--shape-xs);}
+.poem-slot.winner-slot .seed{background:var(--md-primary);color:var(--md-on-primary);}
+.poem-name{flex:1;font-size:.72rem;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--md-on-surface);}
+.poem-slot.winner-slot .poem-name{color:var(--md-on-primary-container);font-weight:700;}
+.poem-slot.pending .poem-name{color:var(--md-on-surface-variant);font-style:italic;font-weight:400;}
+.votes{font-family:monospace;font-size:.6rem;color:var(--md-on-surface-variant);min-width:1.4rem;text-align:right;flex-shrink:0;}
+.poem-slot.winner-slot .votes{color:var(--md-primary);font-weight:700;}
+.pct-chip{font-family:monospace;font-size:.58rem;font-weight:500;padding:.08rem .35rem;border-radius:var(--shape-full);background:var(--md-surface-container-high);color:var(--md-on-surface-variant);flex-shrink:0;}
+.poem-slot.winner-slot .pct-chip{background:var(--md-primary);color:var(--md-on-primary);}
+.vote-bar-wrap{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--md-surface-container-high);}
+.vote-bar{height:100%;background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));transition:width .8s var(--motion-decel);}
+.poem-slot.loser-slot .vote-bar{background:var(--md-outline-variant);}
+.bc.right .poem-slot{flex-direction:row-reverse;}
+.bc.right .seed{text-align:left;}
+.bc.right .poem-name{text-align:right;}
+.bc.right .votes{text-align:left;}
+.center-col{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.6rem .25rem 0;height:100%;}
+.center-header{font-size:1rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--md-primary);text-align:center;padding-bottom:.65rem;border-bottom:2px solid var(--md-primary);width:100%;}
+.champion-card{background:linear-gradient(145deg,var(--md-primary),var(--md-secondary));border-radius:var(--shape-xl);padding:1.25rem .9rem;text-align:center;width:100%;margin-top:.85rem;box-shadow:var(--elev-3);position:relative;overflow:hidden;}
+.champion-card.crowned{animation:champGlow 2.5s ease-in-out infinite alternate;}
+.champion-card.crowned::after{content:'';position:absolute;top:0;left:-70%;bottom:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:bannerShimmer 3s ease-in-out infinite;pointer-events:none;}
+@keyframes champGlow{from{box-shadow:var(--elev-3);}to{box-shadow:0 8px 28px rgba(74,58,255,.45),0 2px 6px rgba(0,0,0,.15);}}
+.champion-trophy{font-size:3.5rem;margin-bottom:.35rem;display:inline-block;animation:crownFloat 2.2s ease-in-out infinite;}
+.champion-card.crowned .champion-trophy{animation:crownFloat 2.2s ease-in-out infinite, crownSpin 6s ease-in-out infinite;}
+@keyframes crownFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-8px) scale(1.08);}}
+@keyframes crownSpin{0%,100%{filter:drop-shadow(0 4px 12px rgba(245,158,11,.5));}50%{filter:drop-shadow(0 8px 20px rgba(245,158,11,.9));}}
+.champion-label{font-size:.6rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:.3rem;}
+.champion-name{font-size:.95rem;font-weight:700;color:#FFF;line-height:1.25;}
+.champion-name.empty{font-size:.7rem;font-weight:400;color:rgba(255,255,255,.6);font-style:italic;}
+.final-label{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);text-align:center;margin:.75rem 0 .25rem;}
+/* LIST VIEW */
+.list-view{padding:1.25rem;max-width:860px;margin:0 auto;}
+.list-champion{border-radius:var(--shape-xl);background:linear-gradient(135deg,var(--md-primary),var(--md-secondary));padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:var(--elev-3);position:relative;overflow:hidden;}
+.list-champion.crowned{animation:champGlow 2.5s ease-in-out infinite alternate;}
+.list-champion.crowned::after{content:'';position:absolute;top:0;left:-70%;bottom:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:bannerShimmer 3s ease-in-out infinite;pointer-events:none;}
+.list-champ-trophy{font-size:2.25rem;flex-shrink:0;display:inline-block;animation:crownFloat 2.2s ease-in-out infinite;filter:drop-shadow(0 4px 12px rgba(245,158,11,.5));}
+.list-champion.crowned .list-champ-trophy{animation:crownFloat 2.2s ease-in-out infinite,crownPulse 3s ease-in-out infinite;filter:drop-shadow(0 4px 16px rgba(245,158,11,.8));}
+@keyframes crownPulse{0%,100%{filter:drop-shadow(0 4px 16px rgba(245,158,11,.7));}50%{filter:drop-shadow(0 6px 28px rgba(245,158,11,1)) drop-shadow(0 0 12px rgba(239,68,68,.4));}}
+.list-champ-label{font-size:.65rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:.2rem;}
+.list-champ-name{font-size:1.35rem;font-weight:700;color:#FFF;line-height:1.2;}
+.list-champ-name.empty{font-size:.9rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.6);}
+.list-section-card{border-radius:var(--shape-xl);background:var(--md-surface-container-lowest);box-shadow:var(--elev-1);margin-bottom:1rem;overflow:hidden;border:1px solid var(--md-outline-variant);}
+.list-section-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid var(--md-outline-variant);background:var(--md-surface-container-low);}
+.list-section-title{font-size:.8rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--md-on-surface);}
+.list-region-card{border-radius:var(--shape-xl);background:var(--md-surface-container-lowest);box-shadow:var(--elev-1);margin-bottom:1rem;overflow:hidden;border:1px solid var(--md-outline-variant);}
+.list-region-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.2);}
+.list-region-title{font-size:.8rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#FFF;}
+.list-region-winner{font-size:.75rem;font-style:italic;color:rgba(255,255,255,.88);}
+.list-round-label{font-size:.65rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);padding:.45rem 1.25rem .3rem;background:var(--md-surface-container);border-bottom:1px solid var(--md-outline-variant);}
+.list-matchup{display:flex;align-items:stretch;border-bottom:1px solid var(--md-outline-variant);background:var(--md-surface-container-lowest);}
+.list-matchup:last-child{border-bottom:none;}
+.list-poem{flex:1;padding:.6rem 1.25rem;display:flex;align-items:center;gap:.55rem;transition:background .2s;}
+.list-poem.winner{background:var(--md-primary-container);}
+.list-poem.loser{opacity:.42;background:var(--md-surface-container);}
+.list-poem.pending{background:var(--md-surface-container);}
+.list-seed{font-family:monospace;font-size:.6rem;font-weight:500;color:var(--md-on-surface-variant);background:var(--md-surface-container-high);padding:.1rem .3rem;border-radius:var(--shape-xs);flex-shrink:0;}
+.list-poem.winner .list-seed{background:var(--md-primary);color:var(--md-on-primary);}
+.list-name{flex:1;font-size:.88rem;font-weight:500;line-height:1.2;color:var(--md-on-surface);}
+.list-poem.winner .list-name{color:var(--md-on-primary-container);font-weight:700;}
+.list-poem.pending .list-name{color:var(--md-on-surface-variant);font-style:italic;}
+.list-vote-info{font-family:monospace;font-size:.65rem;color:var(--md-on-surface-variant);white-space:nowrap;text-align:right;}
+.list-poem.winner .list-vote-info{color:var(--md-primary);font-weight:500;}
+.list-vs{display:flex;align-items:center;justify-content:center;padding:0 .6rem;font-size:.72rem;font-weight:700;color:var(--md-on-surface-variant);border-left:1px solid var(--md-outline-variant);border-right:1px solid var(--md-outline-variant);background:var(--md-surface-container);min-width:2.4rem;}
+.list-bar-row{height:4px;background:var(--md-surface-container-high);display:flex;}
+.list-bar-fill{background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));transition:width .8s var(--motion-decel);}
+/* LEADERBOARD */
+.leaderboard-view{padding:1.25rem;max-width:700px;margin:0 auto;}
+.lb-champion-banner{border-radius:var(--shape-xl);background:linear-gradient(135deg,#1a0533,#4A3AFF,#7C5CBF);padding:1.75rem 2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1.5rem;box-shadow:0 8px 40px rgba(74,58,255,.35);animation:champGlow 2.5s ease-in-out infinite alternate;position:relative;overflow:hidden;}
+.lb-champion-banner.crowned{background:linear-gradient(135deg,#78350F,#F59E0B,#EF4444,#8B5CF6);box-shadow:0 12px 48px rgba(245,158,11,.5);}
+.lb-champion-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 55%);pointer-events:none;}
+.lb-champ-trophy{font-size:4rem;flex-shrink:0;filter:drop-shadow(0 4px 16px rgba(245,158,11,.7));animation:crownFloat 2.2s ease-in-out infinite;}
+.lb-champ-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:.4rem;}
+.lb-champ-name{font-size:2.2rem;font-weight:800;color:#FFF;line-height:1.05;text-shadow:0 2px 16px rgba(0,0,0,.25);}
+.lb-champ-name.empty{font-size:1.1rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.6);}
+.lb-champ-sub{font-size:.8rem;color:rgba(255,255,255,.8);margin-top:.3rem;font-weight:500;}
+/* Podium rows */
+/* 1st place — gold glow + shimmer sweep */
+.lb-poem-row.rank-1st{border:2px solid #F59E0B;background:linear-gradient(135deg,#FFFBEB,#FEF3C7);animation:goldPulse 2s ease-in-out infinite alternate;}
+.lb-poem-row.rank-1st::before{background:linear-gradient(180deg,#F59E0B,#EF4444);}
+.lb-poem-row.rank-1st::after{content:'';position:absolute;top:0;left:-75%;bottom:0;width:50%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:shineSweep 2.8s ease-in-out infinite;pointer-events:none;}
+@keyframes goldPulse{from{box-shadow:var(--elev-1),0 0 6px rgba(245,158,11,.25);}to{box-shadow:var(--elev-3),0 0 24px rgba(245,158,11,.55),0 0 40px rgba(239,68,68,.2);}}
+@keyframes shineSweep{0%{left:-75%;}65%,100%{left:120%;}}
+/* 2nd place — silver pulse */
+.lb-poem-row.rank-2nd{border:2px solid #94a3b8;background:linear-gradient(135deg,#f8fafc,#e2e8f0);animation:silverPulse 2.5s ease-in-out infinite alternate;}
+.lb-poem-row.rank-2nd::before{background:linear-gradient(180deg,#94a3b8,#64748b);}
+.lb-poem-row.rank-2nd::after{content:'';position:absolute;top:0;left:-75%;bottom:0;width:50%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shineSweep 4s ease-in-out infinite;pointer-events:none;}
+@keyframes silverPulse{from{box-shadow:var(--elev-1);}to{box-shadow:var(--elev-2),0 0 16px rgba(148,163,184,.5);}}
+/* 3rd place — bronze pulse */
+.lb-poem-row.rank-3rd{border:2px solid #cd7c2f;background:linear-gradient(135deg,#fdf8f0,#fef3e2);animation:bronzePulse 3s ease-in-out infinite alternate;}
+.lb-poem-row.rank-3rd::before{background:linear-gradient(180deg,#cd7c2f,#a16207);}
+@keyframes bronzePulse{from{box-shadow:var(--elev-1);}to{box-shadow:var(--elev-2),0 0 14px rgba(205,124,47,.4);}}
+/* Champion banner shimmer when crowned */
+.lb-champion-banner.crowned::after{content:'';position:absolute;top:0;left:-60%;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);animation:bannerShimmer 3s ease-in-out infinite;pointer-events:none;}
+@keyframes bannerShimmer{0%{left:-60%;}70%,100%{left:120%;}}
+.lb-podium-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.65rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .6rem;border-radius:var(--shape-full);margin-top:.3rem;}
+.lb-podium-badge.gold{background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;animation:badgeGlow 1.8s ease-in-out infinite alternate;}
+.lb-podium-badge.silver{background:linear-gradient(135deg,#94a3b8,#64748b);color:#fff;}
+.lb-podium-badge.bronze{background:linear-gradient(135deg,#cd7c2f,#a16207);color:#fff;}
+@keyframes badgeGlow{from{box-shadow:0 2px 8px rgba(245,158,11,.4);}to{box-shadow:0 2px 16px rgba(245,158,11,.8),0 0 24px rgba(239,68,68,.3);}}
+.lb-section-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);margin:1.1rem 0 .5rem .25rem;display:flex;align-items:center;gap:.5rem;}
+.lb-section-label::after{content:'';flex:1;height:1px;background:var(--md-outline-variant);}
+.lb-poem-row{display:flex;align-items:center;gap:.85rem;padding:.75rem 1rem;border-radius:var(--shape-lg);background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);margin-bottom:.5rem;box-shadow:var(--elev-1);position:relative;overflow:hidden;}
+.lb-poem-row.alive{border-color:var(--md-primary);}
+.lb-poem-row.alive::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--md-primary),var(--md-secondary));border-radius:var(--shape-sm) 0 0 var(--shape-sm);}
+.lb-poem-row.champion{border-color:#F59E0B;background:linear-gradient(135deg,#FFFBEB,#FEF3C7);}
+.lb-poem-row.champion::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#F59E0B,#EF4444);border-radius:var(--shape-sm) 0 0 var(--shape-sm);}
+.lb-poem-row.eliminated{opacity:.55;background:var(--md-surface-container);}
+.lb-poem-row.pending{opacity:.65;background:var(--md-surface-container);border-style:dashed;}
+.lb-rank{font-family:monospace;font-size:.75rem;font-weight:700;color:var(--md-on-surface-variant);min-width:1.5rem;text-align:center;flex-shrink:0;}
+.lb-poem-row.alive .lb-rank{color:var(--md-primary);}
+.lb-poem-row.champion .lb-rank{color:#F59E0B;font-size:1rem;}
+.lb-status-icon{font-size:1.2rem;flex-shrink:0;width:1.75rem;text-align:center;}
+.lb-poem-info{flex:1;min-width:0;}
+.lb-poem-title{font-size:.95rem;font-weight:600;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-poem-row.eliminated .lb-poem-title{text-decoration:line-through;color:var(--md-on-surface-variant);}
+.lb-poem-row.champion .lb-poem-title{color:#92400E;font-size:1rem;font-weight:700;}
+.lb-poem-round{font-size:.7rem;color:var(--md-on-surface-variant);margin-top:.1rem;}
+.lb-poem-row.alive .lb-poem-round{color:var(--md-primary);font-weight:500;}
+.lb-votes-block{text-align:right;flex-shrink:0;}
+.lb-vote-pct{font-family:monospace;font-size:1.5rem;font-weight:800;color:var(--md-primary);line-height:1;letter-spacing:-.02em;}
+.lb-poem-row.champion .lb-vote-pct{color:#92400E;}
+.lb-poem-row.eliminated .lb-vote-pct{color:var(--md-on-surface-variant);}
+.lb-total-votes{font-family:monospace;font-size:.72rem;font-weight:500;color:var(--md-on-surface-variant);margin-top:.1rem;}
+.lb-poem-row.alive .lb-vote-pct{color:var(--md-primary);}
+.lb-poem-row.champion .lb-total-votes{color:#92400E;}
+.lb-split-bar-wrap{position:absolute;bottom:0;left:0;right:0;height:5px;display:flex;overflow:hidden;border-radius:0 0 var(--shape-lg) var(--shape-lg);}
+.lb-split-winner{background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));transition:width .8s var(--motion-decel);}
+.lb-split-loser{background:var(--md-surface-container-highest);flex:1;}
+.lb-poem-row.champion .lb-split-winner{background:linear-gradient(90deg,#F59E0B,#EF4444);}
+.lb-poem-row.eliminated .lb-split-winner{background:var(--md-outline);}
+.lb-round-chips{display:flex;gap:.3rem;margin-top:.3rem;flex-wrap:wrap;}
+.lb-round-chip{font-size:.6rem;font-weight:700;padding:.12rem .45rem;border-radius:var(--shape-full);letter-spacing:.02em;}
+.lb-round-chip.won{background:#dcfce7;color:#166534;}
+.lb-round-chip.lost{background:#fee2e2;color:#991b1b;}
+.lb-rival{font-size:.68rem;color:var(--md-error);margin-top:.3rem;font-weight:500;}
+.lb-spark{font-size:.68rem;font-weight:700;margin-top:.15rem;letter-spacing:.01em;}
+.lb-spark.up{color:#16a34a;}
+.lb-spark.down{color:#dc2626;}
+.lb-spark.flat{color:var(--md-on-surface-variant);}
+.lb-waiting{text-align:center;padding:3rem 1rem;font-size:1rem;font-weight:500;color:var(--md-on-surface-variant);}
+.lb-waiting-icon{font-size:3rem;margin-bottom:.75rem;}
+/* DIALOGS */
+.dialog-scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:200;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(2px);}
+.dialog-scrim.open{display:flex;}
+.dialog{background:var(--md-surface-container-high);border-radius:var(--shape-xl);padding:1.5rem 1.5rem 1.25rem;width:100%;max-width:420px;box-shadow:var(--elev-4);animation:dialogIn .25s var(--motion-decel);}
+@keyframes dialogIn{from{opacity:0;transform:scale(.92) translateY(16px);}to{opacity:1;transform:none;}}
+.dialog-icon{font-size:1.5rem;margin-bottom:.75rem;text-align:center;}
+.dialog-headline{font-size:1.375rem;font-weight:700;color:var(--md-on-surface);margin-bottom:.75rem;line-height:1.2;}
+.dialog-body{font-size:.875rem;color:var(--md-on-surface-variant);line-height:1.6;margin-bottom:1.25rem;}
+.dialog-eyebrow{font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);margin-bottom:.5rem;}
+.dialog-actions{display:flex;justify-content:flex-end;gap:.5rem;flex-wrap:wrap;}
+.m3-field{width:100%;position:relative;margin-bottom:1rem;}
+.m3-field input{width:100%;background:var(--md-surface-container-highest);border:none;border-radius:var(--shape-md) var(--shape-md) 0 0;border-bottom:2px solid var(--md-outline);padding:1.1rem 1rem .5rem;font-size:1rem;color:var(--md-on-surface);outline:none;}
+.m3-field input:focus{border-bottom-color:var(--md-primary);}
+.m3-field label{position:absolute;left:1rem;top:.75rem;font-size:.75rem;font-weight:500;color:var(--md-on-surface-variant);pointer-events:none;transition:all .15s;}
+.m3-field input:focus+label,.m3-field input:not(:placeholder-shown)+label{top:.3rem;font-size:.65rem;color:var(--md-primary);}
+.m3-field-error{font-size:.72rem;color:var(--md-error);padding:.25rem 1rem 0;display:none;}
+.m3-field-error.show{display:block;}
+.vs-row{display:flex;gap:.75rem;margin-bottom:1rem;}
+.vs-card{flex:1;border-radius:var(--shape-lg);border:2px solid var(--md-outline-variant);padding:.85rem .75rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--md-surface-container-low);}
+.vs-card:hover{border-color:var(--md-primary);background:var(--md-primary-container);}
+.vs-card.selected{border-color:var(--md-primary);background:var(--md-primary-container);box-shadow:var(--elev-2);}
+.vs-card-name{font-size:.85rem;font-weight:600;color:var(--md-on-surface);margin-bottom:.25rem;line-height:1.3;}
+.vs-card.selected .vs-card-name{color:var(--md-on-primary-container);}
+.vs-card-seed{font-family:monospace;font-size:.6rem;color:var(--md-on-surface-variant);}
+.vs-divider{display:flex;align-items:center;font-size:.85rem;font-weight:700;color:var(--md-on-surface-variant);}
+.vote-fields{display:flex;gap:.75rem;margin-bottom:.5rem;}
+.vote-fields .m3-field{margin-bottom:0;}
+.vote-fields .m3-field input{text-align:center;padding:1.4rem .5rem .6rem;font-size:2rem;font-weight:700;letter-spacing:.02em;}
+.vote-field-label{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:.3rem;text-align:center;}
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;max-height:52vh;overflow-y:auto;padding-right:.25rem;margin-bottom:1rem;}
+.setup-cat-header{grid-column:1/-1;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.5rem 0 .2rem;border-top:1px solid var(--md-outline-variant);margin-top:.3rem;}
+.pw-lock{font-size:3rem;text-align:center;margin-bottom:.75rem;}
+#confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
+.m3-snackbar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--md-on-surface);color:var(--md-surface);font-size:.875rem;padding:.75rem 1.25rem;border-radius:var(--shape-sm);box-shadow:var(--elev-3);z-index:300;opacity:0;transition:transform .3s var(--motion-decel),opacity .3s;white-space:nowrap;pointer-events:none;display:flex;align-items:center;}
+.m3-snackbar.show{transform:translateX(-50%) translateY(0);opacity:1;}
+/* HOME VIEW */
+.home-view{padding:0 0 3rem;}
+.home-hero{background:transparent;padding:2rem 2rem 1.5rem;text-align:center;position:relative;}
+.home-hero::before{display:none;}
+@keyframes royalEntrance{
+  0%{opacity:0;transform:translateY(-70px) scale(0.2) rotate(-15deg);}
+  55%{transform:translateY(12px) scale(1.25) rotate(4deg);}
+  75%{transform:translateY(-6px) scale(0.94) rotate(-2deg);}
+  90%{transform:translateY(3px) scale(1.03) rotate(1deg);}
+  100%{opacity:1;transform:translateY(0) scale(1) rotate(0);}
+}
+@keyframes crownIdle{
+  0%,100%{transform:translateY(0);filter:drop-shadow(0 4px 20px rgba(245,158,11,.8));}
+  25%{transform:translateY(-9px);filter:drop-shadow(0 8px 28px rgba(245,158,11,1));}
+  50%{transform:translateY(0);filter:drop-shadow(0 4px 24px rgba(74,58,255,.7));}
+  75%{transform:translateY(-9px);filter:drop-shadow(0 8px 28px rgba(0,104,116,.75));}
+}
+.home-hero-crown{
+  font-size:4rem;display:inline-block;margin-bottom:.75rem;
+  animation:
+    royalEntrance .9s cubic-bezier(.36,.07,.19,.97) forwards,
+    crownIdle 4.5s ease-in-out .9s infinite;
+}
+.home-hero-title{font-size:.8rem;font-weight:700;color:var(--md-primary);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;}
+.home-hero-subtitle{font-size:2.4rem;font-weight:800;color:var(--md-on-surface);letter-spacing:-.02em;line-height:1.1;margin-bottom:1.25rem;font-style:normal;}
+.home-hero-intro{font-size:.92rem;color:var(--md-on-surface-variant);line-height:1.7;max-width:580px;margin:0 auto 1.5rem;font-weight:400;}
+.home-hero-badges{display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap;}
+.home-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--md-primary-container);border:1px solid var(--md-outline-variant);border-radius:var(--shape-full);padding:.4rem 1rem;font-size:.78rem;font-weight:600;color:var(--md-on-primary-container);letter-spacing:.02em;}
+.home-classes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;padding:1.75rem 1.5rem 0;max-width:1000px;margin:0 auto;}
+.home-class-card{background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);border:1px solid var(--md-outline-variant);box-shadow:var(--elev-2);overflow:hidden;transition:box-shadow .2s,transform .15s;cursor:pointer;display:flex;flex-direction:column;}
+.home-class-card:hover{box-shadow:var(--elev-3);transform:translateY(-2px);}
+.home-class-card.crowned{border:2px solid #F59E0B;animation:goldPulse 2s ease-in-out infinite alternate;}
+.home-card-header{background:linear-gradient(135deg,var(--md-primary),var(--md-secondary));padding:.9rem 1.25rem .8rem;display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;position:relative;overflow:hidden;}
+.home-class-card.crowned .home-card-header{background:linear-gradient(135deg,#78350F,#F59E0B,#EF4444,#8B5CF6);}
+.home-class-card.crowned .home-card-header::after{content:'';position:absolute;top:0;left:-70%;bottom:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:bannerShimmer 3s ease-in-out infinite;pointer-events:none;}
+/* Crowned body showcase */
+.home-champ-showcase{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #F59E0B;border-radius:var(--shape-xl);padding:1.1rem 1.25rem;margin-bottom:.9rem;position:relative;overflow:hidden;}
+.home-champ-showcase::after{content:'';position:absolute;top:0;left:-70%;bottom:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:bannerShimmer 3.5s ease-in-out 0.5s infinite;pointer-events:none;}
+.home-champ-showcase-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;gap:.5rem;}
+.home-champ-showcase-crown{font-size:4.5rem;flex-shrink:0;animation:crownFloat 2.2s ease-in-out infinite;filter:drop-shadow(0 4px 16px rgba(245,158,11,.7));line-height:1;}
+.home-champ-showcase-eyebrow{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#92400E;margin-bottom:.25rem;}
+.home-champ-showcase-name{font-size:1.55rem;font-weight:800;color:#78350F;line-height:1.15;}
+.home-champ-rounds{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.65rem;}
+.home-champ-round-chip{font-size:.6rem;font-weight:700;padding:.12rem .45rem;border-radius:var(--shape-full);background:#dcfce7;color:#166534;}
+.home-champ-main-pill{text-align:center;background:linear-gradient(135deg,#F59E0B,#EF4444);border-radius:var(--shape-lg);padding:.85rem 1rem;margin-bottom:.5rem;}
+.home-champ-main-pct{font-family:monospace;font-size:2.4rem;font-weight:800;color:#fff;line-height:1;}
+.home-champ-main-votes{font-size:.9rem;font-weight:600;color:rgba(255,255,255,.9);margin-top:.25rem;letter-spacing:.03em;}
+.home-champ-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem;}
+.home-champ-stat{text-align:center;background:rgba(245,158,11,.12);border-radius:var(--shape-md);padding:.4rem .3rem;}
+.home-champ-stat-num{font-family:monospace;font-size:1.1rem;font-weight:800;color:#92400E;}
+.home-champ-stat-label{font-size:.55rem;color:#B45309;text-transform:uppercase;letter-spacing:.06em;}
+.home-champ-cat-pill{font-size:.78rem;font-weight:700;color:var(--md-on-primary-container);background:var(--md-primary-container);border-radius:var(--shape-full);padding:.35rem 1rem;display:block;text-align:center;margin-bottom:.5rem;letter-spacing:.02em;}
+.home-champ-final{font-size:.72rem;color:#92400E;font-weight:600;background:rgba(239,68,68,.1);border-radius:var(--shape-sm);padding:.35rem .6rem;margin-bottom:.65rem;}
+/* Podium footer */
+.home-podium-footer{display:flex;gap:.5rem;padding:.85rem 1.25rem;border-top:1px solid #F59E0B;background:linear-gradient(135deg,#FEF3C7,#FDE68A);}
+.home-podium-item{flex:1;text-align:center;}
+.home-podium-medal{font-size:1.75rem;display:block;margin-bottom:.2rem;line-height:1;}
+.home-podium-place{font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#92400E;}
+.home-podium-name{font-size:.72rem;font-weight:600;color:#78350F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.home-card-name{font-size:1rem;font-weight:700;color:#fff;letter-spacing:-.01em;}
+.home-card-pct{font-size:.72rem;font-weight:500;color:rgba(255,255,255,.75);}
+/* Progress bar — moved to card body */
+.home-card-progress-wrap{padding:.9rem 1.25rem .5rem;}
+.home-card-progress-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem;}
+.home-card-progress-title{font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.home-card-progress-pct{font-family:monospace;font-size:.8rem;font-weight:800;color:var(--md-primary);}
+.home-card-progress{height:8px;background:var(--md-surface-container-highest);border-radius:var(--shape-full);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.1);}
+.home-card-bar{height:100%;background:linear-gradient(90deg,var(--md-primary),var(--md-secondary),#97F0FF);border-radius:var(--shape-full);transition:width .8s var(--motion-decel);box-shadow:0 0 6px rgba(74,58,255,.4);}
+.home-card-body{padding:1rem 1.25rem 1.25rem;flex:1;}
+.home-card-champ{display:flex;align-items:center;gap:.6rem;padding:.65rem .85rem;border-radius:var(--shape-lg);background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:1px solid #F59E0B;margin-bottom:.9rem;}
+.home-card-champ-icon{font-size:1.4rem;}
+.home-card-champ-label{font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#92400E;margin-bottom:.1rem;}
+.home-card-champ-name{font-size:.9rem;font-weight:700;color:#78350F;line-height:1.2;}
+.home-card-champ-name.empty{font-size:.8rem;font-weight:400;font-style:italic;color:#B45309;}
+.home-card-section-label{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;}
+.home-card-section-label::after{content:'';flex:1;height:1px;background:var(--md-outline-variant);}
+.home-poem-row{display:flex;align-items:center;gap:.6rem;padding:.4rem .5rem;border-radius:var(--shape-sm);margin-bottom:.25rem;}
+.home-poem-row.alive{background:var(--md-primary-container);}
+.home-poem-rank{font-family:monospace;font-size:.65rem;font-weight:700;color:var(--md-on-surface-variant);min-width:1.2rem;text-align:center;flex-shrink:0;}
+.home-poem-row.alive .home-poem-rank{color:var(--md-primary);}
+.home-poem-name{flex:1;font-size:.82rem;font-weight:500;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.home-poem-row.alive .home-poem-name{color:var(--md-on-primary-container);font-weight:700;}
+.home-poem-pct{font-family:monospace;font-size:.72rem;font-weight:700;color:var(--md-primary);flex-shrink:0;}
+.home-card-waiting{text-align:center;padding:1.5rem 1rem;color:var(--md-on-surface-variant);}
+.home-card-waiting-icon{font-size:2rem;margin-bottom:.5rem;}
+.home-card-waiting-text{font-size:.88rem;font-weight:500;color:var(--md-on-surface-variant);margin-bottom:.2rem;}
+.home-card-waiting-sub{font-size:.72rem;color:var(--md-outline);}
+.home-card-footer{display:flex;gap:.5rem;padding:.75rem 1.25rem;border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container-low);}
+.home-card-stat{flex:1;text-align:center;}
+.home-card-stat-num{font-family:monospace;font-size:1.1rem;font-weight:800;color:var(--md-primary);}
+.home-card-stat-label{font-size:.6rem;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.06em;}
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas>
+<div class="m3-snackbar" id="snackbar"></div>
+
+<div class="app-bar">
+  <div class="app-bar-inner">
+    <div>
+      <div class="app-bar-title"><span style="color:var(--md-on-surface)">Bracket Wars</span><span style="color:var(--md-outline-variant);font-weight:300;margin:0 .35rem">·</span><span style="font-weight:400;font-style:italic">Poetry Madness</span></div>
+      <div class="app-bar-subtitle">FGHS · English 1 · Mr. Sun</div>
+    </div>
+    <div class="app-bar-actions" id="appBarActions"></div>
+  </div>
+</div>
+
+<div id="contentCard" style="background:#ffffff;border-radius:0 0 40px 40px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.1);margin:0 0 1.5rem 0;">
+<div class="tabs-surface"><div class="tabs-row" id="classTabs"></div></div>
+<div class="combined-bar" id="secondaryToolbar">
+  <div class="combined-bar-inner">
+    <div class="toolbar-status-stack">
+      <span class="status-label" id="statusLabel">—</span>
+      <div class="toolbar-progress-track">
+        <div class="progress-indicator" id="progressBar" style="width:0%"></div>
+      </div>
+      <span class="toolbar-pct-label" id="progressPct">0% complete</span>
+    </div>
+    <div id="teacherActions"></div>
+    <div class="seg-btn-track" id="viewToggle" style="display:none">
+      <button class="seg-btn active" id="btnHome" onclick="setView('home')"><span class="nav-icon">🏠</span> Home</button>
+      <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
+      <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
+      <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
+    </div>
+  </div>
+</div>
+
+<div id="homeView" style="display:none"><div class="home-view" id="homeContent"></div></div>
+<div id="leaderboardView" style="display:none"><div class="leaderboard-view" id="lbContent"></div></div>
+<div id="listView" style="display:none"><div class="list-view" id="listContent"></div></div>
+<div id="bracketView" style="display:none"><div class="bracket-scroll"><div class="mm-bracket" id="bracket"></div></div></div>
+</div>
+
+<!-- PASSWORD DIALOG -->
+<div class="dialog-scrim" id="passwordDialog">
+  <div class="dialog" style="max-width:360px;text-align:center">
+    <div class="pw-lock">🔒</div>
+    <div class="dialog-headline" style="text-align:center">Teacher Access</div>
+    <div class="dialog-body" style="text-align:center">Enter your password to access the teacher controls.</div>
+    <div class="m3-field" style="margin-bottom:.25rem"><input type="password" id="passwordInput" placeholder=" "><label>Password</label></div>
+    <div class="m3-field-error" id="passwordError">Incorrect password. Please try again.</div>
+    <div style="margin-bottom:1.25rem"></div>
+    <div class="dialog-actions" style="justify-content:center;gap:.75rem">
+      <button class="btn-outlined" onclick="cancelPassword()">Student View</button>
+      <button class="btn-filled" onclick="submitPassword()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- VOTE DIALOG -->
+<div class="dialog-scrim" id="voteDialog">
+  <div class="dialog">
+    <div class="dialog-eyebrow" id="voteEyebrow"></div>
+    <div class="dialog-headline">Record Votes</div>
+    <div class="vs-row">
+      <div class="vs-card" id="vsCardA" onclick="selectWinner(0)"><div class="vs-card-name" id="vsNameA">—</div><div class="vs-card-seed" id="vsSeedA"></div></div>
+      <div class="vs-divider">vs</div>
+      <div class="vs-card" id="vsCardB" onclick="selectWinner(1)"><div class="vs-card-name" id="vsNameB">—</div><div class="vs-card-seed" id="vsSeedB"></div></div>
+    </div>
+    <div class="vote-fields">
+      <div>
+        <div class="vote-field-label" id="voteLabelA">Number of Votes:</div>
+        <div class="m3-field"><input type="number" id="voteA" min="0" placeholder=" " oninput="syncVoteWinner()"><label></label></div>
+      </div>
+      <div>
+        <div class="vote-field-label" id="voteLabelB">Number of Votes:</div>
+        <div class="m3-field"><input type="number" id="voteB" min="0" placeholder=" " oninput="syncVoteWinner()"><label></label></div>
+      </div>
+    </div>
+    <div class="m3-field-error" id="voteError">Please select a winner and enter vote counts.</div>
+    <div class="dialog-actions">
+      <button class="btn-text" onclick="closeVoteDialog()">Cancel</button>
+      <button class="btn-filled" onclick="saveMatchup()">Save Result</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP DIALOG -->
+<div class="dialog-scrim" id="setupDialog">
+  <div class="dialog" style="max-width:500px">
+    <div class="dialog-headline" id="setupHeadline">Edit Poems</div>
+    <div class="setup-grid" id="setupInputs"></div>
+    <div class="dialog-actions">
+      <button class="btn-text" onclick="closeSetup()">Cancel</button>
+      <button class="btn-filled" onclick="saveSetup()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENAME DIALOG -->
+<div class="dialog-scrim" id="renameDialog">
+  <div class="dialog" style="max-width:360px">
+    <div class="dialog-headline" id="renameHeadline">Rename Class</div>
+    <div class="m3-field"><input type="text" id="classNameInput" maxlength="40" placeholder=" "><label>Class name</label></div>
+    <div class="dialog-actions">
+      <button class="btn-text" onclick="closeRename()">Cancel</button>
+      <button class="btn-filled" onclick="saveRename()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CLASS DIALOG -->
+<div class="dialog-scrim" id="addClassDialog">
+  <div class="dialog" style="max-width:360px">
+    <div class="dialog-headline">Add Class</div>
+    <div class="m3-field"><input type="text" id="newClassInput" maxlength="40" placeholder=" "><label>Class name</label></div>
+    <div class="dialog-actions">
+      <button class="btn-text" onclick="closeAddClass()">Cancel</button>
+      <button class="btn-filled" onclick="saveAddClass()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESET DIALOG -->
+<div class="dialog-scrim" id="resetDialog">
+  <div class="dialog" style="max-width:360px">
+    <div class="dialog-icon">⚠️</div>
+    <div class="dialog-headline" id="resetHeadline">Reset bracket?</div>
+    <div class="dialog-body">All vote results will be cleared. Poem names will be kept. This cannot be undone.</div>
+    <div class="dialog-actions">
+      <button class="btn-text" onclick="closeReset()">Cancel</button>
+      <button class="btn-filled" style="background:var(--md-error)" onclick="doReset()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'bracket-wars-v1';
+const CORRECT_PASSWORD = 'fghs2025';
+let teacherUnlocked = false, MODE = 'student', currentView = 'home';
+
+const CATEGORIES = [
+  {name:'A — Growing Up',       seeds:[0,1,2,3],  bg:'var(--cat-a-seed)'},
+  {name:'B — Identity & Resilience', seeds:[4,5,6,7], bg:'var(--cat-b-seed)'},
+  {name:'C — Seeing the World Differently', seeds:[8,9,10,11], bg:'var(--cat-c-seed)'},
+  {name:'D — Power & Society',  seeds:[12,13,14,15], bg:'var(--cat-d-seed)'},
+];
+const DEFAULT_POEMS = [
+  'Oranges','Hanging Fire','Nothing Gold Can Stay','Hope Is the Thing with Feathers',
+  'Still I Rise','The Rose That Grew from Concrete','I, Too','Women',
+  'Famous','Wild Geese','Wind, Water, Stone','The Peace of Wild Things',
+  'Touchscreen','Knock Knock','The Dictator','A Poison Tree',
+];
+
+function defaultBracket() {
+  return {
+    poems: [...DEFAULT_POEMS],
+    regionRounds: [
+      [{winnerIdx:null,votes:[null,null]},{winnerIdx:null,votes:[null,null]},{winnerIdx:null,votes:[null,null]}],
+      [{winnerIdx:null,votes:[null,null]},{winnerIdx:null,votes:[null,null]},{winnerIdx:null,votes:[null,null]}],
+      [{winnerIdx:null,votes:[null,null]},{winnerIdx:null,votes:[null,null]},{winnerIdx:null,votes:[null,null]}],
+      [{winnerIdx:null,votes:[null,null]},{winnerIdx:null,votes:[null,null]},{winnerIdx:null,votes:[null,null]}],
+    ],
+    semis: [{winnerIdx:null,votes:[null,null]},{winnerIdx:null,votes:[null,null]}],
+    final: {winnerIdx:null,votes:[null,null]},
+  };
+}
+function uid() { return Math.random().toString(36).slice(2,10); }
+function defaultAppState() {
+  const s = {classes:[{id:uid(),name:'Block 1',bracket:defaultBracket()},{id:uid(),name:'Block 2',bracket:defaultBracket()}],activeId:null};
+  s.activeId = s.classes[0].id;
+  return s;
+}
+
+let app = defaultAppState();
+
+function saveApp() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(app)); } catch(e) {}
+}
+function loadApp() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p?.classes?.length) { if (!p.activeId) p.activeId = p.classes[0].id; return p; }
+    }
+  } catch(e) {}
+  return defaultAppState();
+}
+
+function activeClass() { return app.classes.find(c => c.id === app.activeId) || app.classes[0]; }
+function bkt() { return activeClass().bracket; }
+
+function r1Poem(ri,mi,slot) { const cat=CATEGORIES[ri],pairs=[[0,1],[2,3]],si=cat.seeds[pairs[mi][slot]]; return {name:bkt().poems[si],seed:si+1,seedIdx:si}; }
+function qfPoem(ri,slot) { const r=bkt().regionRounds[ri][slot]; if(r.winnerIdx===null)return null; return r1Poem(ri,slot,r.winnerIdx); }
+function regionWinner(ri) { const q=bkt().regionRounds[ri][2]; if(q.winnerIdx===null)return null; return qfPoem(ri,q.winnerIdx); }
+function semiPoem(si,slot) { return regionWinner(si===0?[0,2][slot]:[1,3][slot]); }
+function finalPoem(slot) { const s=bkt().semis[slot]; if(s.winnerIdx===null)return null; return semiPoem(slot,s.winnerIdx); }
+function champion() { const f=bkt().final; if(f.winnerIdx===null)return null; return finalPoem(f.winnerIdx); }
+function isRegionDone(ri) { return bkt().semis[ri<=1?0:1].winnerIdx!==null; }
+function isSemiDone() { return bkt().final.winnerIdx!==null; }
+
+// ── Password ──
+function submitPassword() {
+  if (document.getElementById('passwordInput').value === CORRECT_PASSWORD) {
+    teacherUnlocked = true;
+    document.getElementById('passwordDialog').classList.remove('open');
+    setMode('teacher');
+  } else {
+    document.getElementById('passwordError').classList.add('show');
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordInput').focus();
+  }
+}
+function cancelPassword() { document.getElementById('passwordDialog').classList.remove('open'); setMode('student'); }
+function requestTeacherMode() {
+  if (teacherUnlocked) { setMode('teacher'); return; }
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('passwordError').classList.remove('show');
+  document.getElementById('passwordDialog').classList.add('open');
+  setTimeout(() => document.getElementById('passwordInput').focus(), 120);
+}
+document.getElementById('passwordInput').addEventListener('keydown', e => { if(e.key==='Enter') submitPassword(); });
+
+function setMode(m) {
+  MODE = m;
+  buildAppBar();
+  document.getElementById('secondaryToolbar').style.display = MODE==='student' ? 'block' : 'block';
+  if (MODE === 'student') {
+    document.getElementById('viewToggle').style.display = 'flex';
+    showCurrentView();
+  } else {
+    document.getElementById('viewToggle').style.display = 'none';
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('leaderboardView').style.display = 'none';
+    document.getElementById('listView').style.display = 'none';
+    document.getElementById('bracketView').style.display = 'block';
+  }
+  renderAll();
+}
+
+function setView(v) {
+  currentView = v;
+  ['home','leaderboard','list','bracket'].forEach(x => {
+    const el = document.getElementById('btn'+x.charAt(0).toUpperCase()+x.slice(1));
+    if (el) el.classList.toggle('active', v===x);
+  });
+  showCurrentView();
+}
+function showCurrentView() {
+  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView'};
+  Object.entries(views).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    if (key === currentView) {
+      el.style.display = 'block';
+      el.classList.remove('view-fade-in');
+      void el.offsetWidth; // reflow to restart animation
+      el.classList.add('view-fade-in');
+    } else {
+      el.style.display = 'none';
+    }
+  });
+  if (currentView==='home') renderHome();
+  if (currentView==='leaderboard') renderLeaderboard();
+}
+
+function renderHome() {
+  const el = document.getElementById('homeContent'); if (!el) return; el.innerHTML = '';
+
+  // Hero
+  const hero = document.createElement('div'); hero.className = 'home-hero';
+  hero.innerHTML = `
+    <div class="home-hero-crown">👑</div>
+    <div class="home-hero-title">Bracket Wars</div>
+    <div class="home-hero-subtitle">The Crown Is Up for Grabs</div>
+    <div class="home-hero-intro">
+      16 poems. One crown. Every verse will battle its way through four rounds of class votes —
+      from the Round of 16 all the way to the Championship Final. Which poem has what it takes
+      to outlast the competition and claim the crown? Watch the standings shift in real time
+      as Mr. Sun records each round. Your voice shapes the bracket.
+    </div>
+    <div class="home-hero-badges">
+      <div class="home-badge">📖 16 Poems</div>
+      <div class="home-badge">⚔️ 15 Matchups</div>
+      <div class="home-badge">👑 1 Champion</div>
+      <div class="home-badge">🔥 4 Rounds</div>
+    </div>`;
+  el.appendChild(hero);
+  // Class cards
+  const grid = document.createElement('div'); grid.className = 'home-classes';
+
+  app.classes.forEach(cls => {
+    const b = cls.bracket;
+    // Compute stats
+    let done = 0, total = 0;
+    b.regionRounds.forEach(reg => reg.forEach(m => { total++; if (m.winnerIdx !== null) done++; }));
+    b.semis.forEach(m => { total++; if (m.winnerIdx !== null) done++; });
+    total++; if (b.final.winnerIdx !== null) done++;
+    const pct = Math.round((done / total) * 100);
+
+    // Get alive poems for this class
+    const results = b.poems.map((_, idx) => {
+      // temporarily swap bkt() context by computing directly
+      const cat = CATEGORIES.find(c => c.seeds.includes(idx));
+      const ri = CATEGORIES.indexOf(cat);
+      const posInCat = cat.seeds.indexOf(idx);
+      const pairs = [[0,1],[2,3]];
+      const mi = pairs[0].includes(posInCat) ? 0 : 1;
+      const slot = pairs[mi].indexOf(posInCat);
+      let roundsWon = 0, totalVotes = 0, totalMatchVotes = 0;
+      const r1m = b.regionRounds[ri][mi];
+      if (r1m.winnerIdx === null) return {name:b.poems[idx],status:'pending',roundsWon:0,totalVotes:0,totalMatchVotes:0};
+      totalVotes += r1m.votes[slot]||0; totalMatchVotes += (r1m.votes[0]||0)+(r1m.votes[1]||0);
+      if (r1m.winnerIdx !== slot) return {name:b.poems[idx],status:'eliminated',roundsWon:0,totalVotes,totalMatchVotes};
+      roundsWon = 1;
+      const qfm = b.regionRounds[ri][2];
+      if (qfm.winnerIdx === null) return {name:b.poems[idx],status:'alive',roundsWon,totalVotes,totalMatchVotes};
+      totalVotes += qfm.votes[mi]||0; totalMatchVotes += (qfm.votes[0]||0)+(qfm.votes[1]||0);
+      if (qfm.winnerIdx !== mi) return {name:b.poems[idx],status:'eliminated',roundsWon,totalVotes,totalMatchVotes};
+      roundsWon = 2;
+      const semiIdx = ri<=1?0:1, semiSlot = ri===0||ri===2?0:1, sm = b.semis[semiIdx];
+      if (sm.winnerIdx === null) return {name:b.poems[idx],status:'alive',roundsWon,totalVotes,totalMatchVotes};
+      totalVotes += sm.votes[semiSlot]||0; totalMatchVotes += (sm.votes[0]||0)+(sm.votes[1]||0);
+      if (sm.winnerIdx !== semiSlot) return {name:b.poems[idx],status:'eliminated',roundsWon,totalVotes,totalMatchVotes};
+      roundsWon = 3;
+      const fm = b.final, fSlot = semiIdx;
+      if (fm.winnerIdx === null) return {name:b.poems[idx],status:'alive',roundsWon,totalVotes,totalMatchVotes};
+      totalVotes += fm.votes[fSlot]||0; totalMatchVotes += (fm.votes[0]||0)+(fm.votes[1]||0);
+      if (fm.winnerIdx !== fSlot) return {name:b.poems[idx],status:'eliminated',roundsWon,totalVotes,totalMatchVotes};
+      return {name:b.poems[idx],status:'champion',roundsWon:4,totalVotes,totalMatchVotes};
+    });
+
+    const champPoem = results.find(r => r.status === 'champion');
+    const alivePoems = results.filter(r => r.status === 'alive' || r.status === 'champion')
+      .sort((a,b2) => b2.roundsWon - a.roundsWon || b2.totalVotes - a.totalVotes)
+      .slice(0, 5);
+    const aliveCount = results.filter(r => r.status === 'alive' || r.status === 'champion').length;
+    const elimCount = results.filter(r => r.status === 'eliminated').length;
+    const anyPlayed = results.some(r => r.status !== 'pending');
+    // Runner-up and 3rd place
+    const runnerUp = results.find(r => r.status === 'eliminated' && r.roundsWon === 3);
+    const thirdPlaces = results.filter(r => r.status === 'eliminated' && r.roundsWon === 2);
+
+    const card = document.createElement('div');
+    card.className = 'home-class-card' + (champPoem ? ' crowned' : '');
+    card.onclick = () => { app.activeId = cls.id; setView('leaderboard'); renderAll(); };
+
+    // Header
+    // Header — block name + status chip
+    const hdr = document.createElement('div'); hdr.className = 'home-card-header';
+    const statusLabel = champPoem ? 'Champion Crowned' : (anyPlayed ? 'In Progress' : 'Tournament Starting Soon');
+    hdr.innerHTML = `<div class="home-card-name">${esc(cls.name)}</div><div class="home-card-pct">${statusLabel}</div>`;
+    card.appendChild(hdr);
+
+    // Body
+    const body = document.createElement('div'); body.className = 'home-card-body';
+
+    // Progress bar — inside body at top
+    if (!champPoem) {
+      const progWrap = document.createElement('div'); progWrap.className = 'home-card-progress-wrap';
+      progWrap.innerHTML = `<div class="home-card-progress-label"><span class="home-card-progress-title">Tournament Progress</span><span class="home-card-progress-pct">${pct}%</span></div><div class="home-card-progress"><div class="home-card-bar" style="width:${pct}%"></div></div>`;
+      body.appendChild(progWrap);
+    }
+
+    if (champPoem) {
+      // === CROWNED STATE ===
+      // Get full stats for champion
+      const champIdx = b.poems.indexOf(champPoem.name);
+      const champFull = computePoemStatus(champIdx, b);
+      const champPct = champFull.totalMatchVotes > 0 ? Math.round((champFull.totalVotes / champFull.totalMatchVotes) * 100) : 0;
+      const showcase = document.createElement('div'); showcase.className = 'home-champ-showcase';
+      // Crown + name
+      showcase.innerHTML = `<div class="home-champ-showcase-header"><div><div class="home-champ-showcase-eyebrow">Poetry Champion</div><div class="home-champ-showcase-name">${esc(champPoem.name)}</div></div><div class="home-champ-showcase-crown">👑</div></div>`;
+      // Round chips
+      const roundRow = document.createElement('div'); roundRow.className = 'home-champ-rounds';
+      champFull.rounds.forEach(rnd => {
+        const c = document.createElement('span'); c.className = 'home-champ-round-chip';
+        c.textContent = '✓ ' + rnd.label; roundRow.appendChild(c);
+      });
+      showcase.appendChild(roundRow);
+      // Stats grid — all candidate stats for testing
+      const wonRounds = champFull.rounds.filter(r=>r.result==='won');
+      const roundPcts = wonRounds.map(r=>r.myVotes+r.oppVotes>0?Math.round(r.myVotes/(r.myVotes+r.oppVotes)*100):0);
+      const closestCall = roundPcts.length ? Math.min(...roundPcts) : null;
+      const biggestWin = roundPcts.length ? Math.max(...roundPcts) : null;
+      const finalRound = champFull.rounds[champFull.rounds.length-1];
+      const finalMargin = finalRound ? finalRound.myVotes - finalRound.oppVotes : null;
+      const champCat = CATEGORIES.find(c=>c.seeds.includes(champIdx));
+      const catShort = champCat ? champCat.name.replace(/^[A-D] — /,'') : '';
+      // Category pill (above vote pill)
+      if (catShort) {
+        const catPill = document.createElement('div'); catPill.className = 'home-champ-cat-pill';
+        catPill.innerHTML = `<span style="opacity:.7">Category · </span>${esc(catShort)}`;
+        showcase.appendChild(catPill);
+      }
+      // Combined vote pill
+      const mainPill = document.createElement('div'); mainPill.className = 'home-champ-main-pill';
+      mainPill.innerHTML = `<div class="home-champ-main-pct">${champPct}%</div><div class="home-champ-main-votes">${champFull.totalVotes} total votes</div>`;
+      showcase.appendChild(mainPill);
+      // Sub-stats row
+      const statsDiv = document.createElement('div'); statsDiv.className = 'home-champ-stats';
+      statsDiv.innerHTML = `
+        ${closestCall!==null?`<div class="home-champ-stat"><div class="home-champ-stat-num">${closestCall}%</div><div class="home-champ-stat-label">Closest Call</div></div>`:''}
+        ${biggestWin!==null?`<div class="home-champ-stat"><div class="home-champ-stat-num">${biggestWin}%</div><div class="home-champ-stat-label">Biggest Win</div></div>`:''}
+        ${finalMargin!==null?`<div class="home-champ-stat"><div class="home-champ-stat-num">+${finalMargin}</div><div class="home-champ-stat-label">Final Margin</div></div>`:''}`;
+      showcase.appendChild(statsDiv);
+      // Final opponent
+      if (runnerUp) {
+        const finalDiv = document.createElement('div'); finalDiv.className = 'home-champ-final';
+        finalDiv.textContent = '⚔️ Beat in Final: ' + esc(runnerUp.name); showcase.appendChild(finalDiv);
+      }
+      body.appendChild(showcase);
+    } else {
+      // === IN-PROGRESS STATE ===
+      const champDiv = document.createElement('div'); champDiv.className = 'home-card-champ';
+      champDiv.innerHTML = `<div class="home-card-champ-icon">👑</div><div><div class="home-card-champ-label">Poetry Champion</div><div class="home-card-champ-name empty">To be decided…</div></div>`;
+      body.appendChild(champDiv);
+      if (anyPlayed && alivePoems.length > 0) {
+        const lbl = document.createElement('div'); lbl.className = 'home-card-section-label';
+        lbl.textContent = '🔥 Still Alive'; body.appendChild(lbl);
+        alivePoems.forEach((r, i) => {
+          const row = document.createElement('div'); row.className = 'home-poem-row alive';
+          const votePct = r.totalMatchVotes > 0 ? Math.round((r.totalVotes / r.totalMatchVotes) * 100) + '%' : '';
+          row.innerHTML = `<div class="home-poem-rank">${i+1}</div><div class="home-poem-name">${esc(r.name)}</div>${votePct ? `<div class="home-poem-pct">${votePct}</div>` : ''}`;
+          body.appendChild(row);
+        });
+      } else if (!anyPlayed) {
+        const w = document.createElement('div'); w.className = 'home-card-waiting';
+        w.innerHTML = '<div class="home-card-waiting-icon">🎯</div><div class="home-card-waiting-text">Tournament Starting Soon</div><div class="home-card-waiting-sub">Mr. Sun will kick things off shortly</div>'; body.appendChild(w);
+      }
+    }
+
+    card.appendChild(body);
+
+    // Footer
+    let footer;
+    if (champPoem && (runnerUp || thirdPlaces.length)) {
+      footer = document.createElement('div'); footer.className = 'home-podium-footer';
+      if (runnerUp) footer.innerHTML += `<div class="home-podium-item"><span class="home-podium-medal">🥈</span><div class="home-podium-place">2nd Place</div><div class="home-podium-name">${esc(runnerUp.name)}</div></div>`;
+      thirdPlaces.slice(0,2).forEach(p => { footer.innerHTML += `<div class="home-podium-item"><span class="home-podium-medal">🥉</span><div class="home-podium-place">3rd Place</div><div class="home-podium-name">${esc(p.name)}</div></div>`; });
+    } else {
+      footer = document.createElement('div'); footer.className = 'home-card-footer';
+      footer.innerHTML = `
+        <div class="home-card-stat"><div class="home-card-stat-num">${aliveCount}</div><div class="home-card-stat-label">Still Alive</div></div>
+        <div class="home-card-stat"><div class="home-card-stat-num">${elimCount}</div><div class="home-card-stat-label">Eliminated</div></div>
+        <div class="home-card-stat"><div class="home-card-stat-num">${done}/${total}</div><div class="home-card-stat-label">Matchups Done</div></div>`;
+    }
+    card.appendChild(footer);
+
+    grid.appendChild(card);
+  });
+
+  el.appendChild(grid);
+}
+
+function buildAppBar() {
+  const el = document.getElementById('appBarActions'); el.innerHTML = '';
+  if (MODE === 'teacher') {
+    [{label:'Rename',fn:'openRenameClass()'},{label:'Edit Poems',fn:'openSetup()'},{label:'Reset',fn:'openReset()',danger:true}].forEach(a => {
+      const b = document.createElement('button'); b.className='btn-text';
+      if(a.danger) b.style.color='var(--md-error)';
+      b.textContent=a.label; b.setAttribute('onclick',a.fn); el.appendChild(b);
+    });
+    const b = document.createElement('button'); b.className='btn-tonal'; b.innerHTML='👁 Student View'; b.onclick=()=>setMode('student'); el.appendChild(b);
+  } else {
+    const chip = document.createElement('div'); chip.className='live-chip'; chip.innerHTML='<div class="live-dot"></div>Live'; el.appendChild(chip);
+    const b = document.createElement('button'); b.className='btn-tonal'; b.innerHTML='✎ Teacher'; b.onclick=requestTeacherMode; el.appendChild(b);
+  }
+}
+
+function buildSecondaryToolbar() {
+  // Teacher controls moved to app bar; no-op
+}
+
+function renderAll() { renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); updateStatus(); }
+
+function renderTabs() {
+  const bar = document.getElementById('classTabs'); bar.innerHTML = '';
+  app.classes.forEach((cls, ci) => {
+    const tab = document.createElement('button'); tab.className='m3-tab'+(cls.id===app.activeId?' active':'');
+    const dot = document.createElement('span'); dot.className='tab-indicator'; if(cls.bracket.final.winnerIdx!==null) dot.classList.add('show');
+    tab.appendChild(dot); tab.appendChild(document.createTextNode(cls.name));
+    tab.onclick = e => {
+      if(e.target.classList.contains('tab-close'))return;
+      if(app.activeId===cls.id)return;
+      const card=document.getElementById('contentCard');
+      card.classList.add('content-switching');
+      setTimeout(()=>{
+        app.activeId=cls.id;
+        if(MODE==='teacher')saveApp();
+        renderAll();
+        card.classList.remove('content-switching');
+        card.classList.add('content-entering');
+        setTimeout(()=>card.classList.remove('content-entering'),250);
+      },150);
+    };
+    if (MODE==='teacher' && app.classes.length>1) {
+      const x = document.createElement('span'); x.textContent='×'; x.style.cssText='margin-left:.3rem;font-size:1rem;opacity:.5;line-height:1;'; x.className='tab-close';
+      x.onclick = ev => { ev.stopPropagation(); confirmDeleteClass(cls.id); }; tab.appendChild(x);
+    }
+    bar.appendChild(tab);
+  });
+  if (MODE==='teacher') {
+    const add = document.createElement('button'); add.className='add-tab-btn'; add.textContent='+ Add Class'; add.onclick=openAddClass; bar.appendChild(add);
+  }
+}
+
+function updateStatus() {
+  let done=0, total=0; const b=bkt();
+  b.regionRounds.forEach(reg=>reg.forEach(m=>{total++;if(m.winnerIdx!==null)done++;}));
+  b.semis.forEach(m=>{total++;if(m.winnerIdx!==null)done++;}); total++; if(b.final.winnerIdx!==null)done++;
+  document.getElementById('progressBar').style.width=Math.round((done/total)*100)+'%';
+  document.getElementById('progressPct').textContent=Math.round((done/total)*100)+'% complete';
+  const champ=champion();
+  document.getElementById('statusLabel').textContent = done===total ? `👑 Poetry Champion: ${champ?champ.name:''}` :
+    done===0 ? (MODE==='teacher'?`Tap a matchup to record votes`:`Tournament starting soon`) :
+    `${done} of ${total} matchups complete`;
+}
+
+function renderLeaderboard() {
+  const el=document.getElementById('lbContent'); if(!el||!activeClass())return; el.innerHTML='';
+  const b=bkt(), results=b.poems.map((_,idx)=>computePoemStatus(idx,b));
+  const sortByPct=(a,b2)=>{
+    if(a.status==='champion')return -1; if(b2.status==='champion')return 1;
+    const pA=a.totalMatchVotes>0?a.totalVotes/a.totalMatchVotes:0, pB=b2.totalMatchVotes>0?b2.totalVotes/b2.totalMatchVotes:0;
+    return pB!==pA?pB-pA:b2.roundsWon-a.roundsWon;
+  };
+  const champ=champion();
+  const banner=document.createElement('div');banner.className='lb-champion-banner'+(champ?' crowned':'');
+  banner.innerHTML=`<div class="lb-champ-trophy">${champ?'👑':'⏳'}</div><div style="min-width:0"><div class="lb-champ-eyebrow">${champ?'🥇 Poetry Champion · 1st Place':'Tournament in Progress'}</div><div class="lb-champ-name${champ?'':' empty'}">${champ?esc(champ.name):'Who will be crowned?'}</div>${champ?'<div class="lb-champ-sub">Undefeated · Last poem standing · The Crown</div>':''}</div>`;
+  el.appendChild(banner);
+  if(!results.some(r=>r.status!=='pending')){const w=document.createElement('div');w.className='lb-waiting';w.innerHTML='<div class="lb-waiting-icon">🎯</div>Tournament hasn\'t started yet.<br>Check back soon!';el.appendChild(w);return;}
+  const getPlacement=r=>{if(r.status==='champion')return '1st';if(r.status==='eliminated'&&r.roundsWon===3)return '2nd';if(r.status==='eliminated'&&r.roundsWon===2)return '3rd';return null;};
+  const alive=results.filter(r=>r.status==='alive'||r.status==='champion').sort(sortByPct);
+  const elim=results.filter(r=>r.status==='eliminated').sort(sortByPct);
+  const pend=results.filter(r=>r.status==='pending');
+  const maxV=Math.max(...results.map(r=>r.totalVotes),1);
+  let rank=1;
+  if(alive.length){const l=document.createElement('div');l.className='lb-section-label';l.innerHTML=`🔥 Still Alive <span style="background:var(--md-primary);color:var(--md-on-primary);border-radius:var(--shape-full);padding:.1rem .5rem;font-size:.65rem">${alive.length}</span>`;el.appendChild(l);alive.forEach(r=>el.appendChild(buildLbRow(r,rank++,maxV,b,getPlacement(r))));}
+  if(elim.length){const l=document.createElement('div');l.className='lb-section-label';l.innerHTML=`💀 Eliminated <span style="background:var(--md-surface-container-highest);color:var(--md-on-surface-variant);border-radius:var(--shape-full);padding:.1rem .5rem;font-size:.65rem">${elim.length}</span>`;el.appendChild(l);elim.forEach(r=>el.appendChild(buildLbRow(r,rank++,maxV,b,getPlacement(r))));}
+  if(pend.length){const l=document.createElement('div');l.className='lb-section-label';l.textContent='⏳ Yet to Play';el.appendChild(l);pend.forEach(r=>el.appendChild(buildLbRow(r,rank++,maxV,b,getPlacement(r))));}
+}
+
+function computePoemStatus(idx,b) {
+  const name=b.poems[idx]; let roundsWon=0,totalVotes=0,totalMatchVotes=0;
+  const rounds=[]; let killedByIdx=null;
+  const cat=CATEGORIES.find(c=>c.seeds.includes(idx)),ri=CATEGORIES.indexOf(cat),posInCat=cat.seeds.indexOf(idx);
+  const pairs=[[0,1],[2,3]],mi=pairs[0].includes(posInCat)?0:1,slot=pairs[mi].indexOf(posInCat);
+  const oppR16Idx=CATEGORIES[ri].seeds[pairs[mi][1-slot]];
+  // R16
+  const r1m=b.regionRounds[ri][mi];
+  if(r1m.winnerIdx===null)return{name,idx,status:'pending',roundsWon:0,totalVotes:0,totalMatchVotes:0,rounds:[],killedByIdx:null};
+  const myR16=r1m.votes[slot]||0,oppR16=r1m.votes[1-slot]||0;
+  totalVotes+=myR16;totalMatchVotes+=myR16+oppR16;
+  const r16Won=r1m.winnerIdx===slot;
+  rounds.push({label:'R16',result:r16Won?'won':'lost',myVotes:myR16,oppVotes:oppR16});
+  if(!r16Won){killedByIdx=oppR16Idx;return{name,idx,status:'eliminated',roundsWon:0,totalVotes,totalMatchVotes,rounds,killedByIdx};}
+  roundsWon=1;
+  // QF
+  const oppQFR1=b.regionRounds[ri][1-mi];
+  const oppQFIdx=oppQFR1.winnerIdx!==null?CATEGORIES[ri].seeds[pairs[1-mi][oppQFR1.winnerIdx]]:null;
+  const qfm=b.regionRounds[ri][2];
+  if(qfm.winnerIdx===null)return{name,idx,status:'alive',roundsWon,totalVotes,totalMatchVotes,rounds,killedByIdx:null};
+  const myQF=qfm.votes[mi]||0,oppQF=qfm.votes[1-mi]||0;
+  totalVotes+=myQF;totalMatchVotes+=myQF+oppQF;
+  const qfWon=qfm.winnerIdx===mi;
+  rounds.push({label:'QF',result:qfWon?'won':'lost',myVotes:myQF,oppVotes:oppQF});
+  if(!qfWon){killedByIdx=oppQFIdx;return{name,idx,status:'eliminated',roundsWon,totalVotes,totalMatchVotes,rounds,killedByIdx};}
+  roundsWon=2;
+  // SF — fixed: semiIdx=ri%2, semiSlot=ri<=1?0:1
+  const semiIdx=ri%2,semiSlot=ri<=1?0:1,oppSemiSlot=1-semiSlot;
+  const sfRegions=semiIdx===0?[0,2]:[1,3],oppSFRegion=sfRegions[oppSemiSlot];
+  const oppSFQF=b.regionRounds[oppSFRegion][2];
+  let oppSFIdx=null;
+  if(oppSFQF.winnerIdx!==null){const oMI=oppSFQF.winnerIdx,oR1=b.regionRounds[oppSFRegion][oMI];if(oR1.winnerIdx!==null)oppSFIdx=CATEGORIES[oppSFRegion].seeds[pairs[oMI][oR1.winnerIdx]];}
+  const sm=b.semis[semiIdx];
+  if(sm.winnerIdx===null)return{name,idx,status:'alive',roundsWon,totalVotes,totalMatchVotes,rounds,killedByIdx:null};
+  const mySF=sm.votes[semiSlot]||0,oppSF=sm.votes[oppSemiSlot]||0;
+  totalVotes+=mySF;totalMatchVotes+=mySF+oppSF;
+  const sfWon=sm.winnerIdx===semiSlot;
+  rounds.push({label:'SF',result:sfWon?'won':'lost',myVotes:mySF,oppVotes:oppSF});
+  if(!sfWon){killedByIdx=oppSFIdx;return{name,idx,status:'eliminated',roundsWon,totalVotes,totalMatchVotes,rounds,killedByIdx};}
+  roundsWon=3;
+  // Final — fSlot=semiIdx
+  const fSlot=semiIdx,oppFSemi=b.semis[1-semiIdx];
+  let oppFIdx=null;
+  if(oppFSemi.winnerIdx!==null){const oFSR=semiIdx===0?[1,3]:[0,2],oFRegion=oFSR[oppFSemi.winnerIdx],oFQF=b.regionRounds[oFRegion][2];if(oFQF.winnerIdx!==null){const oFMI=oFQF.winnerIdx,oFR1=b.regionRounds[oFRegion][oFMI];if(oFR1.winnerIdx!==null)oppFIdx=CATEGORIES[oFRegion].seeds[pairs[oFMI][oFR1.winnerIdx]];}}
+  const fm=b.final;
+  if(fm.winnerIdx===null)return{name,idx,status:'alive',roundsWon,totalVotes,totalMatchVotes,rounds,killedByIdx:null};
+  const myF=fm.votes[fSlot]||0,oppF=fm.votes[1-fSlot]||0;
+  totalVotes+=myF;totalMatchVotes+=myF+oppF;
+  const fWon=fm.winnerIdx===fSlot;
+  rounds.push({label:'Final',result:fWon?'won':'lost',myVotes:myF,oppVotes:oppF});
+  if(!fWon){killedByIdx=oppFIdx;return{name,idx,status:'eliminated',roundsWon,totalVotes,totalMatchVotes,rounds,killedByIdx};}
+  return{name,idx,status:'champion',roundsWon:4,totalVotes,totalMatchVotes,rounds,killedByIdx:null};
+}
+
+function buildLbRow(r,rank,maxV,b,placement) {
+  const placementClass=placement?'rank-'+placement:'';
+  const div=document.createElement('div');div.className='lb-poem-row '+r.status+(placementClass?' '+placementClass:'');
+  const icons={champion:'👑',alive:'🔥',eliminated:'💀',pending:'⏳'};
+  const placementIcon={'1st':'🥇','2nd':'🥈','3rd':'🥉'};
+  // Rank
+  const rankEl=document.createElement('div');rankEl.className='lb-rank';rankEl.textContent=placement?placementIcon[placement]:rank;
+  // Icon
+  const iconEl=document.createElement('div');iconEl.className='lb-status-icon';iconEl.textContent=icons[r.status];
+  // Info
+  const info=document.createElement('div');info.className='lb-poem-info';
+  const title=document.createElement('div');title.className='lb-poem-title';title.textContent=r.name;
+  info.appendChild(title);
+  // Podium badge
+  if(placement){
+    const badgeColors={'1st':'gold','2nd':'silver','3rd':'bronze'};
+    const badgeLabels={'1st':'🥇 1st Place · Champion','2nd':'🥈 2nd Place · Runner-Up','3rd':'🥉 3rd Place · Semi-Finalist'};
+    const badge=document.createElement('div');badge.className='lb-podium-badge '+badgeColors[placement];badge.textContent=badgeLabels[placement];
+    info.appendChild(badge);
+  }
+  // Round journey chips
+  if(r.rounds&&r.rounds.length){
+    const chips=document.createElement('div');chips.className='lb-round-chips';
+    r.rounds.forEach(rnd=>{const c=document.createElement('span');c.className='lb-round-chip '+rnd.result;c.textContent=(rnd.result==='won'?'✓ ':'✗ ')+rnd.label;chips.appendChild(c);});
+    info.appendChild(chips);
+  }
+  // Rival callout
+  if(r.status==='eliminated'&&r.killedByIdx!==null){
+    const rival=document.createElement('div');rival.className='lb-rival';
+    rival.textContent='⚔️ Lost to: '+(b?b.poems[r.killedByIdx]:r.killedByIdx);
+    info.appendChild(rival);
+  }
+  // Votes block
+  const votePct=r.totalMatchVotes>0?Math.round((r.totalVotes/r.totalMatchVotes)*100):null;
+  const vb=document.createElement('div');vb.className='lb-votes-block';
+  if(votePct!==null&&r.status!=='pending'){const vp=document.createElement('div');vp.className='lb-vote-pct';vp.textContent=votePct+'%';vb.appendChild(vp);}
+  // Momentum spark
+  if(r.rounds&&r.rounds.length>=2){
+    const last=r.rounds[r.rounds.length-1],prev=r.rounds[r.rounds.length-2];
+    const lP=last.myVotes+last.oppVotes>0?Math.round(last.myVotes/(last.myVotes+last.oppVotes)*100):0;
+    const pP=prev.myVotes+prev.oppVotes>0?Math.round(prev.myVotes/(prev.myVotes+prev.oppVotes)*100):0;
+    const diff=lP-pP;
+    const spark=document.createElement('div');
+    if(diff>2){spark.className='lb-spark up';spark.textContent='▲ +'+diff+'%';}
+    else if(diff<-2){spark.className='lb-spark down';spark.textContent='▼ '+diff+'%';}
+    else{spark.className='lb-spark flat';spark.textContent='— steady';}
+    vb.appendChild(spark);
+  }
+  const vn=document.createElement('div');vn.className='lb-total-votes';vn.textContent=r.totalVotes>0?r.totalVotes+' votes':'—';
+  vb.appendChild(vn);
+  div.appendChild(rankEl);div.appendChild(iconEl);div.appendChild(info);div.appendChild(vb);
+  // Split bar
+  if(votePct!==null&&r.status!=='pending'){
+    const bw=document.createElement('div');bw.className='lb-split-bar-wrap';
+    const win=document.createElement('div');win.className='lb-split-winner';win.style.width=votePct+'%';
+    const lose=document.createElement('div');lose.className='lb-split-loser';
+    bw.appendChild(win);bw.appendChild(lose);div.appendChild(bw);
+  }
+  return div;
+}
+
+function renderList() {
+  const el=document.getElementById('listContent');el.innerHTML='';if(!activeClass())return;
+  const champ=champion();
+  const cc=document.createElement('div');cc.className='list-champion'+(champ?' crowned':'');
+  cc.innerHTML=`<div class="list-champ-trophy">👑</div><div><div class="list-champ-label">Poetry Champion</div><div class="list-champ-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div></div>`;
+  el.appendChild(cc);
+  const fs=mkSection('Championship Final');fs.appendChild(buildListMatchup(finalPoem(0),finalPoem(1),bkt().final));el.appendChild(fs);
+  const ss=mkSection('Semifinals');for(let si=0;si<2;si++)ss.appendChild(buildListMatchup(semiPoem(si,0),semiPoem(si,1),bkt().semis[si]));el.appendChild(ss);
+  CATEGORIES.forEach((cat,ri)=>{
+    const card=document.createElement('div');card.className='list-region-card';
+    const rw=regionWinner(ri);
+    const hdr=document.createElement('div');hdr.className='list-region-header';hdr.style.background=cat.bg;
+    hdr.innerHTML=`<span class="list-region-title">${esc(cat.name)}</span>${rw?`<span class="list-region-winner">▶ ${esc(rw.name)}</span>`:''}`;
+    card.appendChild(hdr);
+    const qfR=document.createElement('div');const qfl=document.createElement('div');qfl.className='list-round-label';qfl.textContent='Quarterfinal';qfR.appendChild(qfl);qfR.appendChild(buildListMatchup(qfPoem(ri,0),qfPoem(ri,1),bkt().regionRounds[ri][2]));card.appendChild(qfR);
+    const r1R=document.createElement('div');const r1l=document.createElement('div');r1l.className='list-round-label';r1l.textContent='Round of 16';r1R.appendChild(r1l);for(let mi=0;mi<2;mi++)r1R.appendChild(buildListMatchup(r1Poem(ri,mi,0),r1Poem(ri,mi,1),bkt().regionRounds[ri][mi]));card.appendChild(r1R);el.appendChild(card);
+  });
+}
+function mkSection(t){const sc=document.createElement('div');sc.className='list-section-card';const hdr=document.createElement('div');hdr.className='list-section-header';const tt=document.createElement('div');tt.className='list-section-title';tt.textContent=t;hdr.appendChild(tt);sc.appendChild(hdr);return sc;}
+function buildListMatchup(pA,pB,md){
+  const wrap=document.createElement('div');const isC=md.winnerIdx!==null;const tv=(md.votes[0]||0)+(md.votes[1]||0);
+  const row=document.createElement('div');row.className='list-matchup';
+  [[pA,0],[pB,1]].forEach(([poem,s],i)=>{
+    if(i===1){const vs=document.createElement('div');vs.className='list-vs';vs.textContent='vs';row.appendChild(vs);}
+    const iW=isC&&md.winnerIdx===s,iL=isC&&md.winnerIdx!==s,iP=!poem;
+    const pd=document.createElement('div');pd.className='list-poem'+(iP?' pending':iW?' winner':iL?' loser':'');
+    const se=document.createElement('span');se.className='list-seed';se.textContent=poem?poem.seed:'?';
+    const ne=document.createElement('span');ne.className='list-name';ne.textContent=poem?poem.name:'TBD';
+    pd.appendChild(se);pd.appendChild(ne);
+    if(isC){const v=md.votes[s];const pct=tv>0?Math.round(((v||0)/tv)*100):0;const ve=document.createElement('span');ve.className='list-vote-info';ve.textContent=v!==null?`${v} · ${pct}%`:'';pd.appendChild(ve);}
+    row.appendChild(pd);
+  });
+  wrap.appendChild(row);
+  if(isC&&tv>0){const br=document.createElement('div');br.className='list-bar-row';const bf=document.createElement('div');bf.className='list-bar-fill';bf.style.width=Math.round(((md.votes[0]||0)/tv)*100)+'%';br.appendChild(bf);wrap.appendChild(br);}
+  return wrap;
+}
+
+function renderBracket(){
+  const bracket=document.getElementById('bracket');bracket.innerHTML='';if(!activeClass())return;
+  const isT=MODE==='teacher';
+  ['Round of 16','Quarterfinals','Semifinals','👑 The Crown','Semifinals','Quarterfinals','Round of 16'].forEach((h,i)=>{
+    const hd=document.createElement('div');hd.className='col-header';hd.style.cssText=`grid-column:${i+1};grid-row:1;`;
+    const subs=['4 matchups','2 matchups','','','','2 matchups','4 matchups'];
+    hd.innerHTML=h+(subs[i]?`<span>${subs[i]}</span>`:'');bracket.appendChild(hd);
+  });
+  const lR1=mcol('bc left','1','2');lR1.appendChild(catBan(CATEGORIES[0]));lR1.appendChild(bcard('rR1',0,0,false,isT));lR1.appendChild(bcard('rR1',0,1,false,isT));lR1.appendChild(catBan(CATEGORIES[1]));lR1.appendChild(bcard('rR1',1,0,false,isT));lR1.appendChild(bcard('rR1',1,1,false,isT));bracket.appendChild(lR1);
+  const lQF=mcol('bc left','2','2');lQF.style.justifyContent='space-around';lQF.style.paddingTop='2.75rem';bracket.appendChild(lQF);lQF.appendChild(bcard('rQF',0,2,false,isT));lQF.appendChild(bcard('rQF',1,2,false,isT));
+  const lS=mcol('bc left','3','2');lS.style.justifyContent='center';lS.style.paddingTop='2rem';lS.appendChild(bcard('semi',0,null,false,isT));bracket.appendChild(lS);
+  const center=document.createElement('div');center.className='center-col';center.style.cssText='grid-column:4;grid-row:2;';
+  const ch2=document.createElement('div');ch2.className='col-header center-header';ch2.textContent='The Crown';center.appendChild(ch2);
+  const champ=champion();const cc=document.createElement('div');cc.className='champion-card'+(champ?' crowned':'');cc.innerHTML=`<div class="champion-trophy">👑</div><div class="champion-label">Poetry Champion</div><div class="champion-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div>`;center.appendChild(cc);
+  const fl=document.createElement('div');fl.className='final-label';fl.style.marginTop='.7rem';fl.textContent='Final';center.appendChild(fl);center.appendChild(bcard('final',null,null,false,isT));bracket.appendChild(center);
+  const rS=mcol('bc right','5','2');rS.style.justifyContent='center';rS.style.paddingTop='2rem';rS.appendChild(bcard('semi',1,null,true,isT));bracket.appendChild(rS);
+  const rQF=mcol('bc right','6','2');rQF.style.justifyContent='space-around';rQF.style.paddingTop='2.75rem';bracket.appendChild(rQF);rQF.appendChild(bcard('rQF',2,2,true,isT));rQF.appendChild(bcard('rQF',3,2,true,isT));
+  const rR1=mcol('bc right','7','2');rR1.appendChild(catBan(CATEGORIES[2]));rR1.appendChild(bcard('rR1',2,0,true,isT));rR1.appendChild(bcard('rR1',2,1,true,isT));rR1.appendChild(catBan(CATEGORIES[3]));rR1.appendChild(bcard('rR1',3,0,true,isT));rR1.appendChild(bcard('rR1',3,1,true,isT));bracket.appendChild(rR1);
+}
+function sp(f){const d=document.createElement('div');d.style.flex=f;return d;}
+function mcol(cls,col,row){const d=document.createElement('div');d.className=cls;d.style.cssText=`grid-column:${col};grid-row:${row};`;return d;}
+function catBan(cat){const b=document.createElement('div');b.className='cat-banner';b.style.cssText=`background:${cat.bg};color:#fff;`;b.textContent=cat.name.replace(/^[A-D] — /,'');return b;}
+function bcard(type,ri,mi,mirrored,isT){
+  const wrapper=document.createElement('div');wrapper.className='mg';
+  let pA,pB,md,aA=false,aB=false;
+  if(type==='rR1'){pA=r1Poem(ri,mi,0);pB=r1Poem(ri,mi,1);md=bkt().regionRounds[ri][mi];if(md.winnerIdx!==null&&bkt().regionRounds[ri][2].winnerIdx===null){if(md.winnerIdx===0)aA=true;else aB=true;}}
+  else if(type==='rQF'){pA=qfPoem(ri,0);pB=qfPoem(ri,1);md=bkt().regionRounds[ri][mi];if(md.winnerIdx!==null&&!isRegionDone(ri)){if(md.winnerIdx===0)aA=true;else aB=true;}}
+  else if(type==='semi'){pA=semiPoem(ri,0);pB=semiPoem(ri,1);md=bkt().semis[ri];if(md.winnerIdx!==null&&!isSemiDone()){if(md.winnerIdx===0)aA=true;else aB=true;}}
+  else{pA=finalPoem(0);pB=finalPoem(1);md=bkt().final;}
+  const hasPoems=pA&&pB,isC=md.winnerIdx!==null,tv=(md.votes[0]||0)+(md.votes[1]||0);
+  const card=document.createElement('div');card.className='matchup'+(isT&&hasPoems?' clickable':'');
+  if(isT&&hasPoems)card.onclick=()=>openVoteDialog({type,ri,mi},pA,pB,md);
+  const poems=mirrored?[pB,pA]:[pA,pB],slots=mirrored?[1,0]:[0,1],aliveArr=mirrored?[aB,aA]:[aA,aB];
+  for(let i=0;i<2;i++){
+    const poem=poems[i],s=slots[i],v=md.votes[s];
+    const iW=isC&&md.winnerIdx===s,iL=isC&&md.winnerIdx!==s,iP=!poem,isA=aliveArr[i]&&iW;
+    const slot=document.createElement('div');slot.className='poem-slot'+(iP?' pending':iW?' winner-slot'+(isA?' alive':''):iL?' loser-slot':'');
+    const seed=document.createElement('span');seed.className='seed';seed.textContent=poem?poem.seed:'?';slot.appendChild(seed);
+    const nm=document.createElement('span');nm.className='poem-name';nm.textContent=poem?poem.name:'TBD';slot.appendChild(nm);
+    if(isC){const ve=document.createElement('span');ve.className='votes';ve.textContent=v!==null?v:'';slot.appendChild(ve);if(tv>0){const pc=document.createElement('span');pc.className='pct-chip';pc.textContent=Math.round(((v||0)/tv)*100)+'%';slot.appendChild(pc);}const bw=document.createElement('div');bw.className='vote-bar-wrap';const bar=document.createElement('div');bar.className='vote-bar';bar.style.width=(tv>0?Math.round(((v||0)/tv)*100):0)+'%';bw.appendChild(bar);slot.appendChild(bw);}
+    card.appendChild(slot);
+  }
+  wrapper.appendChild(card);return wrapper;
+}
+
+let activeKey=null,selectedWinner=null;
+function openVoteDialog(key,pA,pB,md){
+  activeKey=key;selectedWinner=md.winnerIdx;
+  const lbl=key.type==='rR1'?`${CATEGORIES[key.ri].name} · Round of 16`:key.type==='rQF'?`${CATEGORIES[key.ri].name} · Quarterfinal`:key.type==='semi'?`Semifinal ${key.ri+1}`:'Championship Final';
+  document.getElementById('voteEyebrow').textContent=`${activeClass().name} · ${lbl}`;
+  document.getElementById('vsNameA').textContent=pA?.name||'—';document.getElementById('vsSeedA').textContent=pA?`Seed #${pA.seed}`:'';
+  document.getElementById('vsNameB').textContent=pB?.name||'—';document.getElementById('vsSeedB').textContent=pB?`Seed #${pB.seed}`:'';
+  document.getElementById('voteLabelA').textContent='Number of Votes:';
+  document.getElementById('voteLabelB').textContent='Number of Votes:';
+  document.getElementById('voteA').value=md.votes[0]!==null?md.votes[0]:'';
+  document.getElementById('voteB').value=md.votes[1]!==null?md.votes[1]:'';
+  updateVoteSel();document.getElementById('voteError').classList.remove('show');
+  document.getElementById('voteDialog').classList.add('open');
+}
+function selectWinner(i){selectedWinner=i;updateVoteSel();}
+function syncVoteWinner(){const a=parseInt(document.getElementById('voteA').value)||0,b=parseInt(document.getElementById('voteB').value)||0;if(a>0||b>0){selectedWinner=a>=b?0:1;updateVoteSel();}}
+function updateVoteSel(){document.getElementById('vsCardA').classList.toggle('selected',selectedWinner===0);document.getElementById('vsCardB').classList.toggle('selected',selectedWinner===1);}
+function getMatchData(key){const b=bkt();if(key.type==='rR1'||key.type==='rQF')return b.regionRounds[key.ri][key.mi];if(key.type==='semi')return b.semis[key.ri];return b.final;}
+function clearDownstream(key){const b=bkt();if(key.type==='rR1'){b.regionRounds[key.ri][2]={winnerIdx:null,votes:[null,null]};clearSF(key.ri);}else if(key.type==='rQF'){clearSF(key.ri);}else if(key.type==='semi'){b.semis[key.ri]={winnerIdx:null,votes:[null,null]};b.final={winnerIdx:null,votes:[null,null]};}else{b.final={winnerIdx:null,votes:[null,null]};}}
+function clearSF(ri){const b=bkt(),si=ri<=1?0:1;b.semis[si]={winnerIdx:null,votes:[null,null]};b.final={winnerIdx:null,votes:[null,null]};}
+function saveMatchup(){
+  const vA=parseInt(document.getElementById('voteA').value),vB=parseInt(document.getElementById('voteB').value);
+  if(selectedWinner===null||isNaN(vA)||isNaN(vB)){document.getElementById('voteError').classList.add('show');return;}
+  const md=getMatchData(activeKey);
+  if(md.winnerIdx!==null&&md.winnerIdx!==selectedWinner)clearDownstream(activeKey);
+  md.winnerIdx=selectedWinner;md.votes=[vA,vB];
+  saveApp();closeVoteDialog();renderAll();showSnack('Result saved ✓');
+  if(bkt().final.winnerIdx!==null)setTimeout(launchConfetti,500);
+}
+function closeVoteDialog(){document.getElementById('voteDialog').classList.remove('open');activeKey=null;selectedWinner=null;}
+
+function openSetup(){
+  document.getElementById('setupHeadline').textContent=`Edit Poems — ${activeClass().name}`;
+  const c=document.getElementById('setupInputs');c.innerHTML='';
+  CATEGORIES.forEach(cat=>{
+    const hdr=document.createElement('div');hdr.className='setup-cat-header';hdr.style.color=cat.bg;hdr.textContent=cat.name;c.appendChild(hdr);
+    cat.seeds.forEach(si=>{const wrap=document.createElement('div');const field=document.createElement('div');field.className='m3-field';field.style.marginBottom='0';field.innerHTML=`<input type="text" value="${esc(activeClass().bracket.poems[si])}" maxlength="50" placeholder=" " data-idx="${si}"><label>Seed ${si+1}</label>`;wrap.appendChild(field);c.appendChild(wrap);});
+  });
+  document.getElementById('setupDialog').classList.add('open');
+}
+function saveSetup(){
+  const inputs=document.querySelectorAll('#setupInputs input[data-idx]'),np=[...activeClass().bracket.poems];
+  inputs.forEach(inp=>{const i=parseInt(inp.dataset.idx);np[i]=inp.value.trim()||`Poem ${i+1}`;});
+  if(JSON.stringify(np)!==JSON.stringify(activeClass().bracket.poems)){activeClass().bracket=defaultBracket();activeClass().bracket.poems=np;}
+  saveApp();closeSetup();renderAll();
+}
+function closeSetup(){document.getElementById('setupDialog').classList.remove('open');}
+function openRenameClass(){document.getElementById('renameHeadline').textContent=`Rename "${activeClass().name}"`;document.getElementById('classNameInput').value=activeClass().name;document.getElementById('renameDialog').classList.add('open');setTimeout(()=>document.getElementById('classNameInput').focus(),80);}
+function saveRename(){const v=document.getElementById('classNameInput').value.trim();if(!v)return;activeClass().name=v;saveApp();closeRename();renderAll();}
+function closeRename(){document.getElementById('renameDialog').classList.remove('open');}
+function openAddClass(){document.getElementById('newClassInput').value=`Block ${app.classes.length+1}`;document.getElementById('addClassDialog').classList.add('open');setTimeout(()=>{const i=document.getElementById('newClassInput');i.focus();i.select();},80);}
+function saveAddClass(){const v=document.getElementById('newClassInput').value.trim();if(!v)return;const nc={id:uid(),name:v,bracket:defaultBracket()};app.classes.push(nc);app.activeId=nc.id;saveApp();closeAddClass();renderAll();}
+function closeAddClass(){document.getElementById('addClassDialog').classList.remove('open');}
+function confirmDeleteClass(id){const cls=app.classes.find(c=>c.id===id);if(!cls)return;if(!confirm(`Remove "${cls.name}"?`))return;app.classes=app.classes.filter(c=>c.id!==id);if(app.activeId===id)app.activeId=app.classes[0].id;saveApp();renderAll();}
+function openReset(){document.getElementById('resetHeadline').textContent=`Reset ${activeClass().name}?`;document.getElementById('resetDialog').classList.add('open');}
+function closeReset(){document.getElementById('resetDialog').classList.remove('open');}
+function doReset(){const p=[...activeClass().bracket.poems];activeClass().bracket=defaultBracket();activeClass().bracket.poems=p;saveApp();closeReset();renderAll();showSnack('Bracket reset');}
+
+function launchConfetti(){
+  const canvas=document.getElementById('confettiCanvas'),ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const colors=['#4A3AFF','#7C5CBF','#006874','#F59E0B','#ffffff','#E4DFFF'];
+  const pieces=Array.from({length:150},()=>({x:Math.random()*canvas.width,y:-20-Math.random()*200,r:Math.random()*7+3,d:Math.random()*80+60,color:colors[Math.floor(Math.random()*colors.length)],tA:0,tAI:Math.random()*.1+.04,shape:Math.random()>.5?'circle':'rect'}));
+  let angle=0,frame=0;
+  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);angle+=.01;pieces.forEach(p=>{p.tA+=p.tAI;p.y+=Math.cos(angle+p.d)*1.5+2.2;p.x+=Math.sin(angle)*1.8;ctx.beginPath();ctx.fillStyle=p.color;ctx.globalAlpha=Math.max(0,1-(frame/240)*.85);if(p.shape==='circle'){ctx.arc(p.x,p.y,p.r,0,2*Math.PI);}else{ctx.rect(p.x+Math.sin(p.tA)*10,p.y,p.r*2,p.r*.9);}ctx.fill();});frame++;if(frame<240)requestAnimationFrame(draw);else ctx.clearRect(0,0,canvas.width,canvas.height);}
+  draw();
+}
+
+let snackTimer=null;
+function showSnack(msg){const s=document.getElementById('snackbar');s.textContent=msg;s.classList.add('show');if(snackTimer)clearTimeout(snackTimer);snackTimer=setTimeout(()=>s.classList.remove('show'),2800);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+['passwordDialog','voteDialog','setupDialog','renameDialog','addClassDialog','resetDialog'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target!==this)return;if(id==='passwordDialog')cancelPassword();else if(id==='voteDialog')closeVoteDialog();else if(id==='setupDialog')closeSetup();else if(id==='renameDialog')closeRename();else if(id==='addClassDialog')closeAddClass();else closeReset();});
+});
+document.getElementById('classNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')saveRename();});
+document.getElementById('newClassInput').addEventListener('keydown',e=>{if(e.key==='Enter')saveAddClass();});
+
+// Boot
+app = loadApp();
+buildAppBar();
+buildSecondaryToolbar();
+setMode('student');
+</script>
+</body>
+</html>
