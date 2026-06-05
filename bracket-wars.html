@@ -723,6 +723,8 @@ function showCurrentView() {
   });
   const vt = document.getElementById('viewToggle');
   if (vt) vt.style.display = (MODE === 'student' && currentView !== 'home') ? 'flex' : 'none';
+  const ss = document.querySelector('.toolbar-status-stack');
+  if (ss) ss.style.display = currentView === 'home' ? 'none' : 'flex';
   if (currentView==='home') renderHome();
   if (currentView==='leaderboard') renderLeaderboard();
 }
