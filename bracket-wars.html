@@ -1350,6 +1350,7 @@ function saveMatchup(){
   md.winnerIdx=selectedWinner;md.votes=[vA,vB];
   saveApp();closeVoteDialog();renderAll();showSnack('Result saved ✓');
   if(bkt().final.winnerIdx!==null)setTimeout(launchConfetti,500);
+  if(pendingCelebrationData){setTimeout(()=>{showVoteResultCelebration(pendingCelebrationData);pendingCelebrationData=null;},400);}
 }
 function closeVoteDialog(){document.getElementById('voteDialog').classList.remove('open');activeKey=null;selectedWinner=null;}
 
@@ -1385,6 +1386,7 @@ let voteSubscription = null;
 let liveVoteCounts = [0, 0];
 let pendingVotingKey = null;
 let pendingVoteChoice = null;
+let pendingCelebrationData = null;
 
 function ensureVoting(app) {
   if (!app.voting) app.voting = {open:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
@@ -1450,22 +1452,33 @@ async function confirmCloseVoting() {
   const key = app.voting.matchupKey; if (!key) return;
   const pA = app.voting.poemA, pB = app.voting.poemB;
   const winnerIdx = liveVoteCounts[0]>=liveVoteCounts[1]?0:1;
-  const winner = winnerIdx===0?pA:pB;
   const total = liveVoteCounts[0]+liveVoteCounts[1];
-  const winPct = total>0?Math.round(liveVoteCounts[winnerIdx]/total*100):0;
-  // Auto-save result
-  const md = getMatchData(key);
-  if (md.winnerIdx!==null&&md.winnerIdx!==winnerIdx) clearDownstream(key);
-  md.winnerIdx=winnerIdx; md.votes=[liveVoteCounts[0],liveVoteCounts[1]];
-  // Store result for celebration
-  app.lastVoteResult = {winnerName:winner?.name||'',loserName:(winnerIdx===0?pB:pA)?.name||'',winVotes:liveVoteCounts[winnerIdx],loseVotes:liveVoteCounts[1-winnerIdx],winPct,ts:Date.now()};
+  // Store celebration data — fires after teacher confirms save
+  pendingCelebrationData = {
+    winnerName:(winnerIdx===0?pA:pB)?.name||'',
+    loserName:(winnerIdx===0?pB:pA)?.name||'',
+    winVotes:liveVoteCounts[winnerIdx],
+    loseVotes:liveVoteCounts[1-winnerIdx],
+    winPct:total>0?Math.round(liveVoteCounts[winnerIdx]/total*100):0
+  };
+  // Close voting state
   app.voting = {open:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
   await saveApp();
   if (voteSubscription) { voteSubscription.unsubscribe(); voteSubscription=null; }
+  // Open pre-filled score dialog for teacher to verify
+  activeKey = key; selectedWinner = winnerIdx;
+  const cls = app.classes.find(c=>c.id===app.voting?.classId)||activeClass();
+  document.getElementById('voteEyebrow').textContent = esc(cls?.name||'')+' · '+getRoundLabel(key)+' · From Voting';
+  document.getElementById('vsNameA').textContent = pA?.name||'—'; document.getElementById('vsSeedA').textContent = pA?'Seed #'+pA.seed:'';
+  document.getElementById('vsNameB').textContent = pB?.name||'—'; document.getElementById('vsSeedB').textContent = pB?'Seed #'+pB.seed:'';
+  document.getElementById('voteLabelA').textContent = 'Votes:';
+  document.getElementById('voteLabelB').textContent = 'Votes:';
+  document.getElementById('voteA').value = liveVoteCounts[0];
+  document.getElementById('voteB').value = liveVoteCounts[1];
+  updateVoteSel(); document.getElementById('voteError').classList.remove('show');
   liveVoteCounts=[0,0];
   renderAll(); showCurrentView();
-  showVoteResultCelebration(app.lastVoteResult);
-  if(bkt().final.winnerIdx!==null) setTimeout(launchConfetti,500);
+  document.getElementById('voteDialog').classList.add('open');
 }
 
 function subscribeToVotes(sessionId) {
@@ -1481,34 +1494,7 @@ function subscribeToVotes(sessionId) {
 }
 
 function updateVoteLiveUI() {
-  const total = liveVoteCounts[0]+liveVoteCounts[1];
-  const sc = app.voting?.studentCount||0;
-  const countEl=document.getElementById('voteTotalCount');
-  if (countEl) countEl.textContent = sc>0?total+' of '+sc+' students voted':total+' votes in';
-  const stripA=document.getElementById('voteTotalStripA');
-  if (stripA&&total>0) stripA.style.width=Math.round(liveVoteCounts[0]/total*100)+'%';
-  [0,1].forEach(i=>{
-    const pct=total>0?Math.round(liveVoteCounts[i]/total*100):0;
-    const margin=total>0?Math.abs(liveVoteCounts[0]-liveVoteCounts[1]):0;
-    const isLeading=total>0&&liveVoteCounts[i]>liveVoteCounts[1-i];
-    const block=document.getElementById('votePoemBlock'+i);
-    const pctEl=document.getElementById('votePct'+i);
-    const cntEl=document.getElementById('voteCnt'+i);
-    const marginEl=document.getElementById('voteMargin'+i);
-    const leadEl=document.getElementById('voteLead'+i);
-    const barEl=document.getElementById('voteBar'+i);
-    if(pctEl) pctEl.textContent=pct+'%';
-    if(cntEl) cntEl.textContent=liveVoteCounts[i]+' vote'+(liveVoteCounts[i]!==1?'s':'');
-    if(marginEl) { marginEl.textContent=isLeading?'+'+margin+' ahead':''; marginEl.style.display=isLeading&&margin>0?'block':'none'; }
-    if(leadEl) leadEl.classList.toggle('show',isLeading&&total>0);
-    if(barEl) barEl.style.width=pct+'%';
-    if(block&&total>0) {
-      const hasVoted=app.voting?.sessionId&&localStorage.getItem('voted-'+app.voting.sessionId)!==null;
-      const myVote=hasVoted?parseInt(localStorage.getItem('voted-'+app.voting.sessionId)):null;
-      block.classList.toggle('is-leading',isLeading&&myVote!==i);
-      block.classList.toggle('is-voted',myVote===i);
-    }
-  });
+  if (currentView === 'vote') { renderVoteView(); return; }
 }
 
 function renderVoteView() {
@@ -1642,7 +1628,6 @@ async function boot() {
           if (voteSubscription) { voteSubscription.unsubscribe(); voteSubscription = null; }
           liveVoteCounts=[0,0];
           if (currentView === 'vote') setView('home');
-          if (app.lastVoteResult && app.lastVoteResult.ts > Date.now()-10000) showVoteResultCelebration(app.lastVoteResult);
         }
         renderAll();
         showCurrentView();
