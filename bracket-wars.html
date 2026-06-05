@@ -528,6 +528,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     <div id="teacherActions"></div>
     <div class="seg-btn-track" id="viewToggle" style="display:none">
       <button class="seg-btn active" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
+      <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
     </div>
@@ -820,9 +821,25 @@ function showCurrentView() {
     }
   });
   const vt = document.getElementById('viewToggle');
-  if (vt) vt.style.display = (MODE === 'student' && currentView !== 'home' && currentView !== 'vote') ? 'flex' : 'none';
+  if (vt) vt.style.display = (MODE === 'student' && currentView !== 'home') ? 'flex' : 'none';
+  const voteBtn = document.getElementById('btnVote');
+  if (voteBtn) {
+    ensureVoting(app);
+    const showVote = app.voting.open && app.voting.classId === app.activeId;
+    voteBtn.style.display = showVote ? 'inline-flex' : 'none';
+    if (showVote) {
+      voteBtn.classList.toggle('active', currentView === 'vote');
+      // Pulse animation when voting is open
+      if (!voteBtn.querySelector('.vote-tab-pulse')) {
+        const dot = document.createElement('span'); dot.className='vote-tab-pulse'; dot.style.cssText='width:7px;height:7px;border-radius:50%;background:var(--md-tertiary);animation:livePulse 1.8s ease-in-out infinite;display:inline-block;margin-right:.3rem;flex-shrink:0;';
+        voteBtn.prepend(dot);
+      }
+    } else if (voteBtn.querySelector('.vote-tab-pulse')) {
+      voteBtn.querySelector('.vote-tab-pulse').remove();
+    }
+  }
   const ss = document.querySelector('.toolbar-status-stack');
-  if (ss) ss.style.display = (currentView === 'home' || currentView === 'vote') ? 'none' : 'flex';
+  if (ss) ss.style.display = currentView === 'home' ? 'none' : 'flex';
   if (currentView==='home') renderHome();
   if (currentView==='leaderboard') renderLeaderboard();
   if (currentView==='vote') renderVoteView();
@@ -1052,16 +1069,6 @@ function renderTabs() {
     homeTab.innerHTML = '🏠 Home';
     homeTab.onclick = () => setView('home');
     bar.appendChild(homeTab);
-    ensureVoting(app);
-    if (app.voting.open) {
-      const voteTab=document.createElement('button');
-      voteTab.id='btnVoteTab';
-      voteTab.className='m3-tab vote-tab'+(currentView==='vote'?' active':'');
-      const dot=document.createElement('span'); dot.className='vote-tab-pulse'; voteTab.appendChild(dot);
-      voteTab.appendChild(document.createTextNode('Vote'));
-      voteTab.onclick=()=>setView('vote');
-      bar.appendChild(voteTab);
-    }
   }
   app.classes.forEach((cls, ci) => {
     const tab = document.createElement('button'); tab.className='m3-tab'+(cls.id===app.activeId&&currentView!=='home'?' active':'');
