@@ -317,6 +317,15 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .lb-spark.flat{color:var(--md-on-surface-variant);}
 .lb-waiting{text-align:center;padding:3rem 1rem;font-size:1rem;font-weight:500;color:var(--md-on-surface-variant);}
 .lb-waiting-icon{font-size:3rem;margin-bottom:.75rem;}
+/* VOTE VIEW */
+.vote-view{padding:1.25rem;max-width:500px;margin:0 auto;}
+.vote-tab-pulse{width:7px;height:7px;border-radius:50%;background:var(--md-tertiary);animation:livePulse 1.8s ease-in-out infinite;display:inline-block;margin-right:.4rem;vertical-align:middle;}
+.m3-tab.vote-tab{background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);}
+.m3-tab.vote-tab.active{background:#ffffff;color:var(--md-primary);}
+.open-voting-btn{display:flex;align-items:center;justify-content:center;gap:.3rem;font-size:.65rem;font-weight:600;padding:.2rem .6rem;width:100%;margin-top:.15rem;border:none;cursor:pointer;background:transparent;color:var(--md-tertiary);border-radius:var(--shape-sm);}
+.open-voting-btn:hover{background:var(--md-tertiary-container);}
+.close-voting-btn{display:flex;align-items:center;justify-content:center;gap:.3rem;font-size:.65rem;font-weight:600;padding:.2rem .6rem;width:100%;margin-top:.15rem;border:none;cursor:pointer;background:var(--md-error-container);color:var(--md-error);border-radius:var(--shape-sm);}
+.voting-active-card{border-color:var(--md-tertiary) !important;}
 /* DIALOGS */
 .dialog-scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:200;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(2px);}
 .dialog-scrim.open{display:flex;}
@@ -581,6 +590,36 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
   </div>
 </div>
 
+<!-- VOTE VIEW -->
+<div id="voteView" style="display:none"><div class="vote-view" id="voteContent"></div></div>
+
+<!-- OPEN VOTING DIALOG -->
+<div class="dialog-scrim" id="openVotingDialog">
+  <div class="dialog" style="max-width:380px;text-align:center">
+    <div class="dialog-icon">🗳️</div>
+    <div class="dialog-headline" id="openVotingHeadline">Open Voting</div>
+    <div class="dialog-body" id="openVotingBody" style="margin-bottom:1rem"></div>
+    <div class="m3-field"><input type="number" id="studentCountInput" min="1" max="60" placeholder=" "><label>Students present today</label></div>
+    <div class="dialog-actions" style="justify-content:center;gap:.75rem">
+      <button class="btn-outlined" onclick="closeOpenVotingDialog()">Cancel</button>
+      <button class="btn-filled" onclick="startVotingSession()">Open Voting</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLOSE VOTING DIALOG -->
+<div class="dialog-scrim" id="closeVotingConfirmDialog">
+  <div class="dialog" style="max-width:360px;text-align:center">
+    <div class="dialog-icon">🏁</div>
+    <div class="dialog-headline">Close voting?</div>
+    <div class="dialog-body" id="closeVotingBody">Vote counts will pre-fill the score entry. You can still adjust before saving.</div>
+    <div class="dialog-actions" style="justify-content:center;gap:.75rem">
+      <button class="btn-outlined" onclick="document.getElementById('closeVotingConfirmDialog').classList.remove('open')">Cancel</button>
+      <button class="btn-filled" onclick="confirmCloseVoting()">Close &amp; Record</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const STORAGE_KEY = 'bracket-wars-v1';
@@ -619,7 +658,7 @@ function defaultBracket() {
 }
 function uid() { return Math.random().toString(36).slice(2,10); }
 function defaultAppState() {
-  const s = {classes:[{id:uid(),name:'Block 1',bracket:defaultBracket()},{id:uid(),name:'Block 2',bracket:defaultBracket()}],activeId:null};
+  const s = {classes:[{id:uid(),name:'Block 1',bracket:defaultBracket()},{id:uid(),name:'Block 2',bracket:defaultBracket()}],activeId:null,voting:{open:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0}};
   s.activeId = s.classes[0].id;
   return s;
 }
@@ -709,24 +748,26 @@ function setView(v) {
   showCurrentView();
 }
 function showCurrentView() {
-  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView'};
+  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView'};
   Object.entries(views).forEach(([key, id]) => {
     const el = document.getElementById(id);
+    if (!el) return;
     if (key === currentView) {
       el.style.display = 'block';
       el.classList.remove('view-fade-in');
-      void el.offsetWidth; // reflow to restart animation
+      void el.offsetWidth;
       el.classList.add('view-fade-in');
     } else {
       el.style.display = 'none';
     }
   });
   const vt = document.getElementById('viewToggle');
-  if (vt) vt.style.display = (MODE === 'student' && currentView !== 'home') ? 'flex' : 'none';
+  if (vt) vt.style.display = (MODE === 'student' && currentView !== 'home' && currentView !== 'vote') ? 'flex' : 'none';
   const ss = document.querySelector('.toolbar-status-stack');
-  if (ss) ss.style.display = currentView === 'home' ? 'none' : 'flex';
+  if (ss) ss.style.display = (currentView === 'home' || currentView === 'vote') ? 'none' : 'flex';
   if (currentView==='home') renderHome();
   if (currentView==='leaderboard') renderLeaderboard();
+  if (currentView==='vote') renderVoteView();
 }
 
 function renderHome() {
@@ -921,6 +962,11 @@ function renderHome() {
 function buildAppBar() {
   const el = document.getElementById('appBarActions'); el.innerHTML = '';
   if (MODE === 'teacher') {
+    ensureVoting(app);
+    if (app.voting.open) {
+      const cv=document.createElement('button'); cv.className='btn-filled'; cv.style.background='var(--md-error)'; cv.innerHTML='⏹ Close Voting';
+      cv.onclick=()=>document.getElementById('closeVotingConfirmDialog').classList.add('open'); el.appendChild(cv);
+    }
     [{label:'Rename',fn:'openRenameClass()'},{label:'Edit Poems',fn:'openSetup()'},{label:'Reset',fn:'openReset()',danger:true}].forEach(a => {
       const b = document.createElement('button'); b.className='btn-text';
       if(a.danger) b.style.color='var(--md-error)';
@@ -937,7 +983,7 @@ function buildSecondaryToolbar() {
   // Teacher controls moved to app bar; no-op
 }
 
-function renderAll() { renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); updateStatus(); }
+function renderAll() { renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); updateStatus(); }
 
 function renderTabs() {
   const bar = document.getElementById('classTabs'); bar.innerHTML = '';
@@ -948,6 +994,16 @@ function renderTabs() {
     homeTab.innerHTML = '🏠 Home';
     homeTab.onclick = () => setView('home');
     bar.appendChild(homeTab);
+    ensureVoting(app);
+    if (app.voting.open) {
+      const voteTab=document.createElement('button');
+      voteTab.id='btnVoteTab';
+      voteTab.className='m3-tab vote-tab'+(currentView==='vote'?' active':'');
+      const dot=document.createElement('span'); dot.className='vote-tab-pulse'; voteTab.appendChild(dot);
+      voteTab.appendChild(document.createTextNode('Vote'));
+      voteTab.onclick=()=>setView('vote');
+      bar.appendChild(voteTab);
+    }
   }
   app.classes.forEach((cls, ci) => {
     const tab = document.createElement('button'); tab.className='m3-tab'+(cls.id===app.activeId&&currentView!=='home'?' active':'');
@@ -1210,7 +1266,20 @@ function bcard(type,ri,mi,mirrored,isT){
     if(isC){const ve=document.createElement('span');ve.className='votes';ve.textContent=v!==null?v:'';slot.appendChild(ve);if(tv>0){const pc=document.createElement('span');pc.className='pct-chip';pc.textContent=Math.round(((v||0)/tv)*100)+'%';slot.appendChild(pc);}const bw=document.createElement('div');bw.className='vote-bar-wrap';const bar=document.createElement('div');bar.className='vote-bar';bar.style.width=(tv>0?Math.round(((v||0)/tv)*100):0)+'%';bw.appendChild(bar);slot.appendChild(bw);}
     card.appendChild(slot);
   }
-  wrapper.appendChild(card);return wrapper;
+  wrapper.appendChild(card);
+  if (isT && hasPoems) {
+    ensureVoting(app);
+    const isActive=app.voting.open&&app.voting.classId===app.activeId&&app.voting.matchupKey?.type===type&&app.voting.matchupKey?.ri===ri&&app.voting.matchupKey?.mi===mi;
+    if (isActive) {
+      if (card.classList) card.classList.add('voting-active-card');
+      const vb=document.createElement('button'); vb.className='close-voting-btn'; vb.textContent='⏹ Close Voting';
+      vb.onclick=(e)=>{e.stopPropagation();document.getElementById('closeVotingConfirmDialog').classList.add('open');}; wrapper.appendChild(vb);
+    } else if (!app.voting.open) {
+      const vb=document.createElement('button'); vb.className='open-voting-btn'; vb.textContent='🗳 Open Voting';
+      vb.onclick=(e)=>{e.stopPropagation();openVotingSetup({type,ri,mi},pA,pB);}; wrapper.appendChild(vb);
+    }
+  }
+  return wrapper;
 }
 
 let activeKey=null,selectedWinner=null;
@@ -1271,6 +1340,164 @@ function openReset(){document.getElementById('resetHeadline').textContent=`Reset
 function closeReset(){document.getElementById('resetDialog').classList.remove('open');}
 function doReset(){const p=[...activeClass().bracket.poems];activeClass().bracket=defaultBracket();activeClass().bracket.poems=p;saveApp();closeReset();renderAll();showSnack('Bracket reset');}
 
+// ── Voting ──
+let voteSubscription = null;
+let liveVoteCounts = [0, 0];
+let pendingVotingKey = null;
+let pendingVoteChoice = null;
+
+function ensureVoting(app) {
+  if (!app.voting) app.voting = {open:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
+  return app;
+}
+
+function getPoemForKey(key, slot) {
+  if (key.type==='rR1') return r1Poem(key.ri, key.mi, slot);
+  if (key.type==='rQF') return qfPoem(key.ri, slot);
+  if (key.type==='semi') return semiPoem(key.ri, slot);
+  return finalPoem(slot);
+}
+
+function getRoundLabel(key) {
+  if (!key) return '';
+  if (key.type==='rR1') return CATEGORIES[key.ri].name.replace(/^[A-D] — /,'')+' · Round of 16';
+  if (key.type==='rQF') return CATEGORIES[key.ri].name.replace(/^[A-D] — /,'')+' · Quarterfinal';
+  if (key.type==='semi') return 'Semifinal '+(key.ri+1);
+  return 'Championship Final';
+}
+
+function openVotingSetup(key, pA, pB) {
+  if (!pA||!pB) return;
+  pendingVotingKey = key;
+  document.getElementById('openVotingHeadline').textContent = 'Open Voting';
+  document.getElementById('openVotingBody').textContent = pA.name+' vs '+pB.name;
+  document.getElementById('studentCountInput').value = '';
+  document.getElementById('openVotingDialog').classList.add('open');
+  setTimeout(()=>document.getElementById('studentCountInput').focus(), 120);
+}
+function closeOpenVotingDialog() { document.getElementById('openVotingDialog').classList.remove('open'); pendingVotingKey=null; }
+
+async function startVotingSession() {
+  const key = pendingVotingKey; if (!key) return;
+  const count = parseInt(document.getElementById('studentCountInput').value)||0;
+  const pA = getPoemForKey(key,0), pB = getPoemForKey(key,1);
+  if (!pA||!pB) return;
+  const sessionId = uid();
+  ensureVoting(app);
+  app.voting = {open:true,sessionId,classId:app.activeId,matchupKey:key,poemA:{name:pA.name,seed:pA.seed},poemB:{name:pB.name,seed:pB.seed},studentCount:count};
+  closeOpenVotingDialog();
+  await saveApp();
+  liveVoteCounts=[0,0];
+  subscribeToVotes(sessionId);
+  renderAll(); showCurrentView();
+  showSnack('Voting is open!');
+}
+
+async function confirmCloseVoting() {
+  document.getElementById('closeVotingConfirmDialog').classList.remove('open');
+  ensureVoting(app);
+  const key = app.voting.matchupKey;
+  const pA = app.voting.poemA, pB = app.voting.poemB;
+  const md = getMatchData(key);
+  activeKey = key;
+  selectedWinner = liveVoteCounts[0]>=liveVoteCounts[1]?0:1;
+  document.getElementById('voteEyebrow').textContent = (app.classes.find(c=>c.id===app.voting.classId)?.name||'')+' · '+getRoundLabel(key)+' · Vote Results';
+  document.getElementById('vsNameA').textContent = pA?.name||'—'; document.getElementById('vsSeedA').textContent = pA?'Seed #'+pA.seed:'';
+  document.getElementById('vsNameB').textContent = pB?.name||'—'; document.getElementById('vsSeedB').textContent = pB?'Seed #'+pB.seed:'';
+  document.getElementById('voteLabelA').textContent = 'Votes (pre-filled):';
+  document.getElementById('voteLabelB').textContent = 'Votes (pre-filled):';
+  document.getElementById('voteA').value = liveVoteCounts[0];
+  document.getElementById('voteB').value = liveVoteCounts[1];
+  updateVoteSel();
+  document.getElementById('voteError').classList.remove('show');
+  app.voting = {open:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
+  await saveApp();
+  if (voteSubscription) { voteSubscription.unsubscribe(); voteSubscription=null; }
+  renderAll(); showCurrentView();
+  document.getElementById('voteDialog').classList.add('open');
+}
+
+function subscribeToVotes(sessionId) {
+  if (voteSubscription) { voteSubscription.unsubscribe(); }
+  db.from('votes').select('choice').eq('session_id',sessionId).then(({data})=>{
+    if (data) { liveVoteCounts=[0,0]; data.forEach(v=>liveVoteCounts[v.choice]++); updateVoteLiveUI(); }
+  });
+  voteSubscription = db.channel('votes_'+sessionId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'votes',filter:'session_id=eq.'+sessionId},payload=>{
+      if (payload.new.choice===0) liveVoteCounts[0]++; else liveVoteCounts[1]++;
+      updateVoteLiveUI();
+    }).subscribe();
+}
+
+function updateVoteLiveUI() {
+  const total = liveVoteCounts[0]+liveVoteCounts[1];
+  const countEl = document.getElementById('voteCount');
+  if (countEl) { const sc=app.voting?.studentCount||0; countEl.querySelector('span').textContent=sc>0?total+' of '+sc+' voted':total+' votes'; }
+  const barA=document.getElementById('liveBarA'),barB=document.getElementById('liveBarB'),pctA=document.getElementById('livePctA'),pctB=document.getElementById('livePctB');
+  if (barA&&total>0) { const pa=Math.round(liveVoteCounts[0]/total*100); barA.style.width=pa+'%'; barB.style.width=(100-pa)+'%'; if(pctA)pctA.textContent=pa+'%'; if(pctB)pctB.textContent=(100-pa)+'%'; }
+}
+
+async function submitStudentVote(choice) {
+  const sessionId = app.voting?.sessionId; if (!sessionId) return;
+  const storageKey = 'voted-'+sessionId;
+  if (localStorage.getItem(storageKey)!==null) { showSnack('You already voted!'); return; }
+  try {
+    await db.from('votes').insert({session_id:sessionId,choice});
+    localStorage.setItem(storageKey,String(choice));
+    pendingVoteChoice=null;
+    renderVoteView(); showSnack('Vote submitted! 🗳️');
+  } catch(e) { showSnack('Error submitting vote. Try again.'); }
+}
+
+function renderVoteView() {
+  const el=document.getElementById('voteContent'); if(!el) return;
+  ensureVoting(app);
+  if (!app.voting.open) { el.innerHTML=''; return; }
+  el.innerHTML='';
+  const v=app.voting, sessionId=v.sessionId;
+  const hasVoted=localStorage.getItem('voted-'+sessionId)!==null;
+  const myVote=hasVoted?parseInt(localStorage.getItem('voted-'+sessionId)):null;
+  const total=liveVoteCounts[0]+liveVoteCounts[1];
+  const cls=app.classes.find(c=>c.id===v.classId);
+
+  // Header
+  const hdr=document.createElement('div'); hdr.style.cssText='text-align:center;padding:1.5rem 1rem 1rem;';
+  hdr.innerHTML=`<div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);margin-bottom:.4rem">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</div><div style="font-size:1.5rem;font-weight:800;color:var(--md-on-surface);margin-bottom:.25rem">${hasVoted?'Your vote is in! 🗳️':'Cast your vote'}</div><div style="font-size:.875rem;color:var(--md-on-surface-variant)">${hasVoted?'Live results updating below':'Tap a poem, then submit'}</div>`;
+  el.appendChild(hdr);
+
+  if (!hasVoted) {
+    const row=document.createElement('div'); row.style.cssText='display:flex;gap:.75rem;padding:.5rem 1.25rem .75rem;';
+    [v.poemA,v.poemB].forEach((poem,i)=>{
+      if(i===1){const vs=document.createElement('div');vs.className='vs-divider';vs.textContent='vs';row.appendChild(vs);}
+      const card=document.createElement('div'); card.className='vs-card'; card.style.cssText='flex:1;padding:1.25rem 1rem;';
+      card.innerHTML=`<div class="vs-card-name" style="font-size:1rem">${esc(poem.name)}</div><div class="vs-card-seed">Seed #${poem.seed}</div>`;
+      card.onclick=()=>{ document.querySelectorAll('.vs-card').forEach(c=>c.classList.remove('selected')); card.classList.add('selected'); pendingVoteChoice=i; };
+      row.appendChild(card);
+    });
+    el.appendChild(row);
+    const btn=document.createElement('button'); btn.className='btn-filled'; btn.style.cssText='width:calc(100% - 2.5rem);margin:0 1.25rem .75rem;padding:.875rem;font-size:1rem;';
+    btn.textContent='Submit Vote'; btn.onclick=()=>{ if(pendingVoteChoice===null){showSnack('Pick a poem first!');return;} submitStudentVote(pendingVoteChoice); };
+    el.appendChild(btn);
+  } else {
+    const picked=myVote===0?v.poemA:v.poemB;
+    const conf=document.createElement('div'); conf.style.cssText='margin:0 1.25rem .75rem;padding:1rem;background:var(--md-primary-container);border-radius:var(--shape-lg);text-align:center;';
+    conf.innerHTML=`<div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);margin-bottom:.25rem">You voted for</div><div style="font-size:1.1rem;font-weight:700;color:var(--md-on-primary-container)">${esc(picked.name)}</div>`;
+    el.appendChild(conf);
+  }
+
+  // Live results
+  const res=document.createElement('div'); res.style.cssText='margin:0 1.25rem 1.25rem;padding:1rem;background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);border:1px solid var(--md-outline-variant);';
+  const countEl=document.createElement('div'); countEl.id='voteCount'; countEl.style.cssText='font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;';
+  const sc=v.studentCount||0; countEl.innerHTML=`<div class="live-dot"></div><span>${sc>0?total+' of '+sc+' voted':total+' votes'}</span>`; res.appendChild(countEl);
+  [v.poemA,v.poemB].forEach((poem,i)=>{
+    const pct=total>0?Math.round(liveVoteCounts[i]/total*100):0;
+    const brow=document.createElement('div'); brow.style.marginBottom='.75rem';
+    brow.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:.85rem;font-weight:500;color:var(--md-on-surface);margin-bottom:.3rem"><span>${esc(poem.name)}</span><span id="livePct${['A','B'][i]}" style="font-family:monospace;color:var(--md-primary);font-weight:700">${pct}%</span></div><div style="height:8px;background:var(--md-surface-container-high);border-radius:99px;overflow:hidden"><div id="liveBar${['A','B'][i]}" style="height:100%;width:${pct}%;background:${i===0?'var(--md-primary)':'var(--md-secondary)'};border-radius:99px;transition:width .5s"></div></div>`;
+    res.appendChild(brow);
+  });
+  el.appendChild(res);
+}
+
 function launchConfetti(){
   const canvas=document.getElementById('confettiCanvas'),ctx=canvas.getContext('2d');
   canvas.width=window.innerWidth;canvas.height=window.innerHeight;
@@ -1302,11 +1529,29 @@ async function boot() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'bracket_state', filter: `id=eq.${STORAGE_KEY}` }, payload => {
       if (payload.new?.data?.classes?.length && MODE === 'student') {
         const incoming = payload.new.data;
+        const prevSessionId = app.voting?.sessionId;
         incoming.activeId = app.activeId;
         app = incoming;
+        ensureVoting(app);
+        // Handle voting session changes
+        if (app.voting.open && app.voting.sessionId !== prevSessionId) {
+          liveVoteCounts = [0, 0];
+          subscribeToVotes(app.voting.sessionId);
+          setView('vote');
+        } else if (!app.voting.open && prevSessionId) {
+          if (voteSubscription) { voteSubscription.unsubscribe(); voteSubscription = null; }
+          if (currentView === 'vote') setView('home');
+        }
         renderAll();
+        showCurrentView();
       }
     }).subscribe();
+  // Re-subscribe to votes if voting already open on load
+  ensureVoting(app);
+  if (app.voting.open && app.voting.sessionId) {
+    liveVoteCounts = [0, 0];
+    subscribeToVotes(app.voting.sessionId);
+  }
 }
 boot();
 </script>
