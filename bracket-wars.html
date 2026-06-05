@@ -957,6 +957,7 @@ function renderTabs() {
         if(currentView==='home') currentView='leaderboard';
         if(MODE==='teacher')saveApp();
         renderAll();
+        showCurrentView();
         card.classList.remove('content-switching');
         card.classList.add('content-entering');
         setTimeout(()=>card.classList.remove('content-entering'),250);
