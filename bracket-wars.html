@@ -1383,6 +1383,7 @@ function doReset(){const p=[...activeClass().bracket.poems];activeClass().bracke
 
 // ── Voting ──
 let voteSubscription = null;
+let votePoller = null;
 let liveVoteCounts = [0, 0];
 let pendingVotingKey = null;
 let pendingVoteChoice = null;
@@ -1464,7 +1465,7 @@ async function confirmCloseVoting() {
   // Close voting state
   app.voting = {open:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
   await saveApp();
-  if (voteSubscription) { voteSubscription.unsubscribe(); voteSubscription=null; }
+  stopVotePolling();
   // Open pre-filled score dialog for teacher to verify
   activeKey = key; selectedWinner = winnerIdx;
   const cls = app.classes.find(c=>c.id===app.voting?.classId)||activeClass();
@@ -1481,16 +1482,28 @@ async function confirmCloseVoting() {
   document.getElementById('voteDialog').classList.add('open');
 }
 
+async function fetchVoteCounts(sessionId) {
+  try {
+    const { data } = await db.from('votes').select('choice').eq('session_id', sessionId);
+    if (data) {
+      const newCounts = [0, 0];
+      data.forEach(v => newCounts[v.choice]++);
+      if (newCounts[0] !== liveVoteCounts[0] || newCounts[1] !== liveVoteCounts[1]) {
+        liveVoteCounts = newCounts;
+        updateVoteLiveUI();
+      }
+    }
+  } catch(e) {}
+}
+
 function subscribeToVotes(sessionId) {
-  if (voteSubscription) { voteSubscription.unsubscribe(); }
-  db.from('votes').select('choice').eq('session_id',sessionId).then(({data})=>{
-    if (data) { liveVoteCounts=[0,0]; data.forEach(v=>liveVoteCounts[v.choice]++); updateVoteLiveUI(); }
-  });
-  voteSubscription = db.channel('votes_'+sessionId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'votes',filter:'session_id=eq.'+sessionId},payload=>{
-      if (payload.new.choice===0) liveVoteCounts[0]++; else liveVoteCounts[1]++;
-      updateVoteLiveUI();
-    }).subscribe();
+  if (votePoller) clearInterval(votePoller);
+  fetchVoteCounts(sessionId);
+  votePoller = setInterval(() => fetchVoteCounts(sessionId), 2000);
+}
+
+function stopVotePolling() {
+  if (votePoller) { clearInterval(votePoller); votePoller = null; }
 }
 
 function updateVoteLiveUI() {
@@ -1544,7 +1557,8 @@ function renderVoteView() {
       <div class="vote-stat"><div class="vote-stat-num" id="votePct${i}">${pct}%</div><div class="vote-stat-label">of votes</div></div>
       <div class="vote-stat-divider"></div>
       <div class="vote-stat"><div class="vote-stat-num" id="voteCnt${i}">${cnt}</div><div class="vote-stat-label">vote${cnt!==1?'s':''}</div></div>
-      ${isLeading&&margin>0?`<div class="vote-stat-divider"></div><div class="vote-stat"><div class="vote-stat-num" id="voteMargin${i}" style="font-size:1.3rem">+${margin}</div><div class="vote-stat-label">ahead</div></div>`:`<div id="voteMargin${i}" style="display:none"></div>`}`;
+      <div class="vote-stat-divider"></div>
+      <div class="vote-stat" style="${!isLeading||margin===0?'opacity:.3':''}"><div class="vote-stat-num" id="voteMargin${i}" style="font-size:1.3rem;color:var(--md-tertiary)">${isLeading&&margin>0?'+'+margin:'—'}</div><div class="vote-stat-label">leading by</div></div>`;
     block.appendChild(statsRow);
 
     // Pill button
