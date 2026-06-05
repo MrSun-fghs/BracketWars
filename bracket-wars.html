@@ -318,7 +318,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .lb-waiting{text-align:center;padding:3rem 1rem;font-size:1rem;font-weight:500;color:var(--md-on-surface-variant);}
 .lb-waiting-icon{font-size:3rem;margin-bottom:.75rem;}
 /* VOTE VIEW */
-.vote-view{padding:1.25rem;max-width:500px;margin:0 auto;}
+.vote-view{padding:1.25rem;max-width:540px;margin:0 auto;}
 .vote-tab-pulse{width:7px;height:7px;border-radius:50%;background:var(--md-tertiary);animation:livePulse 1.8s ease-in-out infinite;display:inline-block;margin-right:.4rem;vertical-align:middle;}
 .m3-tab.vote-tab{background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);}
 .m3-tab.vote-tab.active{background:#ffffff;color:var(--md-primary);}
@@ -326,6 +326,30 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .open-voting-btn:hover{background:var(--md-tertiary-container);}
 .close-voting-btn{display:flex;align-items:center;justify-content:center;gap:.3rem;font-size:.65rem;font-weight:600;padding:.2rem .6rem;width:100%;margin-top:.15rem;border:none;cursor:pointer;background:var(--md-error-container);color:var(--md-error);border-radius:var(--shape-sm);}
 .voting-active-card{border-color:var(--md-tertiary) !important;}
+/* Vote cards — large interactive */
+.vote-cards-row{display:flex;gap:.75rem;padding:.5rem 0 1rem;}
+.vote-card-big{flex:1;border:2px solid var(--md-outline-variant);border-radius:var(--shape-xl);padding:1.25rem 1rem 1rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;background:var(--md-surface-container-low);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:.35rem;}
+.vote-card-big:hover{border-color:var(--md-primary);background:var(--md-primary-container);transform:translateY(-2px);}
+.vote-card-big.selected{border-color:var(--md-primary);background:var(--md-primary-container);}
+.vote-card-big.leading-card{border-color:var(--md-tertiary);background:var(--md-tertiary-container);}
+.vote-card-big.voted-card{cursor:default;}
+.vote-card-big-leading{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--md-tertiary);color:var(--md-on-tertiary);padding:.2rem .6rem;border-radius:var(--shape-full);opacity:0;transition:opacity .3s;}
+.vote-card-big-leading.show{opacity:1;}
+.vote-card-big-name{font-size:1rem;font-weight:700;color:var(--md-on-surface);line-height:1.25;}
+.vote-card-big.selected .vote-card-big-name,.vote-card-big.voted-card .vote-card-big-name{color:var(--md-on-primary-container);}
+.vote-card-big.leading-card .vote-card-big-name{color:var(--md-on-tertiary-container);}
+.vote-card-big-seed{font-family:monospace;font-size:.65rem;color:var(--md-on-surface-variant);}
+.vote-card-big-pct{font-family:monospace;font-size:2rem;font-weight:800;color:var(--md-primary);line-height:1;transition:color .3s;}
+.vote-card-big.leading-card .vote-card-big-pct{color:var(--md-tertiary);}
+.vote-card-big-bar-track{width:100%;height:6px;background:var(--md-surface-container-high);border-radius:var(--shape-full);overflow:hidden;}
+.vote-card-big-bar{height:100%;background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));border-radius:var(--shape-full);transition:width .6s var(--motion-decel);}
+.vote-card-big.leading-card .vote-card-big-bar{background:linear-gradient(90deg,var(--md-tertiary),#006874);}
+.vote-card-big-votes{font-size:.72rem;color:var(--md-on-surface-variant);font-family:monospace;}
+.vote-card-big .vote-checkmark{font-size:1.5rem;display:none;}
+.vote-card-big.my-pick .vote-checkmark{display:block;}
+.vote-total-bar{height:8px;background:var(--md-surface-container-highest);border-radius:var(--shape-full);overflow:hidden;display:flex;margin:0 0 .75rem;}
+.vote-total-fill-a{height:100%;background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));transition:width .6s var(--motion-decel);}
+.vote-total-fill-b{height:100%;background:linear-gradient(90deg,var(--md-secondary),#7C5CBF);flex:1;}
 /* DIALOGS */
 .dialog-scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:200;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(2px);}
 .dialog-scrim.open{display:flex;}
@@ -748,6 +772,7 @@ function setView(v) {
   showCurrentView();
 }
 function showCurrentView() {
+  if (MODE === 'teacher') return;
   const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView'};
   Object.entries(views).forEach(([key, id]) => {
     const el = document.getElementById(id);
@@ -1431,10 +1456,99 @@ function subscribeToVotes(sessionId) {
 
 function updateVoteLiveUI() {
   const total = liveVoteCounts[0]+liveVoteCounts[1];
-  const countEl = document.getElementById('voteCount');
-  if (countEl) { const sc=app.voting?.studentCount||0; countEl.querySelector('span').textContent=sc>0?total+' of '+sc+' voted':total+' votes'; }
-  const barA=document.getElementById('liveBarA'),barB=document.getElementById('liveBarB'),pctA=document.getElementById('livePctA'),pctB=document.getElementById('livePctB');
-  if (barA&&total>0) { const pa=Math.round(liveVoteCounts[0]/total*100); barA.style.width=pa+'%'; barB.style.width=(100-pa)+'%'; if(pctA)pctA.textContent=pa+'%'; if(pctB)pctB.textContent=(100-pa)+'%'; }
+  const sc = app.voting?.studentCount||0;
+  // Header count
+  const countEl=document.getElementById('voteTotalCount');
+  if (countEl) countEl.textContent = sc>0?total+' of '+sc+' voted':total+' votes';
+  // Progress bar
+  const fillA=document.getElementById('voteTotalFillA');
+  if (fillA&&total>0) fillA.style.width=Math.round(liveVoteCounts[0]/total*100)+'%';
+  // Cards
+  [0,1].forEach(i=>{
+    const pct=total>0?Math.round(liveVoteCounts[i]/total*100):0;
+    const opp=total>0?Math.round(liveVoteCounts[1-i]/total*100):0;
+    const card=document.getElementById('voteCardBig'+i);
+    const pctEl=document.getElementById('voteCardPct'+i);
+    const barEl=document.getElementById('voteCardBar'+i);
+    const cntEl=document.getElementById('voteCardCnt'+i);
+    const leadEl=document.getElementById('voteCardLead'+i);
+    if(pctEl) pctEl.textContent=pct+'%';
+    if(barEl) barEl.style.width=pct+'%';
+    if(cntEl) cntEl.textContent=liveVoteCounts[i]+' vote'+(liveVoteCounts[i]!==1?'s':'');
+    if(leadEl) { const isLeading=total>0&&liveVoteCounts[i]>liveVoteCounts[1-i]; leadEl.classList.toggle('show',isLeading); }
+    if(card&&total>0) { const isLeading=liveVoteCounts[i]>liveVoteCounts[1-i]; card.classList.toggle('leading-card',isLeading&&!card.classList.contains('selected')); }
+  });
+}
+
+function renderVoteView() {
+  const el=document.getElementById('voteContent'); if(!el) return;
+  ensureVoting(app);
+  if (!app.voting.open) { el.innerHTML=''; return; }
+  el.innerHTML='';
+  const v=app.voting, sessionId=v.sessionId;
+  const hasVoted=localStorage.getItem('voted-'+sessionId)!==null;
+  const myVote=hasVoted?parseInt(localStorage.getItem('voted-'+sessionId)):null;
+  const total=liveVoteCounts[0]+liveVoteCounts[1];
+  const sc=v.studentCount||0;
+  const cls=app.classes.find(c=>c.id===v.classId);
+
+  // Header
+  const hdr=document.createElement('div'); hdr.style.cssText='text-align:center;padding:1.5rem 1rem .75rem;';
+  hdr.innerHTML=`
+    <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);margin-bottom:.35rem">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</div>
+    <div style="font-size:1.4rem;font-weight:800;color:var(--md-on-surface);margin-bottom:.2rem">${hasVoted?'Your vote is in! 🗳️':'Cast your vote'}</div>
+    <div style="font-size:.85rem;color:var(--md-on-surface-variant);margin-bottom:.75rem">${hasVoted?'Watch the results live':'Tap a poem to select, then submit'}</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.5rem">
+      <div class="live-dot"></div>
+      <span id="voteTotalCount" style="font-size:.8rem;font-weight:600;color:var(--md-on-surface)">${sc>0?total+' of '+sc+' voted':total+' votes'}</span>
+    </div>`;
+  el.appendChild(hdr);
+
+  // Split bar
+  const splitWrap=document.createElement('div'); splitWrap.style.cssText='padding:0 1.25rem .5rem;';
+  splitWrap.innerHTML=`<div class="vote-total-bar"><div class="vote-total-fill-a" id="voteTotalFillA" style="width:${total>0?Math.round(liveVoteCounts[0]/total*100):50}%"></div><div class="vote-total-fill-b"></div></div>`;
+  el.appendChild(splitWrap);
+
+  // Two big vote cards
+  const row=document.createElement('div'); row.className='vote-cards-row'; row.style.padding='0 1.25rem 0';
+  [v.poemA,v.poemB].forEach((poem,i)=>{
+    const pct=total>0?Math.round(liveVoteCounts[i]/total*100):0;
+    const isLeading=total>0&&liveVoteCounts[i]>liveVoteCounts[1-i];
+    const isMyPick=hasVoted&&myVote===i;
+    const card=document.createElement('div');
+    card.id='voteCardBig'+i;
+    card.className='vote-card-big'+(hasVoted?' voted-card':'')+(isMyPick?' selected my-pick':'')+(isLeading&&!isMyPick?' leading-card':'');
+    card.innerHTML=`
+      <div class="vote-card-big-leading${isLeading?' show':''}" id="voteCardLead${i}">Leading</div>
+      <div class="vote-checkmark">✓</div>
+      <div class="vote-card-big-name">${esc(poem.name)}</div>
+      <div class="vote-card-big-seed">Seed #${poem.seed}</div>
+      <div class="vote-card-big-pct" id="voteCardPct${i}">${pct}%</div>
+      <div class="vote-card-big-bar-track"><div class="vote-card-big-bar" id="voteCardBar${i}" style="width:${pct}%"></div></div>
+      <div class="vote-card-big-votes" id="voteCardCnt${i}">${liveVoteCounts[i]} vote${liveVoteCounts[i]!==1?'s':''}</div>`;
+    if (!hasVoted) {
+      card.onclick=()=>{
+        pendingVoteChoice=i;
+        document.querySelectorAll('.vote-card-big').forEach((c,ci)=>{ c.classList.toggle('selected',ci===i); c.classList.remove('leading-card'); });
+      };
+    }
+    row.appendChild(card);
+    if (i===0) { const vs=document.createElement('div'); vs.style.cssText='display:flex;align-items:center;font-size:.85rem;font-weight:700;color:var(--md-on-surface-variant);padding:0 2px;'; vs.textContent='vs'; row.appendChild(vs); }
+  });
+  el.appendChild(row);
+
+  // Submit or voted state
+  const footer=document.createElement('div'); footer.style.cssText='padding:.75rem 1.25rem 1.25rem;';
+  if (!hasVoted) {
+    const btn=document.createElement('button'); btn.className='btn-filled'; btn.style.cssText='width:100%;padding:.9rem;font-size:1rem;';
+    btn.textContent='Submit Vote';
+    btn.onclick=()=>{ if(pendingVoteChoice===null){showSnack('Pick a poem first!');return;} submitStudentVote(pendingVoteChoice); };
+    footer.appendChild(btn);
+  } else {
+    const picked=myVote===0?v.poemA:v.poemB;
+    footer.innerHTML=`<div style="text-align:center;padding:.75rem;background:var(--md-primary-container);border-radius:var(--shape-lg)"><div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);margin-bottom:.2rem">You voted for</div><div style="font-size:1rem;font-weight:700;color:var(--md-on-primary-container)">${esc(picked.name)}</div></div>`;
+  }
+  el.appendChild(footer);
 }
 
 async function submitStudentVote(choice) {
@@ -1447,55 +1561,6 @@ async function submitStudentVote(choice) {
     pendingVoteChoice=null;
     renderVoteView(); showSnack('Vote submitted! 🗳️');
   } catch(e) { showSnack('Error submitting vote. Try again.'); }
-}
-
-function renderVoteView() {
-  const el=document.getElementById('voteContent'); if(!el) return;
-  ensureVoting(app);
-  if (!app.voting.open) { el.innerHTML=''; return; }
-  el.innerHTML='';
-  const v=app.voting, sessionId=v.sessionId;
-  const hasVoted=localStorage.getItem('voted-'+sessionId)!==null;
-  const myVote=hasVoted?parseInt(localStorage.getItem('voted-'+sessionId)):null;
-  const total=liveVoteCounts[0]+liveVoteCounts[1];
-  const cls=app.classes.find(c=>c.id===v.classId);
-
-  // Header
-  const hdr=document.createElement('div'); hdr.style.cssText='text-align:center;padding:1.5rem 1rem 1rem;';
-  hdr.innerHTML=`<div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);margin-bottom:.4rem">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</div><div style="font-size:1.5rem;font-weight:800;color:var(--md-on-surface);margin-bottom:.25rem">${hasVoted?'Your vote is in! 🗳️':'Cast your vote'}</div><div style="font-size:.875rem;color:var(--md-on-surface-variant)">${hasVoted?'Live results updating below':'Tap a poem, then submit'}</div>`;
-  el.appendChild(hdr);
-
-  if (!hasVoted) {
-    const row=document.createElement('div'); row.style.cssText='display:flex;gap:.75rem;padding:.5rem 1.25rem .75rem;';
-    [v.poemA,v.poemB].forEach((poem,i)=>{
-      if(i===1){const vs=document.createElement('div');vs.className='vs-divider';vs.textContent='vs';row.appendChild(vs);}
-      const card=document.createElement('div'); card.className='vs-card'; card.style.cssText='flex:1;padding:1.25rem 1rem;';
-      card.innerHTML=`<div class="vs-card-name" style="font-size:1rem">${esc(poem.name)}</div><div class="vs-card-seed">Seed #${poem.seed}</div>`;
-      card.onclick=()=>{ document.querySelectorAll('.vs-card').forEach(c=>c.classList.remove('selected')); card.classList.add('selected'); pendingVoteChoice=i; };
-      row.appendChild(card);
-    });
-    el.appendChild(row);
-    const btn=document.createElement('button'); btn.className='btn-filled'; btn.style.cssText='width:calc(100% - 2.5rem);margin:0 1.25rem .75rem;padding:.875rem;font-size:1rem;';
-    btn.textContent='Submit Vote'; btn.onclick=()=>{ if(pendingVoteChoice===null){showSnack('Pick a poem first!');return;} submitStudentVote(pendingVoteChoice); };
-    el.appendChild(btn);
-  } else {
-    const picked=myVote===0?v.poemA:v.poemB;
-    const conf=document.createElement('div'); conf.style.cssText='margin:0 1.25rem .75rem;padding:1rem;background:var(--md-primary-container);border-radius:var(--shape-lg);text-align:center;';
-    conf.innerHTML=`<div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);margin-bottom:.25rem">You voted for</div><div style="font-size:1.1rem;font-weight:700;color:var(--md-on-primary-container)">${esc(picked.name)}</div>`;
-    el.appendChild(conf);
-  }
-
-  // Live results
-  const res=document.createElement('div'); res.style.cssText='margin:0 1.25rem 1.25rem;padding:1rem;background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);border:1px solid var(--md-outline-variant);';
-  const countEl=document.createElement('div'); countEl.id='voteCount'; countEl.style.cssText='font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;';
-  const sc=v.studentCount||0; countEl.innerHTML=`<div class="live-dot"></div><span>${sc>0?total+' of '+sc+' voted':total+' votes'}</span>`; res.appendChild(countEl);
-  [v.poemA,v.poemB].forEach((poem,i)=>{
-    const pct=total>0?Math.round(liveVoteCounts[i]/total*100):0;
-    const brow=document.createElement('div'); brow.style.marginBottom='.75rem';
-    brow.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:.85rem;font-weight:500;color:var(--md-on-surface);margin-bottom:.3rem"><span>${esc(poem.name)}</span><span id="livePct${['A','B'][i]}" style="font-family:monospace;color:var(--md-primary);font-weight:700">${pct}%</span></div><div style="height:8px;background:var(--md-surface-container-high);border-radius:99px;overflow:hidden"><div id="liveBar${['A','B'][i]}" style="height:100%;width:${pct}%;background:${i===0?'var(--md-primary)':'var(--md-secondary)'};border-radius:99px;transition:width .5s"></div></div>`;
-    res.appendChild(brow);
-  });
-  el.appendChild(res);
 }
 
 function launchConfetti(){
