@@ -578,8 +578,13 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const STORAGE_KEY = 'bracket-wars-v1';
+const SUPABASE_URL = 'https://livkhrzrcbbnmrfqoiai.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpdmtocnpyY2Jibm1yZnFvaWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MzI0OTgsImV4cCI6MjA5NjIwODQ5OH0.Xoj0YIdPE2P_nhj5UzmCL_4fBB8Srzrk3kFEdu7ZM7I';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 const CORRECT_PASSWORD = 'fghs2025';
 let teacherUnlocked = false, MODE = 'student', currentView = 'home';
 
@@ -618,16 +623,25 @@ function defaultAppState() {
 
 let app = defaultAppState();
 
-function saveApp() {
+async function saveApp() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(app)); } catch(e) {}
+  try {
+    await db.from('bracket_state').upsert({ id: STORAGE_KEY, data: app, updated_at: new Date().toISOString() });
+  } catch(e) { console.error('Supabase save:', e); }
 }
-function loadApp() {
+async function loadApp() {
+  try {
+    const { data } = await db.from('bracket_state').select('data').eq('id', STORAGE_KEY).single();
+    if (data?.data?.classes?.length) {
+      const p = data.data;
+      if (!p.activeId) p.activeId = p.classes[0].id;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch(e) {}
+      return p;
+    }
+  } catch(e) { console.error('Supabase load:', e); }
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const p = JSON.parse(raw);
-      if (p?.classes?.length) { if (!p.activeId) p.activeId = p.classes[0].id; return p; }
-    }
+    if (raw) { const p = JSON.parse(raw); if (p?.classes?.length) { if (!p.activeId) p.activeId = p.classes[0].id; return p; } }
   } catch(e) {}
   return defaultAppState();
 }
@@ -1261,10 +1275,23 @@ document.getElementById('classNameInput').addEventListener('keydown',e=>{if(e.ke
 document.getElementById('newClassInput').addEventListener('keydown',e=>{if(e.key==='Enter')saveAddClass();});
 
 // Boot
-app = loadApp();
-buildAppBar();
-buildSecondaryToolbar();
-setMode('student');
+async function boot() {
+  app = await loadApp();
+  buildAppBar();
+  buildSecondaryToolbar();
+  setMode('student');
+  // Real-time sync — students see teacher votes live
+  db.channel('bracket_state_changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'bracket_state', filter: `id=eq.${STORAGE_KEY}` }, payload => {
+      if (payload.new?.data?.classes?.length && MODE === 'student') {
+        const incoming = payload.new.data;
+        incoming.activeId = app.activeId;
+        app = incoming;
+        renderAll();
+      }
+    }).subscribe();
+}
+boot();
 </script>
 </body>
 </html>
