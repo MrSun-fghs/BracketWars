@@ -472,8 +472,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     </div>
     <div id="teacherActions"></div>
     <div class="seg-btn-track" id="viewToggle" style="display:none">
-      <button class="seg-btn active" id="btnHome" onclick="setView('home')"><span class="nav-icon">🏠</span> Home</button>
-      <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
+      <button class="seg-btn active" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
     </div>
@@ -686,7 +685,6 @@ function setMode(m) {
   buildAppBar();
   document.getElementById('secondaryToolbar').style.display = MODE==='student' ? 'block' : 'block';
   if (MODE === 'student') {
-    document.getElementById('viewToggle').style.display = 'flex';
     showCurrentView();
   } else {
     document.getElementById('viewToggle').style.display = 'none';
@@ -719,6 +717,8 @@ function showCurrentView() {
       el.style.display = 'none';
     }
   });
+  const vt = document.getElementById('viewToggle');
+  if (vt) vt.style.display = (MODE === 'student' && currentView !== 'home') ? 'flex' : 'none';
   if (currentView==='home') renderHome();
   if (currentView==='leaderboard') renderLeaderboard();
 }
@@ -935,17 +935,26 @@ function renderAll() { renderTabs(); renderHome(); renderLeaderboard(); renderLi
 
 function renderTabs() {
   const bar = document.getElementById('classTabs'); bar.innerHTML = '';
+  if (MODE === 'student') {
+    const homeTab = document.createElement('button');
+    homeTab.id = 'btnHomeTab';
+    homeTab.className = 'm3-tab' + (currentView === 'home' ? ' active' : '');
+    homeTab.innerHTML = '🏠 Home';
+    homeTab.onclick = () => setView('home');
+    bar.appendChild(homeTab);
+  }
   app.classes.forEach((cls, ci) => {
-    const tab = document.createElement('button'); tab.className='m3-tab'+(cls.id===app.activeId?' active':'');
+    const tab = document.createElement('button'); tab.className='m3-tab'+(cls.id===app.activeId&&currentView!=='home'?' active':'');
     const dot = document.createElement('span'); dot.className='tab-indicator'; if(cls.bracket.final.winnerIdx!==null) dot.classList.add('show');
     tab.appendChild(dot); tab.appendChild(document.createTextNode(cls.name));
     tab.onclick = e => {
       if(e.target.classList.contains('tab-close'))return;
-      if(app.activeId===cls.id)return;
+      if(app.activeId===cls.id&&currentView!=='home')return;
       const card=document.getElementById('contentCard');
       card.classList.add('content-switching');
       setTimeout(()=>{
         app.activeId=cls.id;
+        if(currentView==='home') currentView='leaderboard';
         if(MODE==='teacher')saveApp();
         renderAll();
         card.classList.remove('content-switching');
