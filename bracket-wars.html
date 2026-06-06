@@ -1518,55 +1518,6 @@ function renderHome() {
 
   el.appendChild(grid);
 
-  // ── Class Comparison & Taste Profile cards (teacher only — rendered in renderBracket for teacher) ──
-  if (MODE !== 'teacher') return;
-  const crossStats = computeCrossClassStats();
-  const anyTaste = app.classes.some(cls => computeClassTasteProfile(cls) !== null);
-
-  if (crossStats || anyTaste) {
-    const sectionLabel = document.createElement('div');
-    sectionLabel.style.cssText = 'font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);padding:1.5rem 1.5rem .6rem;display:flex;align-items:center;gap:.5rem;max-width:1000px;margin:0 auto;';
-    sectionLabel.innerHTML = '🔍 Class Insights <span style="flex:1;height:1px;background:var(--md-outline-variant);display:inline-block"></span>';
-    el.appendChild(sectionLabel);
-  }
-
-  const insightsGrid = document.createElement('div'); insightsGrid.className = 'cross-class-grid';
-
-  // Cross-class comparison card
-  if (crossStats) {
-    const compCard = document.createElement('div'); compCard.className = 'cross-card';
-    const compHdr = document.createElement('div'); compHdr.className = 'cross-card-header';
-    compHdr.innerHTML = `<div class="cross-card-title">⚔️ Class vs Class</div><div style="font-size:.7rem;color:var(--md-on-surface-variant);margin-top:.2rem">${crossStats.total} shared matchup${crossStats.total!==1?'s':''}</div>`;
-    compCard.appendChild(compHdr);
-    const compBody = document.createElement('div'); compBody.className = 'cross-card-body';
-    compBody.innerHTML = `
-      <div class="cross-stat-row"><span class="cross-stat-label">Agreement rate</span><span class="cross-stat-value">${crossStats.agreementRate}%</span></div>
-      <div class="cross-stat-row"><span class="cross-stat-label">Matchups agreed</span><span class="cross-stat-value">${crossStats.agreementCount}/${crossStats.total}</span></div>
-      ${crossStats.classStats.map(c=>`<div class="cross-stat-row"><span class="cross-stat-label">${esc(c.name)} avg margin</span><span class="cross-stat-value">${c.avgMargin}%</span></div>`).join('')}
-      ${crossStats.mostDivisive?`<div style="margin-top:.65rem;padding:.55rem .7rem;background:var(--md-surface-container);border-radius:var(--shape-md);font-size:.78rem;"><span style="font-weight:700;color:var(--md-error)">Most Divisive:</span><br><span style="color:var(--md-on-surface)">${esc(crossStats.mostDivisive.pAName)} vs ${esc(crossStats.mostDivisive.pBName)}</span><br><span style="color:var(--md-on-surface-variant);font-size:.7rem">${crossStats.mostDivisive.results.map(r=>r.className+' → '+(r.winnerIdx===0?crossStats.mostDivisive.pAName:crossStats.mostDivisive.pBName)).join(' · ')}</span></div>`:''}`;
-    compCard.appendChild(compBody);
-    insightsGrid.appendChild(compCard);
-  }
-
-  // Taste profile cards
-  app.classes.forEach(cls => {
-    const tp = computeClassTasteProfile(cls);
-    if (!tp) return;
-    const tCard = document.createElement('div'); tCard.className = 'cross-card';
-    const tHdr = document.createElement('div'); tHdr.className = 'cross-card-header';
-    tHdr.innerHTML = `<div class="cross-card-title">${esc(cls.name)} Taste Profile</div>`;
-    tCard.appendChild(tHdr);
-    const tBody = document.createElement('div'); tBody.className = 'cross-card-body';
-    tBody.innerHTML = `
-      <div class="cross-stat-row"><span class="cross-stat-label">Matchups complete</span><span class="cross-stat-value">${tp.total}</span></div>
-      <div class="cross-stat-row"><span class="cross-stat-label">Avg winning margin</span><span class="cross-stat-value">${tp.avgDecisiveness}%</span></div>
-      <div class="cross-stat-row"><span class="cross-stat-label">Upset rate</span><span class="cross-stat-value">${tp.upsetRate}%</span></div>
-      <div class="taste-profile-chip">${tp.icon} ${esc(tp.profile)}</div>`;
-    tCard.appendChild(tBody);
-    insightsGrid.appendChild(tCard);
-  });
-
-  if (insightsGrid.children.length) el.appendChild(insightsGrid);
 }
 
 function buildAppBar() {
