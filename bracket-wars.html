@@ -370,7 +370,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 /* Pill submitting state */
 .vote-pill-btn.submitting{opacity:.6;cursor:wait;}
 /* Student countdown */
-.student-countdown-num{font-size:11rem;font-weight:900;color:#fff;line-height:1;animation:countPop .9s ease-in-out forwards;}
+.student-countdown-num{font-size:15rem;font-weight:900;color:#fff;line-height:1;animation:countPop .9s ease-in-out forwards;}
 /* Vote button live glow */
 @keyframes voteGlow{0%,100%{box-shadow:0 0 0 0 rgba(0,104,116,.6);}50%{box-shadow:0 0 0 7px rgba(0,104,116,0);}}
 .seg-btn.vote-live{background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);animation:voteGlow 1.8s ease-in-out infinite;}
@@ -548,7 +548,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     </div>
     <div id="teacherActions"></div>
     <div class="seg-btn-track" id="viewToggle" style="display:none">
-      <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
+      <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none;margin-right:.5rem"><span class="nav-icon">🗳</span> Vote</button>
       <button class="seg-btn active" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
@@ -661,7 +661,8 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 <!-- STUDENT COUNTDOWN OVERLAY -->
 <div id="studentCountdownOverlay" class="tallying-overlay" style="z-index:550">
   <div class="student-countdown-num" id="studentCountNum">3</div>
-  <div class="tallying-sub" style="margin-top:1rem">Polls are closing…</div>
+  <div style="font-size:1.5rem;font-weight:800;color:#fff;margin-top:1.25rem;letter-spacing:-.01em">Polls Are Closing</div>
+  <div style="font-size:1rem;color:rgba(255,255,255,.6);margin-top:.5rem">Votes are being finalized…</div>
 </div>
 
 <!-- TALLYING OVERLAY -->
@@ -1506,7 +1507,7 @@ function restoreStudentPrefs() {
 }
 
 // ── Tallying overlay ──
-function showTallyingOverlay() { document.getElementById('tallyingOverlay').classList.add('visible'); }
+function showTallyingOverlay() { if (MODE === 'teacher') return; document.getElementById('tallyingOverlay').classList.add('visible'); }
 function hideTallyingOverlay() { document.getElementById('tallyingOverlay').classList.remove('visible'); }
 
 function closeWinnerAndGoBracket() {
@@ -1609,6 +1610,7 @@ function runTeacherCountdown() {
 
 let studentCountdownTimer = null;
 function showStudentCountdown() {
+  if (MODE === 'teacher') return;
   const overlay = document.getElementById('studentCountdownOverlay');
   const numEl = document.getElementById('studentCountNum');
   if (!overlay||!numEl) return;
@@ -1655,6 +1657,7 @@ async function startVotingSession() {
   await saveApp();
   liveVoteCounts=[0,0];
   subscribeToVotes(sessionId);
+  buildAppBar();
   renderAll(); showCurrentView();
   showSnack('Voting is open!');
 }
@@ -1679,8 +1682,9 @@ async function confirmCloseVoting() {
   app.voting = {open:false,tallying:true,countdown:false,sessionId:null,classId:savedClassId,matchupKey:key,poemA,poemB,studentCount:app.voting.studentCount};
   await saveApp();
   stopVotePolling();
+  buildAppBar();
   showTallyingOverlay();
-  // Open pre-filled score dialog for teacher to verify (appears above tallying overlay)
+  // Open pre-filled score dialog for teacher
   activeKey = key; selectedWinner = winnerIdx;
   const cls = app.classes.find(c=>c.id===app.voting?.classId)||activeClass();
   document.getElementById('voteEyebrow').textContent = esc(cls?.name||'')+' · '+getRoundLabel(key)+' · From Voting';
@@ -1856,10 +1860,12 @@ async function boot() {
   buildAppBar();
   buildSecondaryToolbar();
   setMode('student');
-  // Restore overlay states if active on load
+  // Restore overlay states for students only
   ensureVoting(app);
-  if (app.voting.countdown) showStudentCountdown();
-  if (app.voting.tallying) { hideStudentCountdown(); showTallyingOverlay(); }
+  if (MODE !== 'teacher') {
+    if (app.voting.countdown) showStudentCountdown();
+    if (app.voting.tallying) { hideStudentCountdown(); showTallyingOverlay(); }
+  }
   // Real-time sync — students see teacher votes live
   db.channel('bracket_state_changes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'bracket_state', filter: `id=eq.${STORAGE_KEY}` }, payload => {
