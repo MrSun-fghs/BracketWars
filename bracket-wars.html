@@ -606,7 +606,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     <div style="font-size:.8rem;color:var(--md-on-surface-variant);margin-bottom:1rem;" id="voteDialogSub"></div>
 
     <!-- Poem A row -->
-    <div class="finalize-poem-row" id="finalizePoemA" onclick="selectWinner(0)" style="cursor:pointer">
+    <div class="finalize-poem-row" id="finalizePoemA">
       <div>
         <div class="finalize-poem-name" id="vsNameA">—</div>
         <div style="font-size:.7rem;color:var(--md-on-surface-variant)" id="vsSeedA"></div>
@@ -620,7 +620,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     <div style="text-align:center;font-size:.75rem;font-weight:700;color:var(--md-on-surface-variant);margin:.25rem 0">vs</div>
 
     <!-- Poem B row -->
-    <div class="finalize-poem-row" id="finalizePoemB" onclick="selectWinner(1)" style="cursor:pointer">
+    <div class="finalize-poem-row" id="finalizePoemB">
       <div>
         <div class="finalize-poem-name" id="vsNameB">—</div>
         <div style="font-size:.7rem;color:var(--md-on-surface-variant)" id="vsSeedB"></div>
@@ -632,7 +632,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     </div>
 
     <div style="font-size:.72rem;color:var(--md-on-surface-variant);margin:.75rem 0 .25rem;padding:.6rem .75rem;background:var(--md-surface-container);border-radius:var(--shape-md);">
-      💡 Tap a row to set the winner. Adjust vote counts if any students voted by hand.
+      💡 The poem with the most votes wins. Adjust counts if any students voted by hand.
     </div>
 
     <div class="m3-field-error" id="voteError" style="margin:.25rem 0">Please select a winner and enter vote counts.</div>
@@ -1692,12 +1692,9 @@ function showCountdownThenClose() {
 }
 
 function runTeacherCountdown() {
-  // Students see the countdown on their screens — teacher just waits silently
+  // Students see/hear the countdown — teacher just waits silently
   showSnack('Countdown started… Finalize dialog opening shortly.');
-  playSound('tick');
-  setTimeout(()=>playSound('tick'), 1000);
-  setTimeout(()=>playSound('tick'), 2000);
-  setTimeout(()=>{ playSound('whoosh'); confirmCloseVoting(); }, 3200);
+  setTimeout(()=>{ confirmCloseVoting(); }, 3200);
 }
 
 let studentCountdownTimer = null;
@@ -1792,7 +1789,7 @@ async function confirmCloseVoting() {
   document.getElementById('voteLabelB').textContent = 'Votes';
   document.getElementById('voteA').value = liveVoteCounts[0];
   document.getElementById('voteB').value = liveVoteCounts[1];
-  updateVoteSel(); document.getElementById('voteError').classList.remove('show');
+  syncVoteWinner(); document.getElementById('voteError').classList.remove('show');
   liveVoteCounts=[0,0];
   renderAll(); showCurrentView();
   document.getElementById('voteDialog').classList.add('open');
