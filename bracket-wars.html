@@ -1208,7 +1208,8 @@ function updateVotingTimerUI() {
       edgeGlow.classList.toggle('active', isUrgent);
       edgeGlow.classList.toggle('critical', isCritical);
     }
-    }
+    if (isCritical && remaining > 0) playSound('urgentTick');
+  }
   if (remaining <= 0) {
     stopVotingTimer();
     if (MODE==='teacher' && !autoCloseTriggered) { autoCloseTriggered=true; initiateCountdownClose(); }
@@ -2335,10 +2336,20 @@ function playSound(type) {
       g.gain.setValueAtTime(.18,now); g.gain.exponentialRampToValueAtTime(.001,now+.06);
       o.start(now); o.stop(now+.06);
     } else if (type === 'urgentTick') {
-      const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
-      o.type='square'; o.frequency.setValueAtTime(1200,now); o.frequency.exponentialRampToValueAtTime(900,now+.08);
-      g.gain.setValueAtTime(.32,now); g.gain.exponentialRampToValueAtTime(.001,now+.1);
-      o.start(now); o.stop(now+.1);
+      // Realistic clock tick: sharp noise burst + body resonance
+      const bufLen = Math.floor(ctx.sampleRate * 0.04);
+      const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let j=0; j<bufLen; j++) data[j] = (Math.random()*2-1) * Math.pow(1-(j/bufLen),4);
+      const noise = ctx.createBufferSource();
+      noise.buffer = buf;
+      const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=2800; hp.Q.value=1.2;
+      const gn = ctx.createGain(); gn.gain.setValueAtTime(.55,now); gn.gain.exponentialRampToValueAtTime(.001,now+.04);
+      noise.connect(hp); hp.connect(gn); gn.connect(ctx.destination); noise.start(now);
+      // body resonance (low thud)
+      const o2=ctx.createOscillator(), g2=ctx.createGain(); o2.type='sine'; o2.frequency.value=180;
+      g2.gain.setValueAtTime(.18,now); g2.gain.exponentialRampToValueAtTime(.001,now+.06);
+      o2.connect(g2); g2.connect(ctx.destination); o2.start(now); o2.stop(now+.06);
     } else if (type === 'fanfare') {
       [523,659,784,1047].forEach((freq,i)=>{
         const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
