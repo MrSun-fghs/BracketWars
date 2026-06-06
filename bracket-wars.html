@@ -1870,7 +1870,7 @@ function renderEngagement() {
       if (!poemStats[p.name]) poemStats[p.name]={name:p.name,seed:p.seed,totalV:0,totalMV:0,wins:0,losses:0,rounds:[],bestPct:0};
       const myV=m.votes[idx]||0, pct=m.total>0?Math.round(myV/m.total*100):50;
       poemStats[p.name].totalV+=myV; poemStats[p.name].totalMV+=m.total;
-      if(m.winnerIdx===idx) poemStats[p.name].wins++; else poemStats[p.name].losses++;
+      if(m.winner && m.winner.name===p.name) poemStats[p.name].wins++; else poemStats[p.name].losses++;
       if(pct>poemStats[p.name].bestPct) poemStats[p.name].bestPct=pct;
       poemStats[p.name].rounds.push({round:m.round,myV,oppV:m.votes[1-idx]||0,pct});
     });
