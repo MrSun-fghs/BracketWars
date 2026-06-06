@@ -836,6 +836,7 @@ function isSemiDone() { return bkt().final.winnerIdx!==null; }
 function submitPassword() {
   if (document.getElementById('passwordInput').value === CORRECT_PASSWORD) {
     teacherUnlocked = true;
+    localStorage.setItem('bw-teacher', '1');
     document.getElementById('passwordDialog').classList.remove('open');
     setMode('teacher');
   } else {
@@ -844,7 +845,7 @@ function submitPassword() {
     document.getElementById('passwordInput').focus();
   }
 }
-function cancelPassword() { document.getElementById('passwordDialog').classList.remove('open'); setMode('student'); }
+function cancelPassword() { document.getElementById('passwordDialog').classList.remove('open'); localStorage.removeItem('bw-teacher'); teacherUnlocked = false; setMode('student'); }
 function requestTeacherMode() {
   if (teacherUnlocked) { setMode('teacher'); return; }
   document.getElementById('passwordInput').value = '';
@@ -1941,7 +1942,12 @@ async function boot() {
   restoreStudentPrefs();
   buildAppBar();
   buildSecondaryToolbar();
-  setMode('student');
+  if (localStorage.getItem('bw-teacher') === '1') {
+    teacherUnlocked = true;
+    setMode('teacher');
+  } else {
+    setMode('student');
+  }
   // Restore overlay states for students only
   ensureVoting(app);
   if (MODE !== 'teacher') {
