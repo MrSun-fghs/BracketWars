@@ -377,7 +377,8 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .countdown-num{font-size:11rem;font-weight:900;color:#fff;line-height:1;animation:countPop .9s ease-in-out forwards;}
 .countdown-label{font-size:.9rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:1.5rem;}
 /* Enhanced celebration */
-.vote-result-overlay{background:linear-gradient(160deg,#2D1B69,#4A3AFF 55%,#7C5CBF) !important;border:2px solid rgba(245,158,11,.35) !important;box-shadow:0 0 80px rgba(245,158,11,.15),0 24px 64px rgba(0,0,0,.6) !important;position:relative;overflow:hidden;}
+.vote-result-overlay{position:relative;overflow:hidden;}
+#voteResultDialog .dialog{background:linear-gradient(160deg,#2D1B69,#4A3AFF 55%,#7C5CBF) !important;border:2px solid rgba(245,158,11,.35) !important;box-shadow:0 0 80px rgba(245,158,11,.15),0 24px 64px rgba(0,0,0,.6) !important;}
 @keyframes cardShine{0%{transform:translateX(-120%) skewX(-18deg);}100%{transform:translateX(260%) skewX(-18deg);}}
 .vote-result-overlay::before{content:'';position:absolute;top:0;left:0;bottom:0;width:35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);pointer-events:none;animation:cardShine 3.5s ease-in-out infinite;}
 @keyframes shimmerText{0%{background-position:-200% center;}100%{background-position:200% center;}}
@@ -1624,9 +1625,27 @@ function playSound(type) {
 
 // ── Emoji Reactions ──
 const REACTIONS = ['❤️','👍','😄','🔥','⚡'];
+
+// Supabase Broadcast channel for reactions
+const reactionChannel = db.channel('bw-reactions');
+reactionChannel.on('broadcast', { event: 'react' }, ({ payload }) => {
+  spawnReactionFloat(payload.emoji, payload.x, payload.y);
+}).subscribe();
+
 function launchReaction(emoji, btn) {
-  try { getAudio(); } catch(e) {} // wake audio context
+  try { getAudio(); } catch(e) {}
   const rect = btn.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top;
+  spawnReactionFloat(emoji, x, y);
+  // Broadcast to all other devices
+  reactionChannel.send({ type: 'broadcast', event: 'react', payload: { emoji, x: x / window.innerWidth, y: y / window.innerHeight } });
+}
+
+function spawnReactionFloat(emoji, x, y) {
+  // x/y may be normalized (0-1) from remote, or absolute from local
+  const absX = x <= 1 ? x * window.innerWidth : x;
+  const absY = y <= 1 ? y * window.innerHeight : y;
   const count = Math.floor(Math.random() * 2) + 1;
   for (let i = 0; i < count; i++) {
     setTimeout(() => {
@@ -1635,7 +1654,7 @@ function launchReaction(emoji, btn) {
       const xOffset = (Math.random() - 0.5) * 80;
       const size = 1.5 + Math.random() * 1.2;
       const duration = 1.8 + Math.random() * 0.8;
-      el.style.cssText = `left:${rect.left + rect.width/2 + xOffset}px;top:${rect.top}px;font-size:${size}rem;animation-duration:${duration}s;`;
+      el.style.cssText = `left:${absX + xOffset}px;top:${absY}px;font-size:${size}rem;animation-duration:${duration}s;`;
       el.textContent = emoji;
       document.body.appendChild(el);
       setTimeout(() => el.remove(), duration * 1000 + 100);
@@ -1706,7 +1725,7 @@ function showVoteResultCelebration(r) {
   document.getElementById('vrStats').innerHTML = `
     <div class="vr-stat-card"><div class="vr-stat-num">${r.winPct}%</div><div class="vr-stat-label">of votes</div></div>
     <div class="vr-stat-card"><div class="vr-stat-num">${r.winVotes}</div><div class="vr-stat-label">votes</div></div>
-    <div class="vr-stat-card"><div class="vr-stat-num">+${r.winVotes-r.loseVotes}</div><div class="vr-stat-label">margin</div></div>`;
+    <div class="vr-stat-card"><div class="vr-stat-num">${r.winVotes>=r.loseVotes?'+':''}${r.winVotes-r.loseVotes}</div><div class="vr-stat-label">margin</div></div>`;
   document.getElementById('vrLoser').innerHTML = `⚔️ Defeated: <strong style="color:rgba(255,255,255,.8)">${esc(r.loserName)}</strong> &nbsp;·&nbsp; ${r.loseVotes} votes`;
   document.getElementById('voteResultDialog').classList.add('open');
   playSound('fanfare');
