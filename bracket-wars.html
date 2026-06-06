@@ -368,7 +368,7 @@ body.projection .fullscreen-btn{display:none;}
 .vote-poem-block.is-voted .vote-stat-num{color:var(--md-on-primary-container);}
 .vote-stat-label{font-size:.6rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-top:.1rem;}
 .vote-stat-divider{width:1px;height:2rem;background:var(--md-outline-variant);margin-bottom:.25rem;}
-.vote-leading-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:var(--md-tertiary);color:var(--md-on-tertiary);padding:.2rem .65rem;border-radius:var(--shape-full);margin-bottom:.55rem;opacity:0;transition:opacity .3s;}
+.vote-leading-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:#F59E0B;color:#1C1400;padding:.2rem .65rem;border-radius:var(--shape-full);margin-bottom:.55rem;opacity:0;transition:opacity .3s;}
 .vote-leading-badge.show{opacity:1;}
 .vote-pill-btn{width:100%;padding:.8rem 1.5rem;border-radius:var(--shape-full);border:2px solid var(--md-outline-variant);background:var(--md-surface-container);font-size:1rem;font-weight:600;color:var(--md-on-surface);cursor:pointer;transition:all .2s;letter-spacing:-.01em;}
 .vote-pill-btn:hover{border-color:var(--md-primary);background:var(--md-primary-container);color:var(--md-on-primary-container);}
@@ -376,7 +376,7 @@ body.projection .fullscreen-btn{display:none;}
 .vote-pill-btn.my-vote-pill{border-color:var(--md-primary);background:var(--md-primary-container);color:var(--md-on-primary-container);cursor:default;}
 .vote-pill-btn.my-vote-pill::before{content:'✓ ';font-size:.85rem;}
 @keyframes leadingPulse{0%{box-shadow:0 0 0 0 rgba(0,104,116,.6),0 0 0 0 rgba(0,104,116,.3);}60%{box-shadow:0 0 0 10px rgba(0,104,116,0),0 0 0 20px rgba(0,104,116,0);}100%{box-shadow:0 0 0 0 rgba(0,104,116,0),0 0 0 0 rgba(0,104,116,0);}}
-@keyframes leadingBadgePop{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,104,116,.5);}50%{transform:scale(1.1);box-shadow:0 0 0 6px rgba(0,104,116,0);}}
+@keyframes leadingBadgePop{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(245,158,11,.5);}50%{transform:scale(1.1);box-shadow:0 0 0 6px rgba(245,158,11,0);}}
 .vote-pill-btn.leading-pill{border-color:var(--md-tertiary);background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);font-weight:700;}
 .vote-pill-btn.leading-pill:hover{filter:brightness(.95);}
 .vote-leading-badge.show{animation:leadingBadgePop 1.6s ease-in-out infinite;}
@@ -642,7 +642,7 @@ body.projection .fullscreen-btn{display:none;}
 /* ── Category color accent in list ── */
 .list-cat-dot{width:5px;border-radius:var(--shape-full);flex-shrink:0;align-self:stretch;min-height:20px;}
 /* ── Vote screen category badge ── */
-.vote-cat-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .6rem;border-radius:var(--shape-full);margin-bottom:.4rem;color:#fff;}
+.vote-cat-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .6rem;border-radius:var(--shape-full);color:#fff;}
 /* ── Mobile responsive ── */
 @media(max-width:640px){
   .app-bar-inner{padding:0 .65rem;gap:.35rem;}
@@ -1208,8 +1208,7 @@ function updateVotingTimerUI() {
       edgeGlow.classList.toggle('active', isUrgent);
       edgeGlow.classList.toggle('critical', isCritical);
     }
-    if (isCritical && remaining > 0) playSound('urgentTick');
-  }
+    }
   if (remaining <= 0) {
     stopVotingTimer();
     if (MODE==='teacher' && !autoCloseTriggered) { autoCloseTriggered=true; initiateCountdownClose(); }
@@ -2683,8 +2682,8 @@ function renderVoteView() {
     const poemCat=CATEGORIES.find(c=>c.seeds.includes(seedIdx));
     const catBadgeHtml=poemCat?`<div class="vote-cat-badge" style="background:${poemCat.bg}">${esc(poemCat.name.replace(/^[A-D] — /,''))}</div>`:'';
 
-    // Leading badge
-    block.innerHTML=`${catBadgeHtml}<div class="vote-leading-badge${isLeading?' show':''}" id="voteLead${i}">Leading</div>`;
+    // Category + leading badge row (opposite ends)
+    block.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;min-height:1.4rem;margin-bottom:.55rem;">${catBadgeHtml||'<span></span>'}<div class="vote-leading-badge${isLeading?' show':''}" id="voteLead${i}" style="margin-bottom:0">Leading</div></div>`;
 
     // Stats row
     const statsRow=document.createElement('div'); statsRow.className='vote-stats-row';
