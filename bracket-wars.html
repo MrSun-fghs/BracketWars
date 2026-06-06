@@ -1839,11 +1839,13 @@ function getAllMatchups() {
   return matchups;
 }
 function engSection(title, parent) {
-  const s=document.createElement('div'); s.style.marginBottom='.25rem';
+  const s=document.createElement('div'); s.style.marginBottom='1rem';
   const h=document.createElement('div');
-  h.style.cssText='font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);padding:1.25rem 1.5rem .5rem;display:flex;align-items:center;gap:.5rem;';
+  h.style.cssText='font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);margin:0 0 .4rem;display:flex;align-items:center;gap:.5rem;';
   h.innerHTML=`${title} <span style="flex:1;height:1px;background:var(--md-outline-variant);display:inline-block"></span>`;
-  s.appendChild(h); parent.appendChild(s); return s;
+  const card=document.createElement('div');
+  card.style.cssText='background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);border:1px solid var(--md-outline-variant);box-shadow:var(--elev-1);overflow:hidden;';
+  s.appendChild(h); s.appendChild(card); parent.appendChild(s); return card;
 }
 function dramaCard(parent, icon, label, title, sub, detail) {
   const c=document.createElement('div');
@@ -1892,46 +1894,60 @@ function renderEngagement() {
   const graveyard=Object.values(poemStats).filter(p=>p.losses>0).sort((a,b)=>b.bestPct-a.bestPct);
 
   // ── Header stats ──
-  const statsRow=document.createElement('div'); statsRow.className='results-stats-row';
-  statsRow.innerHTML=`<div class="results-stat"><div class="results-stat-num">${matchups.length}</div><div class="results-stat-label">MATCHUPS DONE</div></div><div class="results-stat"><div class="results-stat-num">${totalVotes}</div><div class="results-stat-label">TOTAL VOTES</div></div><div class="results-stat"><div class="results-stat-num">${avgVotes}</div><div class="results-stat-label">AVG PER MATCHUP</div></div>`;
+  const statsRow=document.createElement('div');
+  statsRow.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-bottom:.85rem;';
+  statsRow.innerHTML=`
+    <div style="background:var(--md-primary-container);border-radius:var(--shape-lg);padding:.7rem .75rem;text-align:center;">
+      <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--md-primary)">${matchups.length}</div>
+      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant)">Matchups Done</div>
+    </div>
+    <div style="background:var(--md-primary-container);border-radius:var(--shape-lg);padding:.7rem .75rem;text-align:center;">
+      <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--md-primary)">${totalVotes}</div>
+      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant)">Total Votes</div>
+    </div>
+    <div style="background:var(--md-primary-container);border-radius:var(--shape-lg);padding:.7rem .75rem;text-align:center;">
+      <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--md-primary)">${15-matchups.length}</div>
+      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant)">To Go</div>
+    </div>`;
   el.appendChild(statsRow);
 
   // ── Participation by Round ──
   if (roundAvgs.length > 1) {
-    const sec=engSection('📈 Participation by Round', el);
-    const chart=document.createElement('div');
-    chart.style.cssText='display:flex;align-items:flex-end;gap:1rem;padding:.75rem 1.5rem 0;height:110px;';
+    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='📈 Participation by Round'; el.appendChild(lbl);
+    const card=document.createElement('div'); card.className='results-stat-card'; card.style.padding='.75rem 1rem 1rem'; el.appendChild(card);
+    const chart=document.createElement('div'); chart.style.cssText='display:flex;align-items:flex-end;gap:1rem;height:110px;';
     roundAvgs.forEach(r=>{
       const col=document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:.35rem;flex:1;';
       const h=Math.max(Math.round((r.avg/maxAvg)*72),4);
-      col.innerHTML=`<div style="font-size:.72rem;font-weight:700;color:var(--md-primary)">${r.avg}</div><div style="width:100%;height:${h}px;background:var(--md-primary-container);border-radius:6px 6px 0 0;"></div><div style="font-size:.6rem;color:var(--md-on-surface-variant);text-align:center;line-height:1.2">${r.round.replace('Round of ','R')}</div>`;
+      col.innerHTML=`<div style="font-size:.72rem;font-weight:700;color:var(--md-primary)">${r.avg}</div><div style="width:100%;height:${h}px;background:var(--md-primary-container);border-radius:6px 6px 0 0;border-bottom:2px solid var(--md-primary)"></div><div style="font-size:.6rem;color:var(--md-on-surface-variant);text-align:center;line-height:1.2">${r.round.replace('Round of ','R')}</div>`;
       chart.appendChild(col);
     });
-    sec.appendChild(chart);
+    card.appendChild(chart);
     const last=roundAvgs[roundAvgs.length-1].avg, first=roundAvgs[0].avg;
     const trend=last>first?'📈 Engagement is heating up as the rounds go on!':last<first?'📉 Early rounds pulled the most votes.':'➡️ Engagement stayed steady throughout.';
-    const note=document.createElement('div'); note.style.cssText='font-size:.73rem;color:var(--md-on-surface-variant);padding:.5rem 1.5rem 1rem;'; note.textContent=trend;
-    sec.appendChild(note);
+    const note=document.createElement('div'); note.style.cssText='font-size:.73rem;color:var(--md-on-surface-variant);padding-top:.6rem;'; note.textContent=trend;
+    card.appendChild(note);
   }
 
   // ── Power Rankings ──
   if (rankings.length) {
-    const sec=engSection('🏆 Power Rankings', el);
-    const sub=document.createElement('div'); sub.style.cssText='font-size:.7rem;color:var(--md-on-surface-variant);padding:0 1.5rem .6rem;'; sub.textContent='Cumulative vote % across all matchups played'; sec.appendChild(sub);
+    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='🏆 Power Rankings'; el.appendChild(lbl);
+    const card=document.createElement('div'); card.className='results-stat-card'; card.style.padding='0'; el.appendChild(card);
+    const sub=document.createElement('div'); sub.style.cssText='font-size:.7rem;color:var(--md-on-surface-variant);padding:.75rem 1rem .4rem;'; sub.textContent='Cumulative vote % across all completed matchups'; card.appendChild(sub);
     rankings.forEach((p,i)=>{
       const undefeated=p.losses===0&&p.wins>0;
       const cat=CATEGORIES.find(c=>c.seeds.includes(p.seed-1));
       const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.5rem 1.5rem;'+(i<rankings.length-1?'border-bottom:1px solid var(--md-outline-variant);':'');
+      row.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.5rem 1rem;'+(i<rankings.length-1?'border-bottom:1px solid var(--md-outline-variant);':'');
       row.innerHTML=`<div style="font-size:.75rem;font-weight:700;color:var(--md-on-surface-variant);width:1.4rem;text-align:right">${i+1}</div><div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:var(--md-on-surface)">${esc(p.name)}</div><div style="font-size:.65rem;color:var(--md-on-surface-variant)">${p.wins}W–${p.losses}L · ${p.totalMV} votes cast</div></div>${undefeated?`<div style="font-size:.58rem;font-weight:700;background:rgba(0,180,80,.12);color:#008040;padding:.15rem .5rem;border-radius:999px;white-space:nowrap">UNDEFEATED</div>`:''}${cat?`<div style="width:6px;height:6px;border-radius:50%;background:${cat.bg};flex-shrink:0"></div>`:''}<div style="font-size:1rem;font-weight:800;color:var(--md-primary);min-width:2.8rem;text-align:right">${p.cumPct}%</div><div style="width:52px;height:5px;background:var(--md-surface-container-high);border-radius:3px;overflow:hidden;flex-shrink:0"><div style="height:100%;width:${p.cumPct}%;background:${i<3?'var(--md-primary)':'var(--md-secondary)'};border-radius:3px"></div></div>`;
-      sec.appendChild(row);
+      card.appendChild(row);
     });
   }
 
   // ── Drama Corner ──
   if (nailbiters.length||upsets.length||blowouts.length) {
-    const sec=engSection('⚡ Drama Corner', el);
-    const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;padding:0 1.5rem 1.25rem;'; sec.appendChild(grid);
+    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='⚡ Drama Corner'; el.appendChild(lbl);
+    const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.75rem;'; el.appendChild(grid);
     if (nailbiters.length) { const m=nailbiters[0]; dramaCard(grid,'⚖️','Nail-Biter',m.winner.name,`${m.pct}% vs ${100-m.pct}% · ${m.round}`,`Just ${m.margin} vote${m.margin===1?'':'s'} apart`); }
     if (upsets.length) { const m=upsets[0]; dramaCard(grid,'🌪️','Biggest Upset',m.winner.name,`Knocked out #${m.loser.seed} seed · ${m.round}`,`Seed gap: ${m.seedGap} — nobody saw it coming`); }
     if (blowouts.length) { const m=blowouts[0]; dramaCard(grid,'💥','Blowout',m.winner.name,`${m.pct}% of the vote · ${m.round}`,`${m.wv} vs ${m.lv} — wasn't even close`); }
@@ -1940,29 +1956,29 @@ function renderEngagement() {
   // ── Category Battle ──
   const catData=CATEGORIES.map(cat=>({cat,survivors:alive.filter(p=>cat.seeds.includes(p.seed-1)).length,played:Object.values(poemStats).filter(p=>cat.seeds.includes(p.seed-1)).length}));
   if (catData.some(c=>c.played>0)) {
-    const sec=engSection('🎯 Category Battle', el);
-    const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;padding:0 1.5rem 1.25rem;'; sec.appendChild(grid);
+    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='🎯 Category Battle'; el.appendChild(lbl);
+    const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;'; el.appendChild(grid);
     catData.forEach(({cat,survivors})=>{
       const shortName=cat.name.replace(/^[A-D] — /,'');
       const pct=Math.round(survivors/4*100);
-      const div=document.createElement('div');
-      div.style.cssText='background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);padding:.85rem 1rem;border:1px solid var(--md-outline-variant);';
-      div.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.35rem;"><div style="width:8px;height:8px;border-radius:50%;background:${cat.bg};flex-shrink:0"></div><div style="font-size:.65rem;font-weight:700;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.05em">${esc(shortName)}</div></div><div style="font-size:1.5rem;font-weight:800;color:var(--md-primary)">${survivors}</div><div style="font-size:.68rem;color:var(--md-on-surface-variant);margin-bottom:.35rem">of 4 still alive</div><div style="height:4px;background:var(--md-surface-container-high);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${cat.bg};border-radius:2px"></div></div>`;
+      const div=document.createElement('div'); div.className='results-stat-card';
+      div.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;"><div style="width:8px;height:8px;border-radius:50%;background:${cat.bg};flex-shrink:0"></div><div style="font-size:.65rem;font-weight:700;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.05em">${esc(shortName)}</div></div><div style="font-size:1.5rem;font-weight:800;color:var(--md-primary)">${survivors}</div><div style="font-size:.68rem;color:var(--md-on-surface-variant);margin-bottom:.5rem">of 4 still alive</div><div style="height:4px;background:var(--md-surface-container-high);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${cat.bg};border-radius:2px"></div></div>`;
       grid.appendChild(div);
     });
   }
 
   // ── The Graveyard ──
   if (graveyard.length) {
-    const sec=engSection('🪦 The Graveyard', el);
-    const sub=document.createElement('div'); sub.style.cssText='font-size:.7rem;color:var(--md-on-surface-variant);padding:0 1.5rem .6rem;'; sub.textContent='Eliminated poems — ranked by their best performance'; sec.appendChild(sub);
+    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='🪦 The Graveyard'; el.appendChild(lbl);
+    const card=document.createElement('div'); card.className='results-stat-card'; card.style.padding='0'; el.appendChild(card);
+    const sub=document.createElement('div'); sub.style.cssText='font-size:.7rem;color:var(--md-on-surface-variant);padding:.75rem 1rem .4rem;'; sub.textContent='Eliminated poems — ranked by their best performance'; card.appendChild(sub);
     graveyard.forEach((p,i)=>{
       const bestRound=p.rounds.reduce((best,r)=>r.pct>best.pct?r:best,p.rounds[0]);
       const cat=CATEGORIES.find(c=>c.seeds.includes(p.seed-1));
       const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.5rem 1.5rem;'+(i<graveyard.length-1?'border-bottom:1px solid var(--md-outline-variant);':'');
+      row.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.5rem 1rem;'+(i<graveyard.length-1?'border-bottom:1px solid var(--md-outline-variant);':'');
       row.innerHTML=`<div style="font-size:.9rem;width:1.5rem;text-align:center">💀</div><div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:var(--md-on-surface)">${esc(p.name)}</div><div style="font-size:.65rem;color:var(--md-on-surface-variant)">Best: ${bestRound.pct}% in ${bestRound.round} · ${bestRound.myV}–${bestRound.oppV}</div></div>${cat?`<div style="font-size:.6rem;font-weight:700;padding:.15rem .5rem;border-radius:999px;background:${cat.bg}22;color:${cat.bg}">${esc(cat.name.replace(/^[A-D] — /,''))}</div>`:''}<div style="font-size:.85rem;font-weight:700;color:var(--md-on-surface-variant)">${p.bestPct}%</div>`;
-      sec.appendChild(row);
+      card.appendChild(row);
     });
   }
 }
