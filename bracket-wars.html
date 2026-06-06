@@ -857,6 +857,12 @@ document.getElementById('passwordInput').addEventListener('keydown', e => { if(e
 function setMode(m) {
   MODE = m;
   buildAppBar();
+  // Always tear down student-only overlays when switching to teacher
+  if (MODE === 'teacher') {
+    hideStudentCountdown();
+    document.getElementById('studentCountdownOverlay')?.classList.remove('visible');
+    hideTallyingOverlay();
+  }
   document.getElementById('secondaryToolbar').style.display = MODE==='student' ? 'block' : 'block';
   if (MODE === 'student') {
     showCurrentView();
@@ -1737,7 +1743,7 @@ async function confirmCloseVoting() {
   };
   // Set tallying state — clears countdown, shows tallying on all devices
   const savedClassId = app.voting.classId;
-  app.voting = {open:false,tallying:true,countdown:false,sessionId:null,classId:savedClassId,matchupKey:key,poemA,poemB,studentCount:app.voting.studentCount};
+  app.voting = {open:false,tallying:true,countdown:false,sessionId:null,classId:savedClassId,matchupKey:key,poemA:pA,poemB:pB,studentCount:app.voting.studentCount};
   await saveApp();
   stopVotePolling();
   buildAppBar();
