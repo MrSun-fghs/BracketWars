@@ -483,7 +483,7 @@ body.projection .fullscreen-btn{display:none;}
 /* HOME VIEW */
 .home-view{padding:0 0 3rem;}
 /* ENGAGEMENT TAB */
-.eng-hdr{display:flex;align-items:center;gap:.5rem;border-radius:var(--shape-full);padding:.45rem 1.1rem .45rem .75rem;font-size:.78rem;font-weight:800;letter-spacing:.02em;margin:.85rem 0 .6rem;box-shadow:var(--elev-2);}
+.eng-hdr{display:flex;align-items:center;gap:.45rem;border-radius:var(--shape-full);padding:.38rem .9rem .38rem .65rem;font-size:.73rem;font-weight:800;letter-spacing:.02em;margin:.75rem 0 .5rem;box-shadow:var(--elev-1);width:fit-content;}
 .eng-hdr-ico{font-size:1.1rem;line-height:1;flex-shrink:0;}
 .eng-card{background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);box-shadow:var(--elev-2);overflow:hidden;}
 .eng-card-lo{background:var(--md-surface-container-low);border-radius:var(--shape-xl);box-shadow:var(--elev-2);overflow:hidden;}
@@ -1880,15 +1880,20 @@ function dramaCard(parent, icon, label, title, sub, detail) {
 
 function renderEngagement() {
   if (MODE !== 'teacher') return;
-  const el = document.getElementById('engagementContent'); if (!el) return;
-  el.innerHTML = '';
+  const elRoot = document.getElementById('engagementContent'); if (!elRoot) return;
+  elRoot.innerHTML = '';
   if (!activeClass()) return;
 
   const matchups = getAllMatchups();
   if (matchups.length === 0) {
-    el.innerHTML='<div style="text-align:center;padding:3rem 1.5rem;color:var(--md-on-surface-variant);font-size:.9rem">No matchups completed yet.<br>Check back after the first round.</div>';
+    elRoot.innerHTML='<div style="text-align:center;padding:3rem 1.5rem;color:var(--md-on-surface-variant);font-size:.9rem">No matchups completed yet.<br>Check back after the first round.</div>';
     return;
   }
+
+  // Centered constrained column
+  const el = document.createElement('div');
+  el.style.cssText = 'max-width:560px;margin:0 auto;padding:.75rem 1rem 3rem;';
+  elRoot.appendChild(el);
 
   // ── Build poem stats ──
   const poemStats = {};
@@ -1933,7 +1938,7 @@ function renderEngagement() {
   statTiles.forEach(t=>{
     const tile=document.createElement('div');
     tile.style.cssText=`background:${t.bg};border-radius:28px;padding:1rem .75rem;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.12),0 2px 6px 2px rgba(0,0,0,.09);`;
-    tile.innerHTML=`<div style="font-size:2.5rem;font-weight:900;color:${t.c};line-height:1;letter-spacing:-.03em;">${t.num}</div><div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${t.lc};margin-top:.35rem;">${t.lbl}</div>`;
+    tile.innerHTML=`<div style="font-size:2rem;font-weight:900;color:${t.c};line-height:1;letter-spacing:-.03em;">${t.num}</div><div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${t.lc};margin-top:.3rem;">${t.lbl}</div>`;
     statsRow.appendChild(tile);
   });
   el.appendChild(statsRow);
