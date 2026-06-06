@@ -202,8 +202,18 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 /* Projection mode */
 body.projection .app-bar{display:none!important;}
 body.projection .tabs-surface{display:none!important;}
+body.projection #secondaryToolbar{display:none!important;}
 body.projection #bracketView{padding-top:1rem;}
-.projection-exit{position:fixed;top:.75rem;right:.75rem;z-index:9999;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:var(--shape-full);padding:.4rem .9rem;font-size:.8rem;cursor:pointer;}
+body.projection .home-view{padding-top:1rem;}
+body.projection .leaderboard-view{padding-top:1rem;}
+body.projection .list-view{padding-top:1rem;}
+body.projection .results-view{padding-top:1rem;}
+body.projection .vote-view{padding-top:1rem;}
+.projection-exit{position:fixed;top:.75rem;right:.75rem;z-index:9999;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:var(--shape-full);padding:.45rem 1rem;font-size:.82rem;font-weight:600;cursor:pointer;letter-spacing:.02em;backdrop-filter:blur(4px);}
+.projection-exit:hover{background:rgba(0,0,0,.85);}
+.fullscreen-btn{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:600;padding:.3rem .7rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:transparent;color:var(--md-on-surface-variant);transition:background .15s;}
+.fullscreen-btn:hover{background:rgba(74,58,255,.1);color:var(--md-primary);}
+body.projection .fullscreen-btn{display:none;}
 /* Presence chip */
 .presence-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:600;padding:.3rem .75rem;border-radius:var(--shape-full);background:rgba(0,150,80,.12);color:#008040;border:1px solid rgba(0,150,80,.25);}
 .presence-dot{width:7px;height:7px;border-radius:50%;background:#00b050;animation:livePulse 1.8s ease-in-out infinite;}
@@ -666,6 +676,7 @@ body.projection #bracketView{padding-top:1rem;}
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
       <button class="seg-btn" id="btnResults" onclick="setView('results')"><span class="nav-icon">📊</span> Results</button>
     </div>
+    <button class="fullscreen-btn" id="studentFullscreenBtn" title="Fullscreen" onclick="toggleStudentFullscreen()" style="display:none">⛶</button>
   </div>
 </div>
 
@@ -673,6 +684,7 @@ body.projection #bracketView{padding-top:1rem;}
 <div id="leaderboardView" style="display:none"><div class="leaderboard-view" id="lbContent"></div></div>
 <div id="listView" style="display:none"><div class="list-view" id="listContent"></div></div>
 <div id="bracketView" style="display:none"><div class="bracket-scroll"><div class="mm-bracket" id="bracket"></div></div></div>
+<div id="trendsView" style="display:none"><div class="home-view" id="trendsContent"></div></div>
 </div>
 
 <!-- PASSWORD DIALOG -->
@@ -986,9 +998,19 @@ function setMode(m) {
     document.getElementById('homeView').style.display = 'none';
     document.getElementById('leaderboardView').style.display = 'none';
     document.getElementById('listView').style.display = 'none';
+    document.getElementById('trendsView').style.display = 'none';
     document.getElementById('bracketView').style.display = 'block';
+    currentView = 'bracket';
   }
   renderAll();
+}
+
+function setTeacherView(v) {
+  currentView = v;
+  document.getElementById('bracketView').style.display = v === 'trends' ? 'none' : 'block';
+  document.getElementById('trendsView').style.display = v === 'trends' ? 'block' : 'none';
+  if (v === 'trends') renderTrends();
+  renderTabs();
 }
 
 function setView(v) {
@@ -1028,6 +1050,8 @@ function showCurrentView() {
   }
   const ss = document.querySelector('.toolbar-status-stack');
   if (ss) ss.style.display = currentView === 'home' ? 'none' : 'flex';
+  const sfBtn = document.getElementById('studentFullscreenBtn');
+  if (sfBtn) sfBtn.style.display = (MODE === 'student' && currentView !== 'home') ? 'inline-flex' : 'none';
   if (currentView==='home') renderHome();
   if (currentView==='leaderboard') renderLeaderboard();
   if (currentView==='vote') renderVoteView();
@@ -1494,7 +1518,8 @@ function renderHome() {
 
   el.appendChild(grid);
 
-  // ── Class Comparison & Taste Profile cards ──
+  // ── Class Comparison & Taste Profile cards (teacher only — rendered in renderBracket for teacher) ──
+  if (MODE !== 'teacher') return;
   const crossStats = computeCrossClassStats();
   const anyTaste = app.classes.some(cls => computeClassTasteProfile(cls) !== null);
 
@@ -1567,8 +1592,7 @@ function buildAppBar() {
     if (undoSnapshot) {
       const ub=document.createElement('button'); ub.className='btn-text'; ub.textContent='↩ Undo'; ub.onclick=undoLastResult; el.appendChild(ub);
     }
-    // Projection + Export
-    const pb=document.createElement('button'); pb.className='btn-tonal'; pb.textContent='⛶ Project'; pb.onclick=enterProjection; el.appendChild(pb);
+    // Export only (projection moved to student nav)
     const eb=document.createElement('button'); eb.className='btn-text'; eb.textContent='⬇ Export'; eb.onclick=exportBracket; el.appendChild(eb);
     [{label:'Rename',fn:'openRenameClass()'},{label:'Edit Poems',fn:'openSetup()'},{label:'Reset',fn:'openReset()',danger:true}].forEach(a => {
       const b = document.createElement('button'); b.className='btn-text';
@@ -1598,18 +1622,26 @@ function renderTabs() {
     homeTab.onclick = () => setView('home');
     bar.appendChild(homeTab);
   }
+  if (MODE === 'teacher') {
+    const trendsTab = document.createElement('button');
+    trendsTab.id = 'btnTrendsTab';
+    trendsTab.className = 'm3-tab home-tab' + (currentView === 'trends' ? ' active' : '');
+    trendsTab.innerHTML = '📈 Trends';
+    trendsTab.onclick = () => setTeacherView('trends');
+    bar.appendChild(trendsTab);
+  }
   app.classes.forEach((cls, ci) => {
     const tab = document.createElement('button'); tab.className='m3-tab'+(cls.id===app.activeId&&currentView!=='home'?' active':'');
     const dot = document.createElement('span'); dot.className='tab-indicator'; if(cls.bracket.final.winnerIdx!==null) dot.classList.add('show');
     tab.appendChild(dot); tab.appendChild(document.createTextNode(cls.name));
     tab.onclick = e => {
       if(e.target.classList.contains('tab-close'))return;
-      if(app.activeId===cls.id&&currentView!=='home')return;
+      if(app.activeId===cls.id&&currentView!=='home'&&currentView!=='trends')return;
       const card=document.getElementById('contentCard');
       card.classList.add('content-switching');
       setTimeout(()=>{
         app.activeId=cls.id;
-        if(currentView==='home'||currentView==='vote') currentView='leaderboard';
+        if(currentView==='home'||currentView==='vote'||currentView==='trends') currentView='leaderboard';
         saveStudentPrefs();
         if(MODE==='teacher')saveApp();
         renderAll();
@@ -1821,6 +1853,58 @@ function buildListMatchup(pA,pB,md){
   wrap.appendChild(row);
   if(isC&&tv>0){const br=document.createElement('div');br.className='list-bar-row';const bf=document.createElement('div');bf.className='list-bar-fill';bf.style.width=Math.round(((md.votes[0]||0)/tv)*100)+'%';br.appendChild(bf);wrap.appendChild(br);}
   return wrap;
+}
+
+function renderTrends() {
+  const panel = document.getElementById('trendsContent');
+  if (!panel) return;
+  panel.innerHTML = '';
+  if (MODE !== 'teacher') return;
+
+  const crossStats = computeCrossClassStats();
+  const anyTaste = app.classes.some(cls => computeClassTasteProfile(cls) !== null);
+  if (!crossStats && !anyTaste) return;
+
+  const sectionLabel = document.createElement('div');
+  sectionLabel.style.cssText = 'font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);padding:1.5rem 1.5rem .6rem;display:flex;align-items:center;gap:.5rem;max-width:1000px;margin:0 auto;';
+  sectionLabel.innerHTML = '🔍 Class Insights <span style="flex:1;height:1px;background:var(--md-outline-variant);display:inline-block"></span>';
+  panel.appendChild(sectionLabel);
+
+  const grid = document.createElement('div'); grid.className = 'cross-class-grid';
+
+  if (crossStats) {
+    const compCard = document.createElement('div'); compCard.className = 'cross-card';
+    const compHdr = document.createElement('div'); compHdr.className = 'cross-card-header';
+    compHdr.innerHTML = `<div class="cross-card-title">⚔️ Class vs Class</div><div style="font-size:.7rem;color:var(--md-on-surface-variant);margin-top:.2rem">${crossStats.total} shared matchup${crossStats.total!==1?'s':''}</div>`;
+    compCard.appendChild(compHdr);
+    const compBody = document.createElement('div'); compBody.className = 'cross-card-body';
+    compBody.innerHTML = `
+      <div class="cross-stat-row"><span class="cross-stat-label">Agreement rate</span><span class="cross-stat-value">${crossStats.agreementRate}%</span></div>
+      <div class="cross-stat-row"><span class="cross-stat-label">Matchups agreed</span><span class="cross-stat-value">${crossStats.agreementCount}/${crossStats.total}</span></div>
+      ${crossStats.classStats.map(c=>`<div class="cross-stat-row"><span class="cross-stat-label">${esc(c.name)} avg margin</span><span class="cross-stat-value">${c.avgMargin}%</span></div>`).join('')}
+      ${crossStats.mostDivisive?`<div style="margin-top:.65rem;padding:.55rem .7rem;background:var(--md-surface-container);border-radius:var(--shape-md);font-size:.78rem;"><span style="font-weight:700;color:var(--md-error)">Most Divisive:</span><br><span style="color:var(--md-on-surface)">${esc(crossStats.mostDivisive.pAName)} vs ${esc(crossStats.mostDivisive.pBName)}</span><br><span style="color:var(--md-on-surface-variant);font-size:.7rem">${crossStats.mostDivisive.results.map(r=>r.className+' → '+(r.winnerIdx===0?crossStats.mostDivisive.pAName:crossStats.mostDivisive.pBName)).join(' · ')}</span></div>`:''}`;
+    compCard.appendChild(compBody);
+    grid.appendChild(compCard);
+  }
+
+  app.classes.forEach(cls => {
+    const tp = computeClassTasteProfile(cls);
+    if (!tp) return;
+    const tCard = document.createElement('div'); tCard.className = 'cross-card';
+    const tHdr = document.createElement('div'); tHdr.className = 'cross-card-header';
+    tHdr.innerHTML = `<div class="cross-card-title">${esc(cls.name)} Taste Profile</div>`;
+    tCard.appendChild(tHdr);
+    const tBody = document.createElement('div'); tBody.className = 'cross-card-body';
+    tBody.innerHTML = `
+      <div class="cross-stat-row"><span class="cross-stat-label">Matchups complete</span><span class="cross-stat-value">${tp.total}</span></div>
+      <div class="cross-stat-row"><span class="cross-stat-label">Avg winning margin</span><span class="cross-stat-value">${tp.avgDecisiveness}%</span></div>
+      <div class="cross-stat-row"><span class="cross-stat-label">Upset rate</span><span class="cross-stat-value">${tp.upsetRate}%</span></div>
+      <div class="taste-profile-chip">${tp.icon} ${esc(tp.profile)}</div>`;
+    tCard.appendChild(tBody);
+    grid.appendChild(tCard);
+  });
+
+  if (grid.children.length) panel.appendChild(grid);
 }
 
 function renderBracket(){
@@ -2221,13 +2305,20 @@ function enterProjection() {
   document.body.classList.add('projection');
   document.getElementById('projectionExitBtn').style.display = 'block';
   document.documentElement.requestFullscreen?.().catch(()=>{});
-  // Switch to bracket view for projection
-  currentView = 'bracket'; renderAll(); showCurrentView();
+  // Stay on current view; just re-render to hide chrome
+  renderAll(); showCurrentView();
 }
 function exitProjection() {
   document.body.classList.remove('projection');
   document.getElementById('projectionExitBtn').style.display = 'none';
   if (document.fullscreenElement) document.exitFullscreen?.();
+}
+function toggleStudentFullscreen() {
+  if (document.body.classList.contains('projection')) {
+    exitProjection();
+  } else {
+    enterProjection();
+  }
 }
 document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement) exitProjection();
