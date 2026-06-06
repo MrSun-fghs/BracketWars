@@ -562,6 +562,74 @@ body.projection #bracketView{padding-top:1rem;}
 .home-card-stat{flex:1;text-align:center;}
 .home-card-stat-num{font-family:monospace;font-size:1.1rem;font-weight:800;color:var(--md-primary);}
 .home-card-stat-label{font-size:.6rem;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.06em;}
+/* ── Voting timer ── */
+.voting-timer{display:inline-flex;align-items:center;gap:.35rem;font-family:monospace;font-size:.88rem;font-weight:700;padding:.3rem .75rem;border-radius:var(--shape-full);background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);}
+.voting-timer.urgent{background:var(--md-error-container);color:var(--md-error);animation:timerUrgent .5s ease-in-out infinite;}
+@keyframes timerUrgent{0%,100%{opacity:1;}50%{opacity:.55;}}
+/* ── Results view ── */
+.results-view{padding:1.25rem;max-width:700px;margin:0 auto;}
+.results-champ-banner{border-radius:var(--shape-xl);background:linear-gradient(135deg,#1a0533,#4A3AFF,#7C5CBF);padding:1.5rem 1.75rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1.25rem;box-shadow:0 8px 32px rgba(74,58,255,.35);position:relative;overflow:hidden;}
+.results-champ-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 55%);pointer-events:none;}
+.results-stat-card{border-radius:var(--shape-xl);background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);box-shadow:var(--elev-1);padding:1.1rem 1.25rem;margin-bottom:.85rem;}
+.results-section-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);margin:1.1rem 0 .5rem .1rem;display:flex;align-items:center;gap:.5rem;}
+.results-section-label::after{content:'';flex:1;height:1px;background:var(--md-outline-variant);}
+.result-matchup-row{display:flex;align-items:center;gap:.6rem;padding:.45rem .75rem;border-radius:var(--shape-md);margin-bottom:.25rem;background:var(--md-surface-container-lowest);}
+.result-matchup-row.r-winner{background:var(--md-primary-container);}
+.result-matchup-row.r-loser{opacity:.45;}
+.result-poem-name{flex:1;font-size:.88rem;font-weight:600;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.result-matchup-row.r-winner .result-poem-name{color:var(--md-on-primary-container);}
+.result-vote-info{font-family:monospace;font-size:.78rem;font-weight:700;color:var(--md-primary);flex-shrink:0;}
+.result-matchup-row.r-loser .result-vote-info{color:var(--md-on-surface-variant);}
+.results-highlight-card{border-radius:var(--shape-xl);background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);box-shadow:var(--elev-1);padding:.85rem 1.1rem;display:flex;align-items:flex-start;gap:.85rem;}
+.results-highlight-icon{font-size:1.75rem;flex-shrink:0;line-height:1;}
+.results-highlight-title{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:.2rem;}
+.results-highlight-main{font-size:.95rem;font-weight:700;color:var(--md-on-surface);line-height:1.2;}
+.results-highlight-sub{font-size:.78rem;color:var(--md-on-surface-variant);margin-top:.2rem;}
+/* ── Cross-class cards ── */
+.cross-class-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;padding:0 1.5rem 1.5rem;max-width:1000px;margin:0 auto;}
+.cross-card{background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);border:1px solid var(--md-outline-variant);box-shadow:var(--elev-1);overflow:hidden;}
+.cross-card-header{padding:.75rem 1.1rem .6rem;background:linear-gradient(135deg,var(--md-surface-container),var(--md-surface-container-high));border-bottom:1px solid var(--md-outline-variant);}
+.cross-card-title{font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.cross-card-body{padding:.85rem 1.1rem;}
+.cross-stat-row{display:flex;align-items:center;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid var(--md-outline-variant);}
+.cross-stat-row:last-child{border-bottom:none;}
+.cross-stat-label{font-size:.8rem;color:var(--md-on-surface-variant);}
+.cross-stat-value{font-size:.88rem;font-weight:700;color:var(--md-primary);font-family:monospace;}
+.taste-profile-chip{display:inline-flex;align-items:center;gap:.4rem;background:var(--md-primary-container);border-radius:var(--shape-full);padding:.35rem .9rem;font-size:.82rem;font-weight:700;color:var(--md-on-primary-container);margin-top:.5rem;}
+/* ── Bracket SVG connector lines ── */
+.bracket-lines-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:0;}
+.mm-bracket{position:relative;}
+/* ── Category color accent in list ── */
+.list-cat-dot{width:5px;border-radius:var(--shape-full);flex-shrink:0;align-self:stretch;min-height:20px;}
+/* ── Vote screen category badge ── */
+.vote-cat-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .6rem;border-radius:var(--shape-full);margin-bottom:.4rem;color:#fff;}
+/* ── Mobile responsive ── */
+@media(max-width:640px){
+  .app-bar-inner{padding:0 .65rem;gap:.35rem;}
+  .app-bar-title{font-size:.92rem;}
+  .app-bar-subtitle{font-size:.6rem;}
+  .btn-tonal,.btn-filled{font-size:.72rem;padding:.38rem .7rem;}
+  .btn-text{padding:.3rem .45rem;font-size:.72rem;}
+  .home-classes{grid-template-columns:1fr;padding:1rem .75rem 0;}
+  .home-hero{padding:1.2rem 1rem 1rem;}
+  .home-hero-subtitle{font-size:1.75rem;}
+  .home-hero-intro{font-size:.82rem;}
+  .home-hero-badges{gap:.4rem;}
+  .home-badge{font-size:.7rem;padding:.3rem .7rem;}
+  .cross-class-grid{grid-template-columns:1fr;padding:0 .75rem 1.5rem;}
+  .vote-view{padding:.75rem .5rem;}
+  .vote-stat-num{font-size:1.5rem;}
+  .vote-pill-btn{padding:.7rem 1rem;font-size:.88rem;}
+  .leaderboard-view{padding:.75rem .5rem;}
+  .list-view{padding:.75rem .5rem;}
+  .results-view{padding:.75rem .5rem;}
+  .seg-btn{min-width:44px;padding:.35rem .5rem;font-size:.6rem;}
+  .seg-btn .nav-icon{font-size:1.1rem;}
+  .combined-bar-inner{flex-wrap:wrap;gap:.4rem;padding:.5rem .75rem;}
+  .seg-btn-track{flex-wrap:wrap;justify-content:center;gap:.2rem;}
+  .seg-btn-container{padding:.45rem .65rem;}
+  .app-bar-actions{flex-wrap:wrap;justify-content:flex-end;gap:.25rem;}
+}
 </style>
 </head>
 <body>
@@ -596,6 +664,7 @@ body.projection #bracketView{padding-top:1rem;}
       <button class="seg-btn active" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
+      <button class="seg-btn" id="btnResults" onclick="setView('results')"><span class="nav-icon">📊</span> Results</button>
     </div>
   </div>
 </div>
@@ -725,6 +794,9 @@ body.projection #bracketView{padding-top:1rem;}
 <!-- VOTE VIEW -->
 <div id="voteView" style="display:none"><div class="vote-view" id="voteContent"></div></div>
 
+<!-- RESULTS VIEW -->
+<div id="resultsView" style="display:none"><div class="results-view" id="resultsContent"></div></div>
+
 <!-- STUDENT COUNTDOWN OVERLAY -->
 <div id="studentCountdownOverlay" class="tallying-overlay" style="z-index:550">
   <div class="student-countdown-num" id="studentCountNum">3</div>
@@ -762,7 +834,17 @@ body.projection #bracketView{padding-top:1rem;}
     <div class="dialog-headline" id="openVotingHeadline">Open Voting</div>
     <div class="dialog-body" id="openVotingBody" style="margin-bottom:1rem"></div>
     <div class="m3-field"><input type="number" id="studentCountInput" min="1" max="60" placeholder=" "><label>Students present today</label></div>
-    <div class="dialog-actions" style="justify-content:center;gap:.75rem">
+    <div class="m3-field" style="margin-bottom:0">
+      <select id="votingTimerInput" style="width:100%;background:var(--md-surface-container-highest);border:none;border-bottom:2px solid var(--md-outline);padding:1.1rem 1rem .5rem;font-size:.95rem;color:var(--md-on-surface);outline:none;border-radius:var(--shape-md) var(--shape-md) 0 0;cursor:pointer;">
+        <option value="0">No timer</option>
+        <option value="1">1 minute</option>
+        <option value="2" selected>2 minutes</option>
+        <option value="3">3 minutes</option>
+        <option value="5">5 minutes</option>
+      </select>
+      <label style="position:absolute;left:1rem;top:.3rem;font-size:.65rem;font-weight:500;color:var(--md-primary);pointer-events:none;">Voting Timer (optional)</label>
+    </div>
+    <div class="dialog-actions" style="justify-content:center;gap:.75rem;margin-top:1rem">
       <button class="btn-outlined" onclick="closeOpenVotingDialog()">Cancel</button>
       <button class="btn-filled" onclick="startVotingSession()">Open Voting</button>
     </div>
@@ -912,7 +994,7 @@ function setMode(m) {
 function setView(v) {
   currentView = v;
   saveStudentPrefs();
-  ['home','leaderboard','list','bracket'].forEach(x => {
+  ['home','leaderboard','list','bracket','results'].forEach(x => {
     const el = document.getElementById('btn'+x.charAt(0).toUpperCase()+x.slice(1));
     if (el) el.classList.toggle('active', v===x);
   });
@@ -921,7 +1003,7 @@ function setView(v) {
 }
 function showCurrentView() {
   if (MODE === 'teacher') return;
-  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView'};
+  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView', results:'resultsView'};
   Object.entries(views).forEach(([key, id]) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -949,6 +1031,278 @@ function showCurrentView() {
   if (currentView==='home') renderHome();
   if (currentView==='leaderboard') renderLeaderboard();
   if (currentView==='vote') renderVoteView();
+  if (currentView==='results') renderResults();
+}
+
+// ── Tournament round progress helper ──
+function getCurrentRoundInfo(b) {
+  const r16 = b.regionRounds.flatMap(reg => [reg[0], reg[1]]);
+  const qf  = b.regionRounds.map(reg => reg[2]);
+  const r16Done = r16.filter(m=>m.winnerIdx!==null).length;
+  const qfDone  = qf.filter(m=>m.winnerIdx!==null).length;
+  const sfDone  = b.semis.filter(m=>m.winnerIdx!==null).length;
+  const finDone = b.final.winnerIdx!==null ? 1 : 0;
+  if (r16Done < 8) return {label:'Round of 16', done:r16Done, total:8};
+  if (qfDone  < 4) return {label:'Quarterfinals', done:qfDone, total:4};
+  if (sfDone  < 2) return {label:'Semifinals', done:sfDone, total:2};
+  if (!finDone)    return {label:'Championship Final', done:0, total:1};
+  return {label:'Complete 👑', done:1, total:1};
+}
+
+// ── Cross-class comparison ──
+function getCrossClassMatchups() {
+  const getMD = (b,key) => {
+    if (key.type==='rR1'||key.type==='rQF') return b.regionRounds[key.ri][key.mi];
+    if (key.type==='semi') return b.semis[key.ri];
+    return b.final;
+  };
+  const allKeys = [];
+  for (let ri=0;ri<4;ri++) { allKeys.push({type:'rR1',ri,mi:0},{type:'rR1',ri,mi:1},{type:'rQF',ri,mi:2}); }
+  allKeys.push({type:'semi',ri:0},{type:'semi',ri:1},{type:'final',ri:null,mi:null});
+
+  return allKeys.filter(key => app.classes.every(cls => getMD(cls.bracket,key)?.winnerIdx!==null))
+    .map(key => {
+      const results = app.classes.map(cls => {
+        const md = getMD(cls.bracket,key);
+        const total = (md.votes[0]||0)+(md.votes[1]||0);
+        const winPct = total>0 ? Math.round((md.votes[md.winnerIdx]||0)/total*100) : 50;
+        return {classId:cls.id, className:cls.name, winnerIdx:md.winnerIdx, winPct};
+      });
+      const agreed = results.every(r=>r.winnerIdx===results[0].winnerIdx);
+      const pctSpread = results.length>1 ? Math.max(...results.map(r=>r.winPct))-Math.min(...results.map(r=>r.winPct)) : 0;
+      // Get poem names from first class
+      const b0=app.classes[0].bracket; const md0=getMD(b0,key);
+      let pAName='?', pBName='?';
+      if (key.type==='rR1') { const pairs=[[0,1],[2,3]]; const p=pairs[key.mi]; pAName=b0.poems[CATEGORIES[key.ri].seeds[p[0]]]; pBName=b0.poems[CATEGORIES[key.ri].seeds[p[1]]]; }
+      else if (key.type==='rQF') { const qW=(ri,si)=>{const r=b0.regionRounds[ri][si]; return r.winnerIdx!==null?b0.poems[CATEGORIES[ri].seeds[[[0,1],[2,3]][si][r.winnerIdx]]]:null;}; pAName=qW(key.ri,0)||'?'; pBName=qW(key.ri,1)||'?'; }
+      const winnerName = results[0] ? (results[0].winnerIdx===0?pAName:pBName) : '?';
+      return {key, agreed, pctSpread, results, pAName, pBName, winnerName};
+    });
+}
+
+function computeCrossClassStats() {
+  if (app.classes.length < 2) return null;
+  const shared = getCrossClassMatchups();
+  if (!shared.length) return null;
+  const agreementCount = shared.filter(m=>m.agreed).length;
+  const agreementRate = Math.round(agreementCount/shared.length*100);
+  const mostDivisive = [...shared].filter(m=>!m.agreed).sort((a,b)=>b.pctSpread-a.pctSpread)[0]||null;
+  const classStats = app.classes.map(cls => {
+    const margins = shared.map(m => m.results.find(r=>r.classId===cls.id)?.winPct||50);
+    return {id:cls.id, name:cls.name, avgMargin:Math.round(margins.reduce((a,b)=>a+b,0)/margins.length)};
+  });
+  return {total:shared.length, agreementCount, agreementRate, mostDivisive, classStats};
+}
+
+function computeClassTasteProfile(cls) {
+  const b = cls.bracket;
+  let total=0, upsets=0, totalWinPct=0;
+  b.regionRounds.forEach((reg,ri) => {
+    [[0,1],[2,3]].forEach((pair,mi) => {
+      const md=reg[mi]; if(md.winnerIdx===null) return; total++;
+      const tv=(md.votes[0]||0)+(md.votes[1]||0);
+      totalWinPct += tv>0 ? Math.round((md.votes[md.winnerIdx]||0)/tv*100) : 50;
+      const sA=CATEGORIES[ri].seeds[pair[0]], sB=CATEGORIES[ri].seeds[pair[1]];
+      const wSeed=md.winnerIdx===0?sA:sB; const lSeed=md.winnerIdx===0?sB:sA;
+      if (wSeed>lSeed) upsets++;
+    });
+    const qf=reg[2]; if(qf.winnerIdx===null) return; total++;
+    const tv=(qf.votes[0]||0)+(qf.votes[1]||0);
+    totalWinPct += tv>0 ? Math.round((qf.votes[qf.winnerIdx]||0)/tv*100) : 50;
+  });
+  b.semis.forEach(md=>{ if(md.winnerIdx===null)return; total++; const tv=(md.votes[0]||0)+(md.votes[1]||0); totalWinPct+=tv>0?Math.round((md.votes[md.winnerIdx]||0)/tv*100):50; });
+  if (b.final.winnerIdx!==null) { total++; const tv=(b.final.votes[0]||0)+(b.final.votes[1]||0); totalWinPct+=tv>0?Math.round((b.final.votes[b.final.winnerIdx]||0)/tv*100):50; }
+  if (!total) return null;
+  const upsetRate = Math.round(upsets/Math.min(total,8)*100);
+  const avgDecisiveness = Math.round(totalWinPct/total);
+  let profile,icon;
+  if (upsetRate>=50) { profile='Upset Specialists'; icon='🌪️'; }
+  else if (avgDecisiveness>=70) { profile='Picks the Favorite'; icon='🎯'; }
+  else if (avgDecisiveness<=57) { profile='Close Race Lovers'; icon='⚖️'; }
+  else { profile='Balanced Taste'; icon='📊'; }
+  return {total, upsetRate, avgDecisiveness, profile, icon};
+}
+
+// ── Voting timer ──
+let votingTimerInterval = null;
+function formatTimer(ms) {
+  const s=Math.max(0,Math.ceil(ms/1000));
+  return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');
+}
+function startVotingTimer() {
+  if (votingTimerInterval) clearInterval(votingTimerInterval);
+  votingTimerInterval = setInterval(updateVotingTimerUI, 1000);
+  updateVotingTimerUI();
+}
+function stopVotingTimer() {
+  if (votingTimerInterval) { clearInterval(votingTimerInterval); votingTimerInterval=null; }
+  const el=document.getElementById('votingTimerDisplay'); if(el) el.textContent='';
+}
+function updateVotingTimerUI() {
+  ensureVoting(app);
+  if (!app.voting.timerEndsAt || !app.voting.open) { stopVotingTimer(); return; }
+  const remaining = app.voting.timerEndsAt - Date.now();
+  const els = document.querySelectorAll('.voting-timer-display');
+  els.forEach(el => {
+    el.textContent = '⏱ ' + formatTimer(remaining);
+    el.classList.toggle('urgent', remaining < 30000);
+  });
+  if (remaining <= 0) {
+    stopVotingTimer();
+    if (MODE==='teacher' && !autoCloseTriggered) { autoCloseTriggered=true; initiateCountdownClose(); }
+  }
+}
+
+// ── Bracket connector lines ──
+function drawBracketLines() {
+  const bracket = document.getElementById('bracket'); if (!bracket) return;
+  const old = bracket.querySelector('.bracket-lines-svg'); if (old) old.remove();
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.className = 'bracket-lines-svg';
+  bracket.appendChild(svg);
+
+  const getRect = (key) => {
+    const el = bracket.querySelector(`[data-matchup-key='${JSON.stringify(key)}']`); if (!el) return null;
+    const bR = bracket.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return { left:r.left-bR.left, right:r.right-bR.left, midY:(r.top+r.bottom)/2-bR.top };
+  };
+  const drawStep = (fx,fy,tx,ty) => {
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    const mx=(fx+tx)/2;
+    p.setAttribute('d',`M${fx},${fy} H${mx} V${ty} H${tx}`);
+    p.setAttribute('fill','none'); p.setAttribute('stroke','rgba(74,58,255,.18)');
+    p.setAttribute('stroke-width','1.5'); p.setAttribute('stroke-linecap','round');
+    svg.appendChild(p);
+  };
+
+  // Left: ri=0 R16→QF, ri=1 R16→QF
+  for(let ri=0;ri<2;ri++){
+    for(let mi=0;mi<2;mi++){
+      const r=getRect({type:'rR1',ri,mi}),q=getRect({type:'rQF',ri,mi:2});
+      if(r&&q) drawStep(r.right,r.midY,q.left,q.midY);
+    }
+    const q=getRect({type:'rQF',ri,mi:2}),s=getRect({type:'semi',ri:0,mi:null});
+    if(q&&s) drawStep(q.right,q.midY,s.left,s.midY);
+  }
+  const ls=getRect({type:'semi',ri:0,mi:null}),fin=getRect({type:'final',ri:null,mi:null});
+  if(ls&&fin) drawStep(ls.right,ls.midY,fin.left,fin.midY);
+  // Right: ri=2,3 R16→QF, QF→Semi, Semi→Final
+  for(let ri=2;ri<4;ri++){
+    for(let mi=0;mi<2;mi++){
+      const r=getRect({type:'rR1',ri,mi}),q=getRect({type:'rQF',ri,mi:2});
+      if(r&&q) drawStep(r.left,r.midY,q.right,q.midY);
+    }
+    const q=getRect({type:'rQF',ri,mi:2}),s=getRect({type:'semi',ri:1,mi:null});
+    if(q&&s) drawStep(q.left,q.midY,s.right,s.midY);
+  }
+  const rs=getRect({type:'semi',ri:1,mi:null});
+  if(rs&&fin) drawStep(rs.left,rs.midY,fin.right,fin.midY);
+}
+
+// ── Results summary view ──
+function renderResults() {
+  const el=document.getElementById('resultsContent'); if(!el||!activeClass()) return; el.innerHTML='';
+  const b=bkt();
+  const champ=champion();
+
+  // Champion banner
+  const banner=document.createElement('div');
+  banner.className='results-champ-banner';
+  banner.innerHTML=`<div style="font-size:3.5rem;filter:drop-shadow(0 4px 16px rgba(245,158,11,.7));animation:crownFloat 2.2s ease-in-out infinite">${champ?'👑':'⏳'}</div><div style="min-width:0"><div style="font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.3rem">${champ?'🥇 Poetry Champion':'Tournament in Progress'}</div><div style="font-size:1.75rem;font-weight:800;color:#fff;line-height:1.1">${champ?esc(champ.name):'Who will be crowned?'}</div>${champ?`<div style="font-size:.8rem;color:rgba(255,255,255,.7);margin-top:.35rem">Undefeated · 4 rounds · ${activeClass().name}</div>`:''}</div>`;
+  el.appendChild(banner);
+
+  // Gather all completed matchups for stats
+  const allMatchups=[];
+  b.regionRounds.forEach((reg,ri)=>{
+    [[0,1],[2,3]].forEach((pair,mi)=>{
+      const md=reg[mi]; if(md.winnerIdx===null)return;
+      const tv=(md.votes[0]||0)+(md.votes[1]||0);
+      const pAName=b.poems[CATEGORIES[ri].seeds[pair[0]]],pBName=b.poems[CATEGORIES[ri].seeds[pair[1]]];
+      const winPct=tv>0?Math.round((md.votes[md.winnerIdx]||0)/tv*100):50;
+      const wSeed=CATEGORIES[ri].seeds[pair[md.winnerIdx]],lSeed=CATEGORIES[ri].seeds[pair[1-md.winnerIdx]];
+      allMatchups.push({round:'Round of 16',pAName,pBName,md,winPct,winnerName:md.winnerIdx===0?pAName:pBName,loserName:md.winnerIdx===0?pBName:pAName,isSurprise:wSeed>lSeed,tv});
+    });
+    const qf=reg[2]; if(qf.winnerIdx===null)return;
+    const tv2=(qf.votes[0]||0)+(qf.votes[1]||0);
+    const qA=qfPoem(ri,0),qB=qfPoem(ri,1);
+    if(qA&&qB){const winPct2=tv2>0?Math.round((qf.votes[qf.winnerIdx]||0)/tv2*100):50;allMatchups.push({round:'Quarterfinals',pAName:qA.name,pBName:qB.name,md:qf,winPct:winPct2,winnerName:qf.winnerIdx===0?qA.name:qB.name,loserName:qf.winnerIdx===0?qB.name:qA.name,isSurprise:qf.winnerIdx===0?qA.seed>qB.seed:qB.seed>qA.seed,tv:tv2});}
+  });
+  b.semis.forEach((md,si)=>{
+    if(md.winnerIdx===null)return;
+    const tv=(md.votes[0]||0)+(md.votes[1]||0);
+    const pA=semiPoem(si,0),pB=semiPoem(si,1);
+    if(pA&&pB){const wp=tv>0?Math.round((md.votes[md.winnerIdx]||0)/tv*100):50;allMatchups.push({round:'Semifinals',pAName:pA.name,pBName:pB.name,md,winPct:wp,winnerName:md.winnerIdx===0?pA.name:pB.name,loserName:md.winnerIdx===0?pB.name:pA.name,isSurprise:md.winnerIdx===0?pA.seed>pB.seed:pB.seed>pA.seed,tv});}
+  });
+  if(b.final.winnerIdx!==null){
+    const tv=(b.final.votes[0]||0)+(b.final.votes[1]||0);
+    const fA=finalPoem(0),fB=finalPoem(1);
+    if(fA&&fB){const wp=tv>0?Math.round((b.final.votes[b.final.winnerIdx]||0)/tv*100):50;allMatchups.push({round:'Final',pAName:fA.name,pBName:fB.name,md:b.final,winPct:wp,winnerName:b.final.winnerIdx===0?fA.name:fB.name,loserName:b.final.winnerIdx===0?fB.name:fA.name,isSurprise:b.final.winnerIdx===0?fA.seed>fB.seed:fB.seed>fA.seed,tv});}
+  }
+
+  if (!allMatchups.length) {
+    const wait=document.createElement('div');wait.style.cssText='text-align:center;padding:3rem 1rem;color:var(--md-on-surface-variant);';
+    wait.innerHTML='<div style="font-size:2.5rem;margin-bottom:.75rem">🎯</div><div style="font-size:1rem;font-weight:500">No results yet</div><div style="font-size:.85rem;margin-top:.35rem">Results will appear here as Mr. Sun records votes</div>';
+    el.appendChild(wait); return;
+  }
+
+  // Highlight stats
+  const mosLopsided=[...allMatchups].sort((a,b)=>b.winPct-a.winPct)[0];
+  const closest=[...allMatchups].sort((a,b)=>a.winPct-b.winPct)[0];
+  const totalVotes=allMatchups.reduce((s,m)=>s+(m.tv||0),0);
+
+  const statsRow=document.createElement('div');statsRow.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-bottom:.85rem;';
+  statsRow.innerHTML=`
+    <div style="background:var(--md-primary-container);border-radius:var(--shape-lg);padding:.7rem .75rem;text-align:center;">
+      <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--md-primary)">${allMatchups.length}</div>
+      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant)">Results In</div>
+    </div>
+    <div style="background:var(--md-primary-container);border-radius:var(--shape-lg);padding:.7rem .75rem;text-align:center;">
+      <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--md-primary)">${totalVotes}</div>
+      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant)">Total Votes</div>
+    </div>
+    <div style="background:var(--md-primary-container);border-radius:var(--shape-lg);padding:.7rem .75rem;text-align:center;">
+      <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--md-primary)">${15-allMatchups.length}</div>
+      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant)">To Go</div>
+    </div>`;
+  el.appendChild(statsRow);
+
+  // Memorable matchups
+  if (allMatchups.length>=1) {
+    const memLabel=document.createElement('div');memLabel.className='results-section-label';memLabel.textContent='⚡ Memorable Matchups';el.appendChild(memLabel);
+    const memGrid=document.createElement('div');memGrid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.65rem;margin-bottom:.5rem;';
+
+    const addHighlight=(icon,title,main,sub)=>{
+      const c=document.createElement('div');c.className='results-highlight-card';
+      c.innerHTML=`<div class="results-highlight-icon">${icon}</div><div><div class="results-highlight-title">${title}</div><div class="results-highlight-main">${esc(main)}</div><div class="results-highlight-sub">${esc(sub)}</div></div>`;
+      memGrid.appendChild(c);
+    };
+    addHighlight('🏆','Most Decisive',mosLopsided.winnerName,`${mosLopsided.winPct}% of ${mosLopsided.tv} votes · ${mosLopsided.round}`);
+    addHighlight('⚖️','Closest Race',closest.winnerName,`Just ${closest.winPct}% vs ${100-closest.winPct}% · ${closest.round}`);
+    const surprises=allMatchups.filter(m=>m.isSurprise);
+    if(surprises.length) addHighlight('🌪️','Surprise Result',surprises[0].winnerName,`Beat the higher-seeded ${esc(surprises[0].loserName)} · ${surprises[0].round}`);
+    el.appendChild(memGrid);
+  }
+
+  // Results by round
+  ['Round of 16','Quarterfinals','Semifinals','Final'].forEach(round=>{
+    const roundMs=allMatchups.filter(m=>m.round===round);
+    if(!roundMs.length) return;
+    const lbl=document.createElement('div');lbl.className='results-section-label';lbl.textContent=round;el.appendChild(lbl);
+    const card=document.createElement('div');card.className='results-stat-card';card.style.padding='.5rem';
+    roundMs.forEach(m=>{
+      const tv=m.tv||0;
+      const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;border-radius:var(--shape-sm);margin-bottom:.2rem;background:var(--md-surface-container-lowest);';
+      row.innerHTML=`
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.82rem;font-weight:700;color:var(--md-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">✓ ${esc(m.winnerName)}</div>
+          <div style="font-size:.72rem;color:var(--md-on-surface-variant);text-decoration:line-through;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(m.loserName)}</div>
+        </div>
+        <div style="font-family:monospace;font-size:.8rem;font-weight:700;color:var(--md-primary);flex-shrink:0">${m.md.votes[m.md.winnerIdx]}–${m.md.votes[1-m.md.winnerIdx]}</div>
+        <div style="font-family:monospace;font-size:.72rem;color:var(--md-on-surface-variant);flex-shrink:0">${m.winPct}%</div>`;
+      card.appendChild(row);
+    });
+    el.appendChild(card);
+  });
 }
 
 function renderHome() {
@@ -1042,10 +1396,11 @@ function renderHome() {
     // Body
     const body = document.createElement('div'); body.className = 'home-card-body';
 
-    // Progress bar — inside body at top
+    // Progress bar — inside body at top with round info
     if (!champPoem) {
+      const rInfo = getCurrentRoundInfo(b);
       const progWrap = document.createElement('div'); progWrap.className = 'home-card-progress-wrap';
-      progWrap.innerHTML = `<div class="home-card-progress-label"><span class="home-card-progress-title">Tournament Progress</span><span class="home-card-progress-pct">${pct}%</span></div><div class="home-card-progress"><div class="home-card-bar" style="width:${pct}%"></div></div>`;
+      progWrap.innerHTML = `<div class="home-card-progress-label"><span class="home-card-progress-title">${esc(rInfo.label)} · ${rInfo.done}/${rInfo.total}</span><span class="home-card-progress-pct">${pct}%</span></div><div class="home-card-progress"><div class="home-card-bar" style="width:${pct}%"></div></div>`;
       body.appendChild(progWrap);
     }
 
@@ -1138,6 +1493,55 @@ function renderHome() {
   });
 
   el.appendChild(grid);
+
+  // ── Class Comparison & Taste Profile cards ──
+  const crossStats = computeCrossClassStats();
+  const anyTaste = app.classes.some(cls => computeClassTasteProfile(cls) !== null);
+
+  if (crossStats || anyTaste) {
+    const sectionLabel = document.createElement('div');
+    sectionLabel.style.cssText = 'font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);padding:1.5rem 1.5rem .6rem;display:flex;align-items:center;gap:.5rem;max-width:1000px;margin:0 auto;';
+    sectionLabel.innerHTML = '🔍 Class Insights <span style="flex:1;height:1px;background:var(--md-outline-variant);display:inline-block"></span>';
+    el.appendChild(sectionLabel);
+  }
+
+  const insightsGrid = document.createElement('div'); insightsGrid.className = 'cross-class-grid';
+
+  // Cross-class comparison card
+  if (crossStats) {
+    const compCard = document.createElement('div'); compCard.className = 'cross-card';
+    const compHdr = document.createElement('div'); compHdr.className = 'cross-card-header';
+    compHdr.innerHTML = `<div class="cross-card-title">⚔️ Class vs Class</div><div style="font-size:.7rem;color:var(--md-on-surface-variant);margin-top:.2rem">${crossStats.total} shared matchup${crossStats.total!==1?'s':''}</div>`;
+    compCard.appendChild(compHdr);
+    const compBody = document.createElement('div'); compBody.className = 'cross-card-body';
+    compBody.innerHTML = `
+      <div class="cross-stat-row"><span class="cross-stat-label">Agreement rate</span><span class="cross-stat-value">${crossStats.agreementRate}%</span></div>
+      <div class="cross-stat-row"><span class="cross-stat-label">Matchups agreed</span><span class="cross-stat-value">${crossStats.agreementCount}/${crossStats.total}</span></div>
+      ${crossStats.classStats.map(c=>`<div class="cross-stat-row"><span class="cross-stat-label">${esc(c.name)} avg margin</span><span class="cross-stat-value">${c.avgMargin}%</span></div>`).join('')}
+      ${crossStats.mostDivisive?`<div style="margin-top:.65rem;padding:.55rem .7rem;background:var(--md-surface-container);border-radius:var(--shape-md);font-size:.78rem;"><span style="font-weight:700;color:var(--md-error)">Most Divisive:</span><br><span style="color:var(--md-on-surface)">${esc(crossStats.mostDivisive.pAName)} vs ${esc(crossStats.mostDivisive.pBName)}</span><br><span style="color:var(--md-on-surface-variant);font-size:.7rem">${crossStats.mostDivisive.results.map(r=>r.className+' → '+(r.winnerIdx===0?crossStats.mostDivisive.pAName:crossStats.mostDivisive.pBName)).join(' · ')}</span></div>`:''}`;
+    compCard.appendChild(compBody);
+    insightsGrid.appendChild(compCard);
+  }
+
+  // Taste profile cards
+  app.classes.forEach(cls => {
+    const tp = computeClassTasteProfile(cls);
+    if (!tp) return;
+    const tCard = document.createElement('div'); tCard.className = 'cross-card';
+    const tHdr = document.createElement('div'); tHdr.className = 'cross-card-header';
+    tHdr.innerHTML = `<div class="cross-card-title">${esc(cls.name)} Taste Profile</div>`;
+    tCard.appendChild(tHdr);
+    const tBody = document.createElement('div'); tBody.className = 'cross-card-body';
+    tBody.innerHTML = `
+      <div class="cross-stat-row"><span class="cross-stat-label">Matchups complete</span><span class="cross-stat-value">${tp.total}</span></div>
+      <div class="cross-stat-row"><span class="cross-stat-label">Avg winning margin</span><span class="cross-stat-value">${tp.avgDecisiveness}%</span></div>
+      <div class="cross-stat-row"><span class="cross-stat-label">Upset rate</span><span class="cross-stat-value">${tp.upsetRate}%</span></div>
+      <div class="taste-profile-chip">${tp.icon} ${esc(tp.profile)}</div>`;
+    tCard.appendChild(tBody);
+    insightsGrid.appendChild(tCard);
+  });
+
+  if (insightsGrid.children.length) el.appendChild(insightsGrid);
 }
 
 function buildAppBar() {
@@ -1147,6 +1551,14 @@ function buildAppBar() {
     if (app.voting.open) {
       const cv=document.createElement('button'); cv.className='btn-filled'; cv.style.background='var(--md-error)'; cv.textContent='🏁 Finalize Votes';
       cv.onclick=()=>document.getElementById('closeVotingConfirmDialog').classList.add('open'); el.appendChild(cv);
+      // Timer display
+      if (app.voting.timerEndsAt) {
+        const remaining=app.voting.timerEndsAt-Date.now();
+        const td=document.createElement('div');
+        td.className='voting-timer voting-timer-display'+(remaining<30000?' urgent':'');
+        td.textContent='⏱ '+(remaining>0?formatTimer(remaining):'0:00');
+        el.appendChild(td);
+      }
     }
     // Presence count
     const pc=document.createElement('div'); pc.className='presence-chip'; pc.id='presenceChip';
@@ -1174,7 +1586,7 @@ function buildSecondaryToolbar() {
   // Teacher controls moved to app bar; no-op
 }
 
-function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); updateStatus(); }
+function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); }
 
 function renderTabs() {
   const bar = document.getElementById('classTabs'); bar.innerHTML = '';
@@ -1395,6 +1807,11 @@ function buildListMatchup(pA,pB,md){
     if(i===1){const vs=document.createElement('div');vs.className='list-vs';vs.textContent='vs';row.appendChild(vs);}
     const iW=isC&&md.winnerIdx===s,iL=isC&&md.winnerIdx!==s,iP=!poem;
     const pd=document.createElement('div');pd.className='list-poem'+(iP?' pending':iW?' winner':iL?' loser':'');
+    // Category color accent
+    if (poem && poem.seedIdx !== undefined) {
+      const cat=CATEGORIES.find(c=>c.seeds.includes(poem.seedIdx));
+      if (cat) { const dot=document.createElement('div');dot.className='list-cat-dot';dot.style.background=cat.bg;pd.appendChild(dot); }
+    }
     const se=document.createElement('span');se.className='list-seed';se.textContent=poem?poem.seed:'?';
     const ne=document.createElement('span');ne.className='list-name';ne.textContent=poem?poem.name:'TBD';
     pd.appendChild(se);pd.appendChild(ne);
@@ -1424,6 +1841,8 @@ function renderBracket(){
   const rS=mcol('bc right','5','2');rS.style.justifyContent='center';rS.style.paddingTop='2rem';rS.appendChild(bcard('semi',1,null,true,isT));bracket.appendChild(rS);
   const rQF=mcol('bc right','6','2');rQF.style.justifyContent='space-around';rQF.style.paddingTop='2.75rem';bracket.appendChild(rQF);rQF.appendChild(bcard('rQF',2,2,true,isT));rQF.appendChild(bcard('rQF',3,2,true,isT));
   const rR1=mcol('bc right','7','2');rR1.appendChild(catBan(CATEGORIES[2]));rR1.appendChild(bcard('rR1',2,0,true,isT));rR1.appendChild(bcard('rR1',2,1,true,isT));rR1.appendChild(catBan(CATEGORIES[3]));rR1.appendChild(bcard('rR1',3,0,true,isT));rR1.appendChild(bcard('rR1',3,1,true,isT));bracket.appendChild(rR1);
+  // Draw connector lines after layout
+  requestAnimationFrame(()=>setTimeout(drawBracketLines,50));
 }
 function sp(f){const d=document.createElement('div');d.style.flex=f;return d;}
 function mcol(cls,col,row){const d=document.createElement('div');d.className=cls;d.style.cssText=`grid-column:${col};grid-row:${row};`;return d;}
@@ -1870,16 +2289,19 @@ async function startVotingSession() {
   const pA = getPoemForKey(key,0), pB = getPoemForKey(key,1);
   if (!pA||!pB) return;
   const sessionId = uid();
+  const timerMins = parseInt(document.getElementById('votingTimerInput')?.value)||0;
+  const timerEndsAt = timerMins > 0 ? Date.now() + timerMins * 60000 : null;
   ensureVoting(app);
-  app.voting = {open:true,sessionId,classId:app.activeId,matchupKey:key,poemA:{name:pA.name,seed:pA.seed},poemB:{name:pB.name,seed:pB.seed},studentCount:count};
+  app.voting = {open:true,sessionId,classId:app.activeId,matchupKey:key,poemA:{name:pA.name,seed:pA.seed},poemB:{name:pB.name,seed:pB.seed},studentCount:count,timerEndsAt};
   closeOpenVotingDialog();
   autoCloseTriggered = false;
   await saveApp();
   liveVoteCounts=[0,0];
   subscribeToVotes(sessionId);
+  if (timerEndsAt) startVotingTimer();
   buildAppBar();
   renderAll(); showCurrentView();
-  showSnack('Voting is open!');
+  showSnack('Voting is open!' + (timerMins ? ` · ${timerMins}min timer started` : ''));
 }
 
 async function confirmCloseVoting() {
@@ -1905,6 +2327,7 @@ async function confirmCloseVoting() {
   app.voting = {open:false,tallying:true,countdown:false,sessionId:null,classId:savedClassId,matchupKey:key,poemA:pA,poemB:pB,studentCount:app.voting.studentCount};
   await saveApp();
   stopVotePolling();
+  stopVotingTimer();
   buildAppBar();
   showTallyingOverlay();
   // Open pre-filled score dialog for teacher
@@ -1981,9 +2404,11 @@ function renderVoteView() {
 
   // Header
   const hdr=document.createElement('div'); hdr.style.cssText='text-align:center;padding:1.5rem 1.25rem .5rem;';
+  const timerHtml = v.timerEndsAt ? `<div style="display:flex;justify-content:center;margin-bottom:.5rem"><div class="voting-timer voting-timer-display${v.timerEndsAt-Date.now()<30000?' urgent':''}">⏱ ${v.timerEndsAt>Date.now()?formatTimer(v.timerEndsAt-Date.now()):'0:00'}</div></div>` : '';
   hdr.innerHTML=`
     <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);margin-bottom:.3rem">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</div>
     <div style="font-size:1.35rem;font-weight:800;color:var(--md-on-surface);margin-bottom:.5rem">${hasVoted?'Vote recorded 🗳️':'Choose your pick'}</div>
+    ${timerHtml}
     <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.5rem">
       <div class="live-dot"></div>
       <span id="voteTotalCount" style="font-size:.8rem;font-weight:600;color:var(--md-on-surface)">${sc>0?total+' of '+sc+' students voted':total+' votes in'}</span>
@@ -2005,8 +2430,13 @@ function renderVoteView() {
     block.id='votePoemBlock'+i;
     block.className='vote-poem-block'+(isLeading&&!isMyVote?' is-leading':'')+(isMyVote?' is-voted':'');
 
+    // Category badge
+    const seedIdx=(poem.seed||1)-1;
+    const poemCat=CATEGORIES.find(c=>c.seeds.includes(seedIdx));
+    const catBadgeHtml=poemCat?`<div class="vote-cat-badge" style="background:${poemCat.bg}">${esc(poemCat.name.replace(/^[A-D] — /,''))}</div>`:'';
+
     // Leading badge
-    block.innerHTML=`<div class="vote-leading-badge${isLeading?' show':''}" id="voteLead${i}">Leading</div>`;
+    block.innerHTML=`${catBadgeHtml}<div class="vote-leading-badge${isLeading?' show':''}" id="voteLead${i}">Leading</div>`;
 
     // Stats row
     const statsRow=document.createElement('div'); statsRow.className='vote-stats-row';
@@ -2126,6 +2556,7 @@ async function boot() {
         if (app.voting.open && app.voting.sessionId !== prevSessionId) {
           liveVoteCounts=[0,0];
           subscribeToVotes(app.voting.sessionId);
+          if (app.voting.timerEndsAt && app.voting.timerEndsAt > Date.now()) startVotingTimer();
           setView('vote');
         } else if (!app.voting.open && prevSessionId) {
           stopVotePolling(); liveVoteCounts=[0,0];
@@ -2155,6 +2586,7 @@ async function boot() {
   if (app.voting.open && app.voting.sessionId) {
     liveVoteCounts = [0, 0];
     subscribeToVotes(app.voting.sessionId);
+    if (app.voting.timerEndsAt && app.voting.timerEndsAt > Date.now()) startVotingTimer();
   }
 }
 boot();
