@@ -377,7 +377,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .countdown-num{font-size:11rem;font-weight:900;color:#fff;line-height:1;animation:countPop .9s ease-in-out forwards;}
 .countdown-label{font-size:.9rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:1.5rem;}
 /* Enhanced celebration */
-.vote-result-overlay{background:linear-gradient(160deg,#0a0a14,#12082a 50%,#0a0a14);border:2px solid rgba(245,158,11,.35) !important;box-shadow:0 0 80px rgba(245,158,11,.15),0 24px 64px rgba(0,0,0,.6) !important;position:relative;overflow:hidden;}
+.vote-result-overlay{background:linear-gradient(160deg,#2D1B69,#4A3AFF 55%,#7C5CBF) !important;border:2px solid rgba(245,158,11,.35) !important;box-shadow:0 0 80px rgba(245,158,11,.15),0 24px 64px rgba(0,0,0,.6) !important;position:relative;overflow:hidden;}
 @keyframes cardShine{0%{transform:translateX(-120%) skewX(-18deg);}100%{transform:translateX(260%) skewX(-18deg);}}
 .vote-result-overlay::before{content:'';position:absolute;top:0;left:0;bottom:0;width:35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);pointer-events:none;animation:cardShine 3.5s ease-in-out infinite;}
 @keyframes shimmerText{0%{background-position:-200% center;}100%{background-position:200% center;}}
@@ -568,7 +568,6 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     <div id="teacherActions"></div>
     <div class="seg-btn-track" id="viewToggle" style="display:none">
       <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
-      <div id="voteDivider" style="display:none;width:1px;height:20px;background:var(--md-outline-variant);margin:0 .25rem;flex-shrink:0;"></div>
       <button class="seg-btn active" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
@@ -715,7 +714,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 
 <!-- VOTE RESULT CELEBRATION -->
 <div class="dialog-scrim" id="voteResultDialog">
-  <div class="dialog vote-result-overlay" style="max-width:420px;text-align:center;">
+  <div class="dialog vote-result-overlay" style="max-width:420px;text-align:center;background:linear-gradient(160deg,#2D1B69,#4A3AFF 55%,#7C5CBF);">
     <div class="vr-trophy">🏆</div>
     <div style="font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);margin:.6rem 0 .3rem">Round Winner</div>
     <div style="font-size:1.75rem;font-weight:800;line-height:1.15;margin-bottom:1rem" id="vrWinnerName" class="vr-winner-text"></div>
@@ -913,8 +912,6 @@ function showCurrentView() {
     voteBtn.style.display = showVote ? 'inline-flex' : 'none';
     voteBtn.classList.toggle('vote-live', showVote);
     voteBtn.classList.toggle('active', showVote && currentView === 'vote');
-    const divider = document.getElementById('voteDivider');
-    if (divider) divider.style.display = showVote ? 'block' : 'none';
   }
   const ss = document.querySelector('.toolbar-status-stack');
   if (ss) ss.style.display = currentView === 'home' ? 'none' : 'flex';
