@@ -2459,7 +2459,7 @@ function spawnReactionFloat(emoji, x, y) {
   if (MODE === 'teacher') return;
   const absX = x <= 1 ? x * window.innerWidth : x;
   const absY = y <= 1 ? y * window.innerHeight : y;
-  const count = Math.floor(Math.random() * 2) + 1;
+  const count = 1;
   for (let i = 0; i < count; i++) {
     setTimeout(() => {
       const el = document.createElement('div');
@@ -2802,10 +2802,10 @@ function renderVoteView() {
       btnContent=`<span id="v2BtnIcon${i}" style="font-size:15px;animation:v2CheckPop .4s cubic-bezier(.17,.67,.35,1.4) both">✓</span><span id="v2BtnLabel${i}">Voted</span>`;
       btnClass='v2-vote-btn voted-state';
     } else if (hasVoted) {
-      btnContent=`<span id="v2BtnLabel${i}">${esc(poem.name)}</span>`;
+      btnContent=`<span id="v2BtnLabel${i}">Vote</span>`;
       btnClass='v2-vote-btn unvoted-ghost';
     } else {
-      btnContent=`<span id="v2BtnLabel${i}">${esc(poem.name)}</span>`;
+      btnContent=`<span id="v2BtnLabel${i}">Vote</span>`;
       btnClass='v2-vote-btn';
     }
 
@@ -2843,7 +2843,7 @@ function renderVoteView() {
   // ── Emoji reactions ──
   const reactLabel=document.createElement('div');
   reactLabel.style.cssText='text-align:center;font-size:.7rem;color:var(--md-on-surface-variant);margin:.85rem 0 .25rem;letter-spacing:.04em;';
-  reactLabel.textContent='Tap to react while you wait';
+  reactLabel.textContent='Click to react while you wait';
   view.appendChild(reactLabel);
   const reactBar=document.createElement('div'); reactBar.className='reactions-bar';
   REACTIONS.forEach(emoji=>{
@@ -2853,6 +2853,8 @@ function renderVoteView() {
   });
   view.appendChild(reactBar);
   el.appendChild(view);
+  // Immediately sync live counts into newly-rendered DOM (no waiting for next poll)
+  updateVoteLiveUI();
 }
 
 function handleVoteBtnClick(choice) {
