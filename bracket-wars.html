@@ -173,6 +173,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .poem-slot:not(:last-child){border-bottom:1px solid var(--md-outline-variant);}
 .poem-slot.winner-slot{background:var(--md-primary-container);}
 .poem-slot.loser-slot{opacity:.4;background:var(--md-surface-container-high);}
+.poem-slot.loser-slot .poem-name{text-decoration:line-through;}
 .poem-slot.pending{background:var(--md-surface-container);}
 .poem-slot.winner-slot.alive::after{content:'›';font-size:1rem;font-weight:700;color:var(--md-primary);margin-left:.15rem;animation:nudge 1.2s ease-in-out infinite;}
 @keyframes nudge{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
@@ -247,6 +248,7 @@ body.projection #bracketView{padding-top:1rem;}
 .list-poem{flex:1;padding:.6rem 1.25rem;display:flex;align-items:center;gap:.55rem;transition:background .2s;}
 .list-poem.winner{background:var(--md-primary-container);}
 .list-poem.loser{opacity:.42;background:var(--md-surface-container);}
+.list-poem.loser .list-name{text-decoration:line-through;}
 .list-poem.pending{background:var(--md-surface-container);}
 .list-seed{font-family:monospace;font-size:.6rem;font-weight:500;color:var(--md-on-surface-variant);background:var(--md-surface-container-high);padding:.1rem .3rem;border-radius:var(--shape-xs);flex-shrink:0;}
 .list-poem.winner .list-seed{background:var(--md-primary);color:var(--md-on-primary);}
@@ -1457,8 +1459,6 @@ function bcard(type,ri,mi,mirrored,isT){
     if(isC){const ve=document.createElement('span');ve.className='votes';ve.textContent=v!==null?v:'';slot.appendChild(ve);if(tv>0){const pc=document.createElement('span');pc.className='pct-chip';pc.textContent=Math.round(((v||0)/tv)*100)+'%';slot.appendChild(pc);}const bw=document.createElement('div');bw.className='vote-bar-wrap';const bar=document.createElement('div');bar.className='vote-bar';bar.style.width=(tv>0?Math.round(((v||0)/tv)*100):0)+'%';bw.appendChild(bar);slot.appendChild(bw);}
     card.appendChild(slot);
   }
-  // Upset badge
-  if(isC&&pA&&pB){const winner=md.winnerIdx===0?pA:pB,loser=md.winnerIdx===0?pB:pA;if(winner.seed>loser.seed){const ub=document.createElement('div');ub.className='upset-badge';ub.textContent='⚡ UPSET';card.style.position='relative';card.appendChild(ub);}}
   // Note icon
   if(md.notes){const ni=document.createElement('span');ni.className='matchup-note-icon';ni.textContent='📝';ni.setAttribute('data-note',md.notes);card.style.position='relative';card.appendChild(ni);}
   wrapper.appendChild(card);
