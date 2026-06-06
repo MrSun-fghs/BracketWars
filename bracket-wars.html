@@ -344,6 +344,9 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .vote-pill-btn.selected{border-color:var(--md-primary);background:var(--md-primary);color:#fff;}
 .vote-pill-btn.my-vote-pill{border-color:var(--md-primary);background:var(--md-primary-container);color:var(--md-on-primary-container);cursor:default;}
 .vote-pill-btn.my-vote-pill::before{content:'✓ ';font-size:.85rem;}
+@keyframes leadingPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,104,116,.5);border-color:var(--md-tertiary);}50%{box-shadow:0 0 0 8px rgba(0,104,116,0);border-color:var(--md-tertiary);}}
+.vote-pill-btn.leading-pill{border-color:var(--md-tertiary);background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);animation:leadingPulse 2s ease-in-out infinite;}
+.vote-pill-btn.leading-pill:hover{filter:brightness(.95);}
 .vote-bar-track{height:5px;background:var(--md-surface-container-high);border-radius:var(--shape-full);overflow:hidden;margin-top:.65rem;}
 .vote-bar-fill{height:100%;background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));border-radius:var(--shape-full);transition:width .6s var(--motion-decel);}
 .vote-poem-block.is-leading .vote-bar-fill{background:linear-gradient(90deg,var(--md-tertiary),#006874);}
@@ -548,7 +551,8 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     </div>
     <div id="teacherActions"></div>
     <div class="seg-btn-track" id="viewToggle" style="display:none">
-      <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none;margin-right:.5rem"><span class="nav-icon">🗳</span> Vote</button>
+      <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
+      <div id="voteDivider" style="display:none;width:1px;height:20px;background:var(--md-outline-variant);margin:0 .25rem;flex-shrink:0;"></div>
       <button class="seg-btn active" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
@@ -710,7 +714,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     <div class="dialog-body" id="closeVotingBody">Vote counts will pre-fill the score entry. You can still adjust before saving.</div>
     <div class="dialog-actions" style="justify-content:center;gap:.75rem">
       <button class="btn-outlined" onclick="document.getElementById('closeVotingConfirmDialog').classList.remove('open')">Cancel</button>
-      <button class="btn-filled" onclick="showCountdownThenClose()">Close &amp; Record</button>
+      <button class="btn-filled" onclick="showCountdownThenClose()">🏁 Finalize Votes</button>
     </div>
   </div>
 </div>
@@ -869,6 +873,8 @@ function showCurrentView() {
     voteBtn.style.display = showVote ? 'inline-flex' : 'none';
     voteBtn.classList.toggle('vote-live', showVote);
     voteBtn.classList.toggle('active', showVote && currentView === 'vote');
+    const divider = document.getElementById('voteDivider');
+    if (divider) divider.style.display = showVote ? 'block' : 'none';
   }
   const ss = document.querySelector('.toolbar-status-stack');
   if (ss) ss.style.display = currentView === 'home' ? 'none' : 'flex';
@@ -1071,7 +1077,7 @@ function buildAppBar() {
   if (MODE === 'teacher') {
     ensureVoting(app);
     if (app.voting.open) {
-      const cv=document.createElement('button'); cv.className='btn-filled'; cv.style.background='var(--md-error)'; cv.innerHTML='⏹ Close Voting';
+      const cv=document.createElement('button'); cv.className='btn-filled'; cv.style.background='var(--md-error)'; cv.textContent='🏁 Finalize Votes';
       cv.onclick=()=>document.getElementById('closeVotingConfirmDialog').classList.add('open'); el.appendChild(cv);
     }
     [{label:'Rename',fn:'openRenameClass()'},{label:'Edit Poems',fn:'openSetup()'},{label:'Reset',fn:'openReset()',danger:true}].forEach(a => {
@@ -1090,7 +1096,7 @@ function buildSecondaryToolbar() {
   // Teacher controls moved to app bar; no-op
 }
 
-function renderAll() { renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); updateStatus(); }
+function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); updateStatus(); }
 
 function renderTabs() {
   const bar = document.getElementById('classTabs'); bar.innerHTML = '';
@@ -1370,7 +1376,7 @@ function bcard(type,ri,mi,mirrored,isT){
     const isActive=app.voting.open&&app.voting.classId===app.activeId&&app.voting.matchupKey?.type===type&&app.voting.matchupKey?.ri===ri&&app.voting.matchupKey?.mi===mi;
     if (isActive) {
       if (card.classList) card.classList.add('voting-active-card');
-      const vb=document.createElement('button'); vb.className='close-voting-btn'; vb.textContent='⏹ Close Voting';
+      const vb=document.createElement('button'); vb.className='close-voting-btn'; vb.textContent='🏁 Finalize Votes';
       vb.onclick=(e)=>{e.stopPropagation();document.getElementById('closeVotingConfirmDialog').classList.add('open');}; wrapper.appendChild(vb);
     } else if (!app.voting.open) {
       const vb=document.createElement('button'); vb.className='open-voting-btn'; vb.textContent='🗳 Open Voting';
@@ -1664,8 +1670,10 @@ async function startVotingSession() {
 
 async function confirmCloseVoting() {
   document.getElementById('closeVotingConfirmDialog').classList.remove('open');
+  try {
   ensureVoting(app);
-  const key = app.voting.matchupKey; if (!key) return;
+  const key = app.voting.matchupKey;
+  if (!key) { showSnack('Error: no active matchup found. Please try again.'); return; }
   const pA = app.voting.poemA, pB = app.voting.poemB;
   const winnerIdx = liveVoteCounts[0]>=liveVoteCounts[1]?0:1;
   const total = liveVoteCounts[0]+liveVoteCounts[1];
@@ -1698,6 +1706,7 @@ async function confirmCloseVoting() {
   liveVoteCounts=[0,0];
   renderAll(); showCurrentView();
   document.getElementById('voteDialog').classList.add('open');
+  } catch(err) { console.error('confirmCloseVoting error:', err); showSnack('Error finalizing votes. Try again.'); }
 }
 
 async function fetchVoteCounts(sessionId) {
@@ -1793,7 +1802,7 @@ function renderVoteView() {
 
     // Pill button
     const pill=document.createElement('button');
-    pill.className='vote-pill-btn'+(isMyVote?' my-vote-pill':'')+((!hasVoted&&pendingVoteChoice===i)?' selected':'');
+    pill.className='vote-pill-btn'+(isMyVote?' my-vote-pill':isLeading&&!hasVoted?' leading-pill':(!hasVoted&&pendingVoteChoice===i)?' selected':'');
     pill.textContent=poem.name;
     if (!hasVoted) {
       pill.onclick=()=>{ pendingVoteChoice=i; submitStudentVote(i); };
