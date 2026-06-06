@@ -601,6 +601,11 @@ body.projection .fullscreen-btn{display:none;}
 .voting-timer{display:inline-flex;align-items:center;gap:.35rem;font-family:monospace;font-size:.88rem;font-weight:700;padding:.3rem .75rem;border-radius:var(--shape-full);background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);}
 .voting-timer.urgent{background:var(--md-error-container);color:var(--md-error);animation:timerUrgent .5s ease-in-out infinite;}
 @keyframes timerUrgent{0%,100%{opacity:1;}50%{opacity:.55;}}
+@keyframes screenEdgeGlow{0%,100%{box-shadow:inset 0 0 60px 20px rgba(186,26,26,0);}50%{box-shadow:inset 0 0 100px 40px rgba(186,26,26,.6);}}
+@keyframes screenEdgeGlowCritical{0%,100%{box-shadow:inset 0 0 80px 40px rgba(186,26,26,.15);}50%{box-shadow:inset 0 0 140px 70px rgba(186,26,26,.85);}}
+#timerEdgeGlow{display:none;position:fixed;inset:0;pointer-events:none;z-index:9997;animation:screenEdgeGlow .5s ease-in-out infinite;}
+#timerEdgeGlow.active{display:block;}
+#timerEdgeGlow.active.critical{animation:screenEdgeGlowCritical .35s ease-in-out infinite;}
 /* ── Results view ── */
 .results-view{padding:1.25rem;max-width:700px;margin:0 auto;}
 .results-champ-banner{border-radius:var(--shape-xl);background:linear-gradient(135deg,#1a0533,#4A3AFF,#7C5CBF);padding:1.5rem 1.75rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1.25rem;box-shadow:0 8px 32px rgba(74,58,255,.35);position:relative;overflow:hidden;}
@@ -671,6 +676,7 @@ body.projection .fullscreen-btn{display:none;}
 <canvas id="confettiCanvas"></canvas>
 <div class="m3-snackbar" id="snackbar"></div>
 <button class="projection-exit" id="projectionExitBtn" style="display:none" onclick="exitProjection()">✕ Exit Full Screen</button>
+<div id="timerEdgeGlow"></div>
 
 <div class="app-bar">
   <div class="app-bar-inner">
@@ -1183,16 +1189,27 @@ function startVotingTimer() {
 function stopVotingTimer() {
   if (votingTimerInterval) { clearInterval(votingTimerInterval); votingTimerInterval=null; }
   const el=document.getElementById('votingTimerDisplay'); if(el) el.textContent='';
+  const edgeGlow=document.getElementById('timerEdgeGlow'); if(edgeGlow) edgeGlow.classList.remove('active');
 }
 function updateVotingTimerUI() {
   ensureVoting(app);
   if (!app.voting.timerEndsAt || !app.voting.open) { stopVotingTimer(); return; }
   const remaining = app.voting.timerEndsAt - Date.now();
   const els = document.querySelectorAll('.voting-timer-display');
+  const isUrgent = remaining < 30000;
+  const isCritical = remaining < 10000;
   els.forEach(el => {
     el.textContent = '⏱ ' + formatTimer(remaining);
-    el.classList.toggle('urgent', remaining < 30000);
+    el.classList.toggle('urgent', isUrgent);
   });
+  if (MODE === 'student') {
+    const edgeGlow = document.getElementById('timerEdgeGlow');
+    if (edgeGlow) {
+      edgeGlow.classList.toggle('active', isUrgent);
+      edgeGlow.classList.toggle('critical', isCritical);
+    }
+    if (isCritical && remaining > 0) playSound('urgentTick');
+  }
   if (remaining <= 0) {
     stopVotingTimer();
     if (MODE==='teacher' && !autoCloseTriggered) { autoCloseTriggered=true; initiateCountdownClose(); }
@@ -2318,6 +2335,11 @@ function playSound(type) {
       o.type='square'; o.frequency.value=700;
       g.gain.setValueAtTime(.18,now); g.gain.exponentialRampToValueAtTime(.001,now+.06);
       o.start(now); o.stop(now+.06);
+    } else if (type === 'urgentTick') {
+      const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+      o.type='square'; o.frequency.setValueAtTime(1200,now); o.frequency.exponentialRampToValueAtTime(900,now+.08);
+      g.gain.setValueAtTime(.32,now); g.gain.exponentialRampToValueAtTime(.001,now+.1);
+      o.start(now); o.stop(now+.1);
     } else if (type === 'fanfare') {
       [523,659,784,1047].forEach((freq,i)=>{
         const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
