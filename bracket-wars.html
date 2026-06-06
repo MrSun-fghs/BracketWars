@@ -1561,9 +1561,12 @@ function buildAppBar() {
     // Presence count
     const pc=document.createElement('div'); pc.className='presence-chip'; pc.id='presenceChip';
     pc.innerHTML=`<div class="presence-dot"></div><span id="presenceCount">${onlineStudentCount}</span> online`; el.appendChild(pc);
-    // Undo button
+    // Undo / Redo buttons
     if (undoSnapshot) {
       const ub=document.createElement('button'); ub.className='btn-text'; ub.textContent='↩ Undo'; ub.onclick=undoLastResult; el.appendChild(ub);
+    }
+    if (redoSnapshot) {
+      const rb=document.createElement('button'); rb.className='btn-tonal'; rb.textContent='↪ Redo'; rb.onclick=redoLastResult; el.appendChild(rb);
     }
     // Export only (projection moved to student nav)
     const eb=document.createElement('button'); eb.className='btn-text'; eb.textContent='⬇ Export'; eb.onclick=exportBracket; el.appendChild(eb);
@@ -2133,7 +2136,7 @@ function clearSF(ri){const b=bkt(),si=ri<=1?0:1;b.semis[si]={winnerIdx:null,vote
 function saveMatchup(){
   const vA=parseInt(document.getElementById('voteA').value),vB=parseInt(document.getElementById('voteB').value);
   if(selectedWinner===null||isNaN(vA)||isNaN(vB)){document.getElementById('voteError').classList.add('show');return;}
-  undoSnapshot=JSON.parse(JSON.stringify(app)); // save for undo
+  undoSnapshot=JSON.parse(JSON.stringify(app)); redoSnapshot=null; // save for undo, clear redo
   const md=getMatchData(activeKey);
   if(md.winnerIdx!==null&&md.winnerIdx!==selectedWinner)clearDownstream(activeKey);
   md.winnerIdx=selectedWinner;md.votes=[vA,vB];
@@ -2391,19 +2394,27 @@ function showCountdownThenClose() {
   initiateCountdownClose();
 }
 
-// ── Undo ──
+// ── Undo / Redo ──
 let undoSnapshot = null;
+let redoSnapshot = null;
 function undoLastResult() {
   if (!undoSnapshot) return;
+  redoSnapshot = JSON.parse(JSON.stringify(app));
   app = undoSnapshot; undoSnapshot = null;
-  saveApp(); renderAll(); showSnack('Undone ✓');
+  saveApp(); buildAppBar(); renderAll(); showSnack('Undone ✓');
+}
+function redoLastResult() {
+  if (!redoSnapshot) return;
+  undoSnapshot = JSON.parse(JSON.stringify(app));
+  app = redoSnapshot; redoSnapshot = null;
+  saveApp(); buildAppBar(); renderAll(); showSnack('Redone ✓');
 }
 
 // ── Reset single matchup ──
 function resetMatchup() {
   if (!activeKey) return;
   if (!confirm('Reset this matchup? This will also clear any downstream results that depend on it.')) return;
-  undoSnapshot = JSON.parse(JSON.stringify(app));
+  undoSnapshot = JSON.parse(JSON.stringify(app)); redoSnapshot = null;
   const md = getMatchData(activeKey);
   clearDownstream(activeKey);
   md.winnerIdx = null; md.votes = [null, null]; delete md.notes;
