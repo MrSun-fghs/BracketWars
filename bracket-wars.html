@@ -1097,11 +1097,15 @@ function setMode(m) {
   renderAll();
 }
 
+function saveTeacherPrefs() {
+  try { localStorage.setItem('bw-teacher-prefs', JSON.stringify({view:currentView, activeId:app.activeId})); } catch(e) {}
+}
 function setTeacherView(v) {
   currentView = v;
   document.getElementById('bracketView').style.display = v === 'engagement' ? 'none' : 'block';
   document.getElementById('engagementView').style.display = v === 'engagement' ? 'block' : 'none';
   if (v === 'engagement') renderEngagement();
+  saveTeacherPrefs();
   renderTabs();
 }
 
@@ -1700,6 +1704,7 @@ function renderTabs() {
       setTimeout(()=>{
         app.activeId=cls.id;
         if(MODE==='teacher'){
+          saveTeacherPrefs();
           saveApp();
           document.getElementById('engagementView').style.display='none';
           document.getElementById('bracketView').style.display='block';
@@ -2916,7 +2921,11 @@ async function boot() {
   buildSecondaryToolbar();
   if (localStorage.getItem('bw-teacher') === '1') {
     teacherUnlocked = true;
+    // Restore active class before rendering
+    try { const tp=JSON.parse(localStorage.getItem('bw-teacher-prefs')||'{}'); if(tp.activeId&&app.classes.find(c=>c.id===tp.activeId)) app.activeId=tp.activeId; } catch(e) {}
     setMode('teacher');
+    // Restore teacher view (engagement vs bracket) after setMode resets it
+    try { const tp=JSON.parse(localStorage.getItem('bw-teacher-prefs')||'{}'); if(tp.view==='engagement') setTeacherView('engagement'); } catch(e) {}
   } else {
     setMode('student');
   }
