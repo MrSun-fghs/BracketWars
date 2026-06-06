@@ -482,6 +482,29 @@ body.projection .fullscreen-btn{display:none;}
 .m3-snackbar.show{transform:translateX(-50%) translateY(0);opacity:1;}
 /* HOME VIEW */
 .home-view{padding:0 0 3rem;}
+/* ENGAGEMENT TAB */
+.eng-hdr{display:flex;align-items:center;gap:.5rem;border-radius:var(--shape-full);padding:.45rem 1.1rem .45rem .75rem;font-size:.78rem;font-weight:800;letter-spacing:.02em;margin:.85rem 0 .6rem;box-shadow:var(--elev-2);}
+.eng-hdr-ico{font-size:1.1rem;line-height:1;flex-shrink:0;}
+.eng-card{background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);box-shadow:var(--elev-2);overflow:hidden;}
+.eng-card-lo{background:var(--md-surface-container-low);border-radius:var(--shape-xl);box-shadow:var(--elev-2);overflow:hidden;}
+.eng-row{display:flex;align-items:center;gap:.75rem;padding:.65rem 1.1rem;}
+.eng-row+.eng-row{border-top:1px solid var(--md-outline-variant);}
+.eng-sub{font-size:.7rem;color:var(--md-on-surface-variant);padding:.7rem 1.1rem .35rem;font-style:italic;}
+.eng-drama-card{border-radius:var(--shape-xl);padding:1.15rem;box-shadow:var(--elev-2);}
+.eng-drama-ico{font-size:2rem;line-height:1;margin-bottom:.5rem;}
+.eng-drama-tag{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.4rem;}
+.eng-drama-title{font-size:.95rem;font-weight:800;line-height:1.25;margin-bottom:.3rem;}
+.eng-drama-stat{font-size:.73rem;opacity:.85;margin-bottom:.25rem;}
+.eng-drama-detail{font-size:.65rem;font-weight:600;}
+.eng-cat-tile{border-radius:var(--shape-xl);padding:1.1rem;background:var(--md-surface-container-low);box-shadow:var(--elev-2);}
+.eng-cat-num{font-size:2.2rem;font-weight:900;line-height:1;letter-spacing:-.03em;color:var(--md-on-surface);}
+.eng-cat-sub{font-size:.68rem;color:var(--md-on-surface-variant);margin:.2rem 0 .65rem;}
+.eng-bar-track{height:6px;background:var(--md-surface-container-high);border-radius:var(--shape-full);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.1);}
+.eng-rank-badge{width:1.65rem;height:1.65rem;border-radius:50%;background:var(--md-surface-container-high);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:var(--md-on-surface-variant);flex-shrink:0;}
+.eng-rank-pct{font-size:1.2rem;font-weight:900;letter-spacing:-.02em;}
+.eng-undefeated{font-size:.58rem;font-weight:800;background:var(--md-tertiary);color:var(--md-on-tertiary);padding:.22rem .6rem;border-radius:var(--shape-full);white-space:nowrap;box-shadow:var(--elev-1);}
+.eng-chip{display:inline-flex;align-items:center;gap:.25rem;background:var(--md-surface-container-high);border-radius:var(--shape-full);padding:.15rem .5rem .15rem .35rem;font-size:.58rem;font-weight:700;color:var(--md-on-surface-variant);white-space:nowrap;}
+.eng-chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .m3-tab.home-tab{background:var(--md-primary-container);color:var(--md-on-primary-container);}
 .m3-tab.home-tab:hover{background:#DDD8FF;}
 .m3-tab.home-tab.active{background:#ffffff;color:var(--md-primary);}
@@ -1025,6 +1048,7 @@ function setView(v) {
 }
 function showCurrentView() {
   if (MODE === 'teacher') return;
+  document.getElementById('engagementView').style.display = 'none';
   const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView', results:'resultsView'};
   Object.entries(views).forEach(([key, id]) => {
     const el = document.getElementById(id);
@@ -1855,6 +1879,7 @@ function dramaCard(parent, icon, label, title, sub, detail) {
 }
 
 function renderEngagement() {
+  if (MODE !== 'teacher') return;
   const el = document.getElementById('engagementContent'); if (!el) return;
   el.innerHTML = '';
   if (!activeClass()) return;
@@ -1893,91 +1918,109 @@ function renderEngagement() {
   const alive=Object.values(poemStats).filter(p=>p.losses===0&&p.wins>0);
   const graveyard=Object.values(poemStats).filter(p=>p.losses>0).sort((a,b)=>b.bestPct-a.bestPct);
 
-  // ── Header stats ──
+  // helpers
+  const mkHdr=(emoji,text,parent,bg,fg)=>{const h=document.createElement('div');h.className='eng-hdr';h.style.cssText=`background:${bg};color:${fg};`;h.innerHTML=`<span class="eng-hdr-ico">${emoji}</span>${text}`;parent.appendChild(h);};
+  const mkCard=(parent,cls)=>{const c=document.createElement('div');c.className=cls||'eng-card';parent.appendChild(c);return c;};
+
+  // ── Stats row ──
   const statsRow=document.createElement('div');
-  statsRow.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-bottom:.85rem;';
-  statsRow.innerHTML=`
-    <div style="background:var(--md-primary-container);border-radius:var(--shape-lg);padding:.7rem .75rem;text-align:center;">
-      <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--md-primary)">${matchups.length}</div>
-      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant)">Matchups Done</div>
-    </div>
-    <div style="background:var(--md-primary-container);border-radius:var(--shape-lg);padding:.7rem .75rem;text-align:center;">
-      <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--md-primary)">${totalVotes}</div>
-      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant)">Total Votes</div>
-    </div>
-    <div style="background:var(--md-primary-container);border-radius:var(--shape-lg);padding:.7rem .75rem;text-align:center;">
-      <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--md-primary)">${15-matchups.length}</div>
-      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant)">To Go</div>
-    </div>`;
+  statsRow.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin-bottom:.15rem;';
+  const statTiles=[
+    {bg:'var(--md-primary-container)',num:matchups.length,lbl:'Done',c:'var(--md-primary)',lc:'var(--md-on-primary-container)'},
+    {bg:'var(--md-secondary-container)',num:totalVotes,lbl:'Votes',c:'var(--md-secondary)',lc:'var(--md-on-secondary-container)'},
+    {bg:'var(--md-tertiary-container)',num:15-matchups.length,lbl:'To Go',c:'var(--md-tertiary)',lc:'var(--md-on-tertiary-container)'},
+  ];
+  statTiles.forEach(t=>{
+    const tile=document.createElement('div');
+    tile.style.cssText=`background:${t.bg};border-radius:28px;padding:1rem .75rem;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.12),0 2px 6px 2px rgba(0,0,0,.09);`;
+    tile.innerHTML=`<div style="font-size:2.5rem;font-weight:900;color:${t.c};line-height:1;letter-spacing:-.03em;">${t.num}</div><div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${t.lc};margin-top:.35rem;">${t.lbl}</div>`;
+    statsRow.appendChild(tile);
+  });
   el.appendChild(statsRow);
 
-  // ── Participation by Round ──
-  if (roundAvgs.length > 1) {
-    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='📈 Participation by Round'; el.appendChild(lbl);
-    const card=document.createElement('div'); card.className='results-stat-card'; card.style.padding='.75rem 1rem 1rem'; el.appendChild(card);
-    const chart=document.createElement('div'); chart.style.cssText='display:flex;align-items:flex-end;gap:1rem;height:110px;';
-    roundAvgs.forEach(r=>{
-      const col=document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:.35rem;flex:1;';
-      const h=Math.max(Math.round((r.avg/maxAvg)*72),4);
-      col.innerHTML=`<div style="font-size:.72rem;font-weight:700;color:var(--md-primary)">${r.avg}</div><div style="width:100%;height:${h}px;background:var(--md-primary-container);border-radius:6px 6px 0 0;border-bottom:2px solid var(--md-primary)"></div><div style="font-size:.6rem;color:var(--md-on-surface-variant);text-align:center;line-height:1.2">${r.round.replace('Round of ','R')}</div>`;
+  // ── Participation ──
+  if (roundAvgs.length>1) {
+    mkHdr('📈','Participation by Round',el,'var(--md-tertiary-container)','var(--md-on-tertiary-container)');
+    const card=mkCard(el,'eng-card-lo'); card.style.padding='.9rem 1rem 1rem';
+    const chart=document.createElement('div'); chart.style.cssText='display:flex;align-items:flex-end;gap:.75rem;height:120px;';
+    const grads=['linear-gradient(180deg,#4A3AFF,#7C5CBF)','linear-gradient(180deg,#7C5CBF,#006874)','linear-gradient(180deg,#006874,#00BFA5)','linear-gradient(180deg,#4A3AFF,#006874)'];
+    roundAvgs.forEach((r,i)=>{
+      const col=document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:.4rem;flex:1;';
+      const h=Math.max(Math.round((r.avg/maxAvg)*84),6);
+      col.innerHTML=`<div style="font-size:.82rem;font-weight:800;color:var(--md-on-surface);">${r.avg}</div><div style="width:100%;height:${h}px;background:${grads[i%4]};border-radius:10px 10px 2px 2px;box-shadow:0 1px 2px rgba(0,0,0,.12),0 2px 6px 2px rgba(0,0,0,.09);"></div><div style="font-size:.6rem;font-weight:600;color:var(--md-on-surface-variant);text-align:center;line-height:1.3;">${r.round.replace('Round of ','R')}</div>`;
       chart.appendChild(col);
     });
     card.appendChild(chart);
-    const last=roundAvgs[roundAvgs.length-1].avg, first=roundAvgs[0].avg;
-    const trend=last>first?'📈 Engagement is heating up as the rounds go on!':last<first?'📉 Early rounds pulled the most votes.':'➡️ Engagement stayed steady throughout.';
-    const note=document.createElement('div'); note.style.cssText='font-size:.73rem;color:var(--md-on-surface-variant);padding-top:.6rem;'; note.textContent=trend;
-    card.appendChild(note);
+    const last=roundAvgs[roundAvgs.length-1].avg,first=roundAvgs[0].avg;
+    const trend=last>first?'📈 Heating up as rounds go on!':last<first?'📉 Early rounds drew the most votes.':'➡️ Steady engagement throughout.';
+    const note=document.createElement('div'); note.className='eng-sub'; note.style.padding='.65rem 0 0'; note.textContent=trend; card.appendChild(note);
   }
 
   // ── Power Rankings ──
   if (rankings.length) {
-    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='🏆 Power Rankings'; el.appendChild(lbl);
-    const card=document.createElement('div'); card.className='results-stat-card'; card.style.padding='0'; el.appendChild(card);
-    const sub=document.createElement('div'); sub.style.cssText='font-size:.7rem;color:var(--md-on-surface-variant);padding:.75rem 1rem .4rem;'; sub.textContent='Cumulative vote % across all completed matchups'; card.appendChild(sub);
+    const podium=[
+      {emoji:'🥇',bg:'var(--md-primary-container)',nc:'var(--md-primary)'},
+      {emoji:'🥈',bg:'var(--md-secondary-container)',nc:'var(--md-secondary)'},
+      {emoji:'🥉',bg:'var(--md-tertiary-container)',nc:'var(--md-tertiary)'},
+    ];
+    mkHdr('🏆','Power Rankings',el,'var(--md-primary-container)','var(--md-on-primary-container)');
+    const card=mkCard(el); card.style.overflow='hidden';
+    const sub=document.createElement('div'); sub.className='eng-sub'; sub.textContent='Cumulative vote share across all completed matchups'; card.appendChild(sub);
     rankings.forEach((p,i)=>{
       const undefeated=p.losses===0&&p.wins>0;
       const cat=CATEGORIES.find(c=>c.seeds.includes(p.seed-1));
-      const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.5rem 1rem;'+(i<rankings.length-1?'border-bottom:1px solid var(--md-outline-variant);':'');
-      row.innerHTML=`<div style="font-size:.75rem;font-weight:700;color:var(--md-on-surface-variant);width:1.4rem;text-align:right">${i+1}</div><div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:var(--md-on-surface)">${esc(p.name)}</div><div style="font-size:.65rem;color:var(--md-on-surface-variant)">${p.wins}W–${p.losses}L · ${p.totalMV} votes cast</div></div>${undefeated?`<div style="font-size:.58rem;font-weight:700;background:rgba(0,180,80,.12);color:#008040;padding:.15rem .5rem;border-radius:999px;white-space:nowrap">UNDEFEATED</div>`:''}${cat?`<div style="width:6px;height:6px;border-radius:50%;background:${cat.bg};flex-shrink:0"></div>`:''}<div style="font-size:1rem;font-weight:800;color:var(--md-primary);min-width:2.8rem;text-align:right">${p.cumPct}%</div><div style="width:52px;height:5px;background:var(--md-surface-container-high);border-radius:3px;overflow:hidden;flex-shrink:0"><div style="height:100%;width:${p.cumPct}%;background:${i<3?'var(--md-primary)':'var(--md-secondary)'};border-radius:3px"></div></div>`;
+      const pod=podium[i];
+      const row=document.createElement('div'); row.className='eng-row';
+      if(pod) row.style.background=pod.bg;
+      if(i<rankings.length-1) row.style.borderBottom='1px solid var(--md-outline-variant)';
+      const badge=pod?`<span style="font-size:1.3rem;line-height:1;flex-shrink:0;">${pod.emoji}</span>`:`<div class="eng-rank-badge">${i+1}</div>`;
+      const nc=pod?pod.nc:'var(--md-on-surface)';
+      row.innerHTML=`${badge}<div style="flex:1;min-width:0;"><div style="font-size:.9rem;font-weight:700;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(p.name)}</div><div style="font-size:.65rem;color:var(--md-on-surface-variant);margin-top:.1rem;">${p.wins}W–${p.losses}L · ${p.totalMV} votes</div></div>${undefeated?`<span class="eng-undefeated">UNDEFEATED</span>`:''}<div style="display:flex;flex-direction:column;align-items:flex-end;gap:.3rem;flex-shrink:0;"><div class="eng-rank-pct" style="color:${nc};">${p.cumPct}%</div><div class="eng-bar-track" style="width:56px;"><div style="height:100%;width:${p.cumPct}%;background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));border-radius:9999px;"></div></div></div>${cat?`<div style="width:8px;height:8px;border-radius:50%;background:${cat.bg};flex-shrink:0;"></div>`:''}`;
       card.appendChild(row);
     });
   }
 
   // ── Drama Corner ──
   if (nailbiters.length||upsets.length||blowouts.length) {
-    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='⚡ Drama Corner'; el.appendChild(lbl);
-    const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.75rem;'; el.appendChild(grid);
-    if (nailbiters.length) { const m=nailbiters[0]; dramaCard(grid,'⚖️','Nail-Biter',m.winner.name,`${m.pct}% vs ${100-m.pct}% · ${m.round}`,`Just ${m.margin} vote${m.margin===1?'':'s'} apart`); }
-    if (upsets.length) { const m=upsets[0]; dramaCard(grid,'🌪️','Biggest Upset',m.winner.name,`Knocked out #${m.loser.seed} seed · ${m.round}`,`Seed gap: ${m.seedGap} — nobody saw it coming`); }
-    if (blowouts.length) { const m=blowouts[0]; dramaCard(grid,'💥','Blowout',m.winner.name,`${m.pct}% of the vote · ${m.round}`,`${m.wv} vs ${m.lv} — wasn't even close`); }
+    mkHdr('⚡','Drama Corner',el,'var(--md-secondary-container)','var(--md-on-secondary-container)');
+    const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem;'; el.appendChild(grid);
+    const dCard=(parent,emoji,label,title,stat,detail,bg,ac,onBg)=>{
+      const c=document.createElement('div'); c.className='eng-drama-card'; c.style.background=bg;
+      c.innerHTML=`<div class="eng-drama-ico">${emoji}</div><div class="eng-drama-tag" style="color:${ac};">${label}</div><div class="eng-drama-title" style="color:${onBg};">${esc(title)}</div><div class="eng-drama-stat" style="color:${onBg};">${stat}</div><div class="eng-drama-detail" style="color:${ac};">${detail}</div>`;
+      parent.appendChild(c);
+    };
+    if(nailbiters.length){const m=nailbiters[0];dCard(grid,'⚖️','Nail-Biter',m.winner.name,`${m.pct}% vs ${100-m.pct}% · ${m.round}`,`Just ${m.margin} vote${m.margin===1?'':'s'} apart`,'var(--md-secondary-container)','var(--md-secondary)','var(--md-on-secondary-container)');}
+    if(upsets.length){const m=upsets[0];dCard(grid,'🌪️','Biggest Upset',m.winner.name,`Beat #${m.loser.seed} seed · ${m.round}`,`Seed gap: ${m.seedGap}`,'var(--md-tertiary-container)','var(--md-tertiary)','var(--md-on-tertiary-container)');}
+    if(blowouts.length){const m=blowouts[0];dCard(grid,'💥','Blowout',m.winner.name,`${m.pct}% of the vote · ${m.round}`,`${m.wv} vs ${m.lv} — wasn't close`,'var(--md-primary-container)','var(--md-primary)','var(--md-on-primary-container)');}
   }
 
   // ── Category Battle ──
   const catData=CATEGORIES.map(cat=>({cat,survivors:alive.filter(p=>cat.seeds.includes(p.seed-1)).length,played:Object.values(poemStats).filter(p=>cat.seeds.includes(p.seed-1)).length}));
   if (catData.some(c=>c.played>0)) {
-    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='🎯 Category Battle'; el.appendChild(lbl);
+    mkHdr('🎯','Category Battle',el,'var(--md-surface-container-highest)','var(--md-on-surface)');
     const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;'; el.appendChild(grid);
     catData.forEach(({cat,survivors})=>{
       const shortName=cat.name.replace(/^[A-D] — /,'');
       const pct=Math.round(survivors/4*100);
-      const div=document.createElement('div'); div.className='results-stat-card';
-      div.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;"><div style="width:8px;height:8px;border-radius:50%;background:${cat.bg};flex-shrink:0"></div><div style="font-size:.65rem;font-weight:700;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.05em">${esc(shortName)}</div></div><div style="font-size:1.5rem;font-weight:800;color:var(--md-primary)">${survivors}</div><div style="font-size:.68rem;color:var(--md-on-surface-variant);margin-bottom:.5rem">of 4 still alive</div><div style="height:4px;background:var(--md-surface-container-high);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${cat.bg};border-radius:2px"></div></div>`;
-      grid.appendChild(div);
+      const tile=document.createElement('div'); tile.className='eng-cat-tile';
+      tile.style.borderTop=`4px solid ${cat.bg}`;
+      tile.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;"><div style="width:9px;height:9px;border-radius:50%;background:${cat.bg};flex-shrink:0;"></div><div style="font-size:.62rem;font-weight:800;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(shortName)}</div></div><div class="eng-cat-num">${survivors}</div><div class="eng-cat-sub">of 4 still alive</div><div class="eng-bar-track"><div style="height:100%;width:${pct}%;background:${cat.bg};border-radius:9999px;"></div></div>`;
+      grid.appendChild(tile);
     });
   }
 
-  // ── The Graveyard ──
+  // ── Graveyard ──
   if (graveyard.length) {
-    const lbl=document.createElement('div'); lbl.className='results-section-label'; lbl.textContent='🪦 The Graveyard'; el.appendChild(lbl);
-    const card=document.createElement('div'); card.className='results-stat-card'; card.style.padding='0'; el.appendChild(card);
-    const sub=document.createElement('div'); sub.style.cssText='font-size:.7rem;color:var(--md-on-surface-variant);padding:.75rem 1rem .4rem;'; sub.textContent='Eliminated poems — ranked by their best performance'; card.appendChild(sub);
+    mkHdr('🪦','The Graveyard',el,'var(--md-surface-container-highest)','var(--md-on-surface-variant)');
+    const card=mkCard(el,'eng-card-lo'); card.style.overflow='hidden';
+    const sub=document.createElement('div'); sub.className='eng-sub'; sub.textContent='Eliminated poems, ranked by best performance'; card.appendChild(sub);
     graveyard.forEach((p,i)=>{
       const bestRound=p.rounds.reduce((best,r)=>r.pct>best.pct?r:best,p.rounds[0]);
       const cat=CATEGORIES.find(c=>c.seeds.includes(p.seed-1));
-      const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.5rem 1rem;'+(i<graveyard.length-1?'border-bottom:1px solid var(--md-outline-variant);':'');
-      row.innerHTML=`<div style="font-size:.9rem;width:1.5rem;text-align:center">💀</div><div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:var(--md-on-surface)">${esc(p.name)}</div><div style="font-size:.65rem;color:var(--md-on-surface-variant)">Best: ${bestRound.pct}% in ${bestRound.round} · ${bestRound.myV}–${bestRound.oppV}</div></div>${cat?`<div style="font-size:.6rem;font-weight:700;padding:.15rem .5rem;border-radius:999px;background:${cat.bg}22;color:${cat.bg}">${esc(cat.name.replace(/^[A-D] — /,''))}</div>`:''}<div style="font-size:.85rem;font-weight:700;color:var(--md-on-surface-variant)">${p.bestPct}%</div>`;
+      const row=document.createElement('div'); row.className='eng-row'; row.style.opacity='.8';
+      if(i<graveyard.length-1) row.style.borderBottom='1px solid var(--md-outline-variant)';
+      const chip=cat?`<div class="eng-chip"><div class="eng-chip-dot" style="background:${cat.bg};"></div>${esc(cat.name.replace(/^[A-D] — /,''))}</div>`:'';
+      row.innerHTML=`<div style="font-size:1.1rem;flex-shrink:0;">💀</div><div style="flex:1;min-width:0;"><div style="font-size:.86rem;font-weight:700;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(p.name)}</div><div style="font-size:.63rem;color:var(--md-on-surface-variant);margin-top:.1rem;">Best: ${bestRound.pct}% in ${bestRound.round} · ${bestRound.myV}–${bestRound.oppV}</div></div>${chip}<div style="font-size:.95rem;font-weight:800;color:var(--md-on-surface-variant);min-width:2.5rem;text-align:right;">${p.bestPct}%</div>`;
       card.appendChild(row);
     });
   }
