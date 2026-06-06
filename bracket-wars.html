@@ -191,6 +191,23 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .bc.right .poem-slot{flex-direction:row-reverse;}
 .bc.right .seed{text-align:left;}
 .bc.right .poem-name{text-align:right;}
+/* Upset badge */
+.upset-badge{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#EF4444,#F59E0B);color:#fff;font-size:.55rem;font-weight:800;letter-spacing:.08em;padding:.15rem .5rem;border-radius:var(--shape-full);white-space:nowrap;z-index:5;text-transform:uppercase;}
+/* Path to victory */
+.matchup.path-highlight{outline:2px solid var(--md-tertiary);outline-offset:2px;background:rgba(0,104,116,.06);}
+/* Note tooltip */
+.matchup-note-icon{position:absolute;top:4px;right:4px;font-size:.7rem;cursor:default;opacity:.6;}
+.matchup-note-icon:hover::after{content:attr(data-note);position:absolute;right:0;top:1.4rem;background:var(--md-on-surface);color:var(--md-surface);font-size:.7rem;padding:.4rem .65rem;border-radius:var(--shape-sm);white-space:pre-wrap;max-width:180px;z-index:20;box-shadow:var(--elev-3);}
+/* Projection mode */
+body.projection .app-bar{display:none!important;}
+body.projection .tabs-surface{display:none!important;}
+body.projection #bracketView{padding-top:1rem;}
+.projection-exit{position:fixed;top:.75rem;right:.75rem;z-index:9999;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:var(--shape-full);padding:.4rem .9rem;font-size:.8rem;cursor:pointer;}
+/* Presence chip */
+.presence-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:600;padding:.3rem .75rem;border-radius:var(--shape-full);background:rgba(0,150,80,.12);color:#008040;border:1px solid rgba(0,150,80,.25);}
+.presence-dot{width:7px;height:7px;border-radius:50%;background:#00b050;animation:livePulse 1.8s ease-in-out infinite;}
+/* Print / export */
+@media print{.app-bar,.tabs-surface,#appBarActions,.open-voting-btn,.close-voting-btn,.voting-active-card::after,button{display:none!important;}body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-inside:avoid;}}
 .bc.right .votes{text-align:left;}
 .center-col{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.6rem .25rem 0;height:100%;}
 .center-header{font-size:1rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--md-primary);text-align:center;padding-bottom:.65rem;border-bottom:2px solid var(--md-primary);width:100%;}
@@ -548,6 +565,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 <body>
 <canvas id="confettiCanvas"></canvas>
 <div class="m3-snackbar" id="snackbar"></div>
+<button class="projection-exit" id="projectionExitBtn" style="display:none" onclick="exitProjection()">✕ Exit Projection</button>
 
 <div class="app-bar">
   <div class="app-bar-inner">
@@ -640,8 +658,14 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
     </div>
 
     <div class="m3-field-error" id="voteError" style="margin:.25rem 0">Please select a winner and enter vote counts.</div>
-    <div class="dialog-actions" style="margin-top:.75rem">
-      <button class="btn-text" onclick="closeVoteDialog()">Cancel</button>
+    <div style="margin:.75rem 0 0">
+      <textarea id="matchupNote" placeholder="Add a note about this matchup… (optional)" style="width:100%;border:1px solid var(--md-outline-variant);border-radius:var(--shape-md);padding:.6rem .75rem;font-size:.8rem;font-family:inherit;resize:none;height:56px;background:var(--md-surface-container-low);color:var(--md-on-surface);outline:none;" onfocus="this.style.borderColor='var(--md-primary)'" onblur="this.style.borderColor='var(--md-outline-variant)'"></textarea>
+    </div>
+    <div class="dialog-actions" style="margin-top:.5rem;justify-content:space-between">
+      <div style="display:flex;gap:.25rem">
+        <button class="btn-text" onclick="closeVoteDialog()">Cancel</button>
+        <button class="btn-text" style="color:var(--md-error)" id="resetMatchupBtn" onclick="resetMatchup()">Reset</button>
+      </div>
       <button class="btn-filled" id="saveMatchupBtn" onclick="saveMatchup()">Save Result</button>
     </div>
   </div>
@@ -1122,6 +1146,16 @@ function buildAppBar() {
       const cv=document.createElement('button'); cv.className='btn-filled'; cv.style.background='var(--md-error)'; cv.textContent='🏁 Finalize Votes';
       cv.onclick=()=>document.getElementById('closeVotingConfirmDialog').classList.add('open'); el.appendChild(cv);
     }
+    // Presence count
+    const pc=document.createElement('div'); pc.className='presence-chip'; pc.id='presenceChip';
+    pc.innerHTML=`<div class="presence-dot"></div><span id="presenceCount">${onlineStudentCount}</span> online`; el.appendChild(pc);
+    // Undo button
+    if (undoSnapshot) {
+      const ub=document.createElement('button'); ub.className='btn-text'; ub.textContent='↩ Undo'; ub.onclick=undoLastResult; el.appendChild(ub);
+    }
+    // Projection + Export
+    const pb=document.createElement('button'); pb.className='btn-tonal'; pb.textContent='⛶ Project'; pb.onclick=enterProjection; el.appendChild(pb);
+    const eb=document.createElement('button'); eb.className='btn-text'; eb.textContent='⬇ Export'; eb.onclick=exportBracket; el.appendChild(eb);
     [{label:'Rename',fn:'openRenameClass()'},{label:'Edit Poems',fn:'openSetup()'},{label:'Reset',fn:'openReset()',danger:true}].forEach(a => {
       const b = document.createElement('button'); b.className='btn-text';
       if(a.danger) b.style.color='var(--md-error)';
@@ -1401,6 +1435,17 @@ function bcard(type,ri,mi,mirrored,isT){
   else{pA=finalPoem(0);pB=finalPoem(1);md=bkt().final;}
   const hasPoems=pA&&pB,isC=md.winnerIdx!==null,tv=(md.votes[0]||0)+(md.votes[1]||0);
   const card=document.createElement('div');card.className='matchup'+(isT&&hasPoems?' clickable':'');card.dataset.matchupKey=JSON.stringify({type,ri,mi});
+  if(pA) card.dataset.poemA=pA.name;
+  if(pB) card.dataset.poemB=pB.name;
+  // Path-to-victory hover
+  if(hasPoems){
+    card.addEventListener('mouseenter',()=>{
+      [pA.name,pB.name].forEach(name=>{
+        document.querySelectorAll(`[data-poem-a="${name}"],[data-poem-b="${name}"]`).forEach(c=>c.classList.add('path-highlight'));
+      });
+    });
+    card.addEventListener('mouseleave',()=>document.querySelectorAll('.path-highlight').forEach(c=>c.classList.remove('path-highlight')));
+  }
   if(isT&&hasPoems)card.onclick=()=>openVoteDialog({type,ri,mi},pA,pB,md);
   const poems=mirrored?[pB,pA]:[pA,pB],slots=mirrored?[1,0]:[0,1],aliveArr=mirrored?[aB,aA]:[aA,aB];
   for(let i=0;i<2;i++){
@@ -1412,6 +1457,10 @@ function bcard(type,ri,mi,mirrored,isT){
     if(isC){const ve=document.createElement('span');ve.className='votes';ve.textContent=v!==null?v:'';slot.appendChild(ve);if(tv>0){const pc=document.createElement('span');pc.className='pct-chip';pc.textContent=Math.round(((v||0)/tv)*100)+'%';slot.appendChild(pc);}const bw=document.createElement('div');bw.className='vote-bar-wrap';const bar=document.createElement('div');bar.className='vote-bar';bar.style.width=(tv>0?Math.round(((v||0)/tv)*100):0)+'%';bw.appendChild(bar);slot.appendChild(bw);}
     card.appendChild(slot);
   }
+  // Upset badge
+  if(isC&&pA&&pB){const winner=md.winnerIdx===0?pA:pB,loser=md.winnerIdx===0?pB:pA;if(winner.seed>loser.seed){const ub=document.createElement('div');ub.className='upset-badge';ub.textContent='⚡ UPSET';card.style.position='relative';card.appendChild(ub);}}
+  // Note icon
+  if(md.notes){const ni=document.createElement('span');ni.className='matchup-note-icon';ni.textContent='📝';ni.setAttribute('data-note',md.notes);card.style.position='relative';card.appendChild(ni);}
   wrapper.appendChild(card);
   if (isT && hasPoems) {
     ensureVoting(app);
@@ -1439,6 +1488,8 @@ function openVoteDialog(key,pA,pB,md){
   document.getElementById('voteLabelB').textContent='Number of Votes:';
   document.getElementById('voteA').value=md.votes[0]!==null?md.votes[0]:'';
   document.getElementById('voteB').value=md.votes[1]!==null?md.votes[1]:'';
+  document.getElementById('matchupNote').value=md.notes||'';
+  document.getElementById('resetMatchupBtn').style.display=md.winnerIdx!==null?'inline-flex':'none';
   updateVoteSel();document.getElementById('voteError').classList.remove('show');
   document.getElementById('voteDialog').classList.add('open');
 }
@@ -1455,9 +1506,12 @@ function clearSF(ri){const b=bkt(),si=ri<=1?0:1;b.semis[si]={winnerIdx:null,vote
 function saveMatchup(){
   const vA=parseInt(document.getElementById('voteA').value),vB=parseInt(document.getElementById('voteB').value);
   if(selectedWinner===null||isNaN(vA)||isNaN(vB)){document.getElementById('voteError').classList.add('show');return;}
+  undoSnapshot=JSON.parse(JSON.stringify(app)); // save for undo
   const md=getMatchData(activeKey);
   if(md.winnerIdx!==null&&md.winnerIdx!==selectedWinner)clearDownstream(activeKey);
   md.winnerIdx=selectedWinner;md.votes=[vA,vB];
+  const note=document.getElementById('matchupNote').value.trim();
+  if(note) md.notes=note; else delete md.notes;
   if (pendingCelebrationData) {
     ensureVoting(app);
     const total = vA + vB;
@@ -1493,6 +1547,7 @@ function closeVoteDialog(){
   document.getElementById('voteDialogTitle').textContent='Record Votes';
   document.getElementById('voteDialogSub').textContent='';
   document.getElementById('saveMatchupBtn').textContent='Save Result';
+  document.getElementById('matchupNote').value='';
   activeKey=null;selectedWinner=null;
 }
 
@@ -1707,6 +1762,64 @@ async function initiateCountdownClose() {
 function showCountdownThenClose() {
   document.getElementById('closeVotingConfirmDialog').classList.remove('open');
   initiateCountdownClose();
+}
+
+// ── Undo ──
+let undoSnapshot = null;
+function undoLastResult() {
+  if (!undoSnapshot) return;
+  app = undoSnapshot; undoSnapshot = null;
+  saveApp(); renderAll(); showSnack('Undone ✓');
+}
+
+// ── Reset single matchup ──
+function resetMatchup() {
+  if (!activeKey) return;
+  if (!confirm('Reset this matchup? This will also clear any downstream results that depend on it.')) return;
+  undoSnapshot = JSON.parse(JSON.stringify(app));
+  const md = getMatchData(activeKey);
+  clearDownstream(activeKey);
+  md.winnerIdx = null; md.votes = [null, null]; delete md.notes;
+  saveApp(); closeVoteDialog(); renderAll(); showSnack('Matchup reset ✓');
+}
+
+// ── Presence ──
+let onlineStudentCount = 0;
+const presenceChannel = db.channel('bw-presence');
+presenceChannel.on('presence', { event: 'sync' }, () => {
+  const state = presenceChannel.presenceState();
+  onlineStudentCount = Object.values(state).flat().filter(p => p.m === 's').length;
+  const el = document.getElementById('presenceCount');
+  if (el) el.textContent = onlineStudentCount;
+}).subscribe(async status => {
+  if (status === 'SUBSCRIBED') {
+    await presenceChannel.track({ m: MODE === 'teacher' ? 't' : 's', id: Math.random().toString(36).slice(2) });
+  }
+});
+
+// ── Projection mode ──
+function enterProjection() {
+  document.body.classList.add('projection');
+  document.getElementById('projectionExitBtn').style.display = 'block';
+  document.documentElement.requestFullscreen?.().catch(()=>{});
+  // Switch to bracket view for projection
+  currentView = 'bracket'; renderAll(); showCurrentView();
+}
+function exitProjection() {
+  document.body.classList.remove('projection');
+  document.getElementById('projectionExitBtn').style.display = 'none';
+  if (document.fullscreenElement) document.exitFullscreen?.();
+}
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) exitProjection();
+});
+
+// ── Export ──
+function exportBracket() {
+  // Switch to bracket, then print
+  const prev = currentView;
+  currentView = 'bracket'; renderAll(); showCurrentView();
+  setTimeout(() => { window.print(); currentView = prev; renderAll(); showCurrentView(); }, 300);
 }
 
 function runTeacherCountdown() {
