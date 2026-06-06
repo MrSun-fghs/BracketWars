@@ -382,7 +382,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 @keyframes cardShine{0%{transform:translateX(-120%) skewX(-18deg);}100%{transform:translateX(260%) skewX(-18deg);}}
 .vote-result-overlay::before{content:'';position:absolute;top:0;left:0;bottom:0;width:35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);pointer-events:none;animation:cardShine 3.5s ease-in-out infinite;}
 @keyframes shimmerText{0%{background-position:-200% center;}100%{background-position:200% center;}}
-.vr-winner-text{background:linear-gradient(90deg,#fff 35%,#F59E0B 50%,#fff 65%);background-size:250% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmerText 2.8s linear infinite;}
+.vr-winner-text{color:#fff;font-weight:800;}
 .vr-trophy{font-size:3rem;display:inline-block;filter:drop-shadow(0 0 18px rgba(245,158,11,.7));}
 .vr-stat-card{background:rgba(245,158,11,.1);border-radius:12px;padding:.65rem 1rem;flex:1;text-align:center;border:1px solid rgba(245,158,11,.25);}
 .vr-stat-num{font-size:1.6rem;font-weight:800;color:#F59E0B;font-family:monospace;line-height:1;}
@@ -1459,8 +1459,11 @@ function saveMatchup(){
     const total = vA + vB;
     const winVotes = selectedWinner === 0 ? vA : vB;
     const loseVotes = selectedWinner === 0 ? vB : vA;
+    const pA = app.voting.poemA || pendingCelebrationData._pA;
+    const pB = app.voting.poemB || pendingCelebrationData._pB;
     const celebData = {
-      ...pendingCelebrationData,
+      winnerName: (selectedWinner === 0 ? pA : pB)?.name || pendingCelebrationData.winnerName,
+      loserName:  (selectedWinner === 0 ? pB : pA)?.name || pendingCelebrationData.loserName,
       winVotes, loseVotes,
       winPct: total > 0 ? Math.round(winVotes / total * 100) : 0,
       classId: app.voting.classId
@@ -1633,17 +1636,17 @@ reactionChannel.on('broadcast', { event: 'react' }, ({ payload }) => {
 }).subscribe();
 
 function launchReaction(emoji, btn) {
+  if (MODE === 'teacher') return;
   try { getAudio(); } catch(e) {}
-  const rect = btn.getBoundingClientRect();
-  const x = rect.left + rect.width / 2;
-  const y = rect.top;
+  // Always spawn on the left side
+  const x = 0.05 + Math.random() * 0.15; // 5–20% from left, normalized
+  const y = 0.75 + Math.random() * 0.15; // near bottom
   spawnReactionFloat(emoji, x, y);
-  // Broadcast to all other devices
-  reactionChannel.send({ type: 'broadcast', event: 'react', payload: { emoji, x: x / window.innerWidth, y: y / window.innerHeight } });
+  reactionChannel.send({ type: 'broadcast', event: 'react', payload: { emoji, x, y } });
 }
 
 function spawnReactionFloat(emoji, x, y) {
-  // x/y may be normalized (0-1) from remote, or absolute from local
+  if (MODE === 'teacher') return;
   const absX = x <= 1 ? x * window.innerWidth : x;
   const absY = y <= 1 ? y * window.innerHeight : y;
   const count = Math.floor(Math.random() * 2) + 1;
@@ -1766,7 +1769,8 @@ async function confirmCloseVoting() {
     loserName:(winnerIdx===0?pB:pA)?.name||'',
     winVotes:liveVoteCounts[winnerIdx],
     loseVotes:liveVoteCounts[1-winnerIdx],
-    winPct:total>0?Math.round(liveVoteCounts[winnerIdx]/total*100):0
+    winPct:total>0?Math.round(liveVoteCounts[winnerIdx]/total*100):0,
+    _pA: pA, _pB: pB
   };
   // Set tallying state — clears countdown, shows tallying on all devices
   const savedClassId = app.voting.classId;
