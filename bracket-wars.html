@@ -344,9 +344,13 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .vote-pill-btn.selected{border-color:var(--md-primary);background:var(--md-primary);color:#fff;}
 .vote-pill-btn.my-vote-pill{border-color:var(--md-primary);background:var(--md-primary-container);color:var(--md-on-primary-container);cursor:default;}
 .vote-pill-btn.my-vote-pill::before{content:'✓ ';font-size:.85rem;}
-@keyframes leadingPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,104,116,.5);border-color:var(--md-tertiary);}50%{box-shadow:0 0 0 8px rgba(0,104,116,0);border-color:var(--md-tertiary);}}
-.vote-pill-btn.leading-pill{border-color:var(--md-tertiary);background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);animation:leadingPulse 2s ease-in-out infinite;}
+@keyframes leadingPulse{0%{box-shadow:0 0 0 0 rgba(0,104,116,.6),0 0 0 0 rgba(0,104,116,.3);}60%{box-shadow:0 0 0 10px rgba(0,104,116,0),0 0 0 20px rgba(0,104,116,0);}100%{box-shadow:0 0 0 0 rgba(0,104,116,0),0 0 0 0 rgba(0,104,116,0);}}
+@keyframes leadingBadgePop{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+.vote-pill-btn.leading-pill{border-color:var(--md-tertiary);background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);animation:leadingPulse 1.6s ease-out infinite;font-weight:700;}
 .vote-pill-btn.leading-pill:hover{filter:brightness(.95);}
+.vote-leading-badge.show{animation:leadingBadgePop 1.6s ease-in-out infinite;}
+@keyframes justVotedGlow{0%{box-shadow:0 0 0 0 rgba(74,58,255,.0);}15%{box-shadow:0 0 0 6px rgba(74,58,255,.5),0 0 24px 4px rgba(74,58,255,.3);}70%{box-shadow:0 0 0 10px rgba(74,58,255,.0),0 0 32px 8px rgba(74,58,255,.1);}100%{box-shadow:none;}}
+.matchup.just-voted{animation:justVotedGlow 1.2s ease-out 3;outline:2px solid var(--md-primary);outline-offset:2px;}
 .vote-bar-track{height:5px;background:var(--md-surface-container-high);border-radius:var(--shape-full);overflow:hidden;margin-top:.65rem;}
 .vote-bar-fill{height:100%;background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));border-radius:var(--shape-full);transition:width .6s var(--motion-decel);}
 .vote-poem-block.is-leading .vote-bar-fill{background:linear-gradient(90deg,var(--md-tertiary),#006874);}
@@ -1396,7 +1400,7 @@ function bcard(type,ri,mi,mirrored,isT){
   else if(type==='semi'){pA=semiPoem(ri,0);pB=semiPoem(ri,1);md=bkt().semis[ri];if(md.winnerIdx!==null&&!isSemiDone()){if(md.winnerIdx===0)aA=true;else aB=true;}}
   else{pA=finalPoem(0);pB=finalPoem(1);md=bkt().final;}
   const hasPoems=pA&&pB,isC=md.winnerIdx!==null,tv=(md.votes[0]||0)+(md.votes[1]||0);
-  const card=document.createElement('div');card.className='matchup'+(isT&&hasPoems?' clickable':'');
+  const card=document.createElement('div');card.className='matchup'+(isT&&hasPoems?' clickable':'');card.dataset.matchupKey=JSON.stringify({type,ri,mi});
   if(isT&&hasPoems)card.onclick=()=>openVoteDialog({type,ri,mi},pA,pB,md);
   const poems=mirrored?[pB,pA]:[pA,pB],slots=mirrored?[1,0]:[0,1],aliveArr=mirrored?[aB,aA]:[aA,aB];
   for(let i=0;i<2;i++){
@@ -1466,7 +1470,8 @@ function saveMatchup(){
       loserName:  (selectedWinner === 0 ? pB : pA)?.name || pendingCelebrationData.loserName,
       winVotes, loseVotes,
       winPct: total > 0 ? Math.round(winVotes / total * 100) : 0,
-      classId: app.voting.classId
+      classId: app.voting.classId,
+      matchupKey: pendingCelebrationData._key
     };
     app.voting = {open:false,tallying:false,countdown:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
     app.lastVoteResult = {...celebData, ts:Date.now()};
@@ -1578,6 +1583,7 @@ function hideTallyingOverlay() { document.getElementById('tallyingOverlay').clas
 function closeWinnerAndGoBracket() {
   document.getElementById('voteResultDialog').classList.remove('open');
   hideTallyingOverlay();
+  const matchupKey = app.lastVoteResult?.matchupKey;
   if (app.lastVoteResult?.classId) app.activeId = app.lastVoteResult.classId;
   if (MODE === 'student') {
     currentView = 'bracket';
@@ -1585,6 +1591,18 @@ function closeWinnerAndGoBracket() {
     renderAll(); showCurrentView();
   } else {
     setMode('teacher');
+  }
+  // Highlight the just-voted matchup card
+  if (matchupKey) {
+    setTimeout(() => {
+      const keyStr = JSON.stringify(matchupKey);
+      const card = document.querySelector(`[data-matchup-key='${keyStr}']`);
+      if (card) {
+        card.classList.add('just-voted');
+        card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        setTimeout(() => card.classList.remove('just-voted'), 4000);
+      }
+    }, 350);
   }
 }
 
@@ -1767,7 +1785,7 @@ async function confirmCloseVoting() {
     winVotes:liveVoteCounts[winnerIdx],
     loseVotes:liveVoteCounts[1-winnerIdx],
     winPct:total>0?Math.round(liveVoteCounts[winnerIdx]/total*100):0,
-    _pA: pA, _pB: pB
+    _pA: pA, _pB: pB, _key: key
   };
   // Set tallying state — clears countdown, shows tallying on all devices
   const savedClassId = app.voting.classId;
