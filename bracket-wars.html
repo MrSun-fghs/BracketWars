@@ -400,7 +400,7 @@ body.projection .fullscreen-btn{display:none;}
 .reaction-btn:hover{background:var(--md-primary-container);transform:scale(1.15);}
 .reaction-btn:active{transform:scale(.9);}
 /* ── Vote View v2 ── */
-.v2-view{padding:.75rem 1rem 1.5rem;background:#fff;}
+.v2-view{padding:.75rem .4rem 1.5rem;background:#fff;}
 .v2-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:.4rem;}
 .v2-round-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant);}
 .v2-pills{display:flex;align-items:center;gap:6px;}
@@ -2477,7 +2477,7 @@ function spawnReactionFloat(emoji, x, y) {
 
 // ── +1 Float ──
 function showVoteFloat(sideIndex) {
-  const block = document.getElementById('votePoemBlock'+sideIndex); if (!block) return;
+  const block = document.getElementById('v2Card'+sideIndex) || document.getElementById('votePoemBlock'+sideIndex); if (!block) return;
   const rect = block.getBoundingClientRect();
   const el = document.createElement('div');
   el.className = 'vote-float';
