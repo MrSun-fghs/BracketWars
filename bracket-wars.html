@@ -357,6 +357,20 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 /* Vote float animation */
 @keyframes voteFloat{0%{opacity:1;transform:translateY(0) scale(1);}60%{opacity:1;transform:translateY(-50px) scale(1.2);}100%{opacity:0;transform:translateY(-90px) scale(.8);}}
 .vote-float{position:fixed;font-size:1.6rem;font-weight:900;pointer-events:none;z-index:999;animation:voteFloat .9s ease-out forwards;}
+/* Emoji reactions */
+@keyframes emojiRise{0%{opacity:1;transform:translateY(0) scale(.6) rotate(-8deg);}20%{transform:translateY(-80px) scale(1.3) rotate(6deg);opacity:1;}70%{opacity:.9;}100%{opacity:0;transform:translateY(-65vh) scale(.9) rotate(-4deg);}}
+.emoji-float{position:fixed;pointer-events:none;z-index:450;animation:emojiRise 2.2s ease-out forwards;line-height:1;}
+.reactions-bar{display:flex;justify-content:center;gap:.75rem;padding:.75rem 1.25rem 1.25rem;}
+.reaction-btn{background:var(--md-surface-container);border:1.5px solid var(--md-outline-variant);border-radius:var(--shape-full);width:3rem;height:3rem;font-size:1.4rem;cursor:pointer;transition:transform .15s,background .15s;display:flex;align-items:center;justify-content:center;}
+.reaction-btn:hover{background:var(--md-primary-container);transform:scale(1.15);}
+.reaction-btn:active{transform:scale(.9);}
+/* Finalize dialog overrides */
+.finalize-poem-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:var(--md-surface-container-low);border-radius:var(--shape-lg);border:1.5px solid var(--md-outline-variant);margin-bottom:.6rem;}
+.finalize-poem-row.winner-row{border-color:var(--md-primary);background:var(--md-primary-container);}
+.finalize-poem-name{font-size:.95rem;font-weight:600;color:var(--md-on-surface);flex:1;}
+.finalize-poem-row.winner-row .finalize-poem-name{color:var(--md-on-primary-container);}
+.finalize-vote-input{width:5rem;text-align:center;font-size:1.25rem;font-weight:700;padding:.4rem .5rem;border-radius:var(--shape-md);border:1.5px solid var(--md-outline-variant);background:var(--md-surface-container-lowest);color:var(--md-on-surface);}
+.finalize-vote-input:focus{border-color:var(--md-primary);outline:none;}
 /* Countdown overlay */
 @keyframes countPop{0%{transform:scale(2);opacity:0;}30%{transform:scale(1);opacity:1;}80%{transform:scale(1);opacity:1;}100%{transform:scale(.5);opacity:0;}}
 .countdown-overlay{position:fixed;inset:0;background:rgba(8,0,32,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:600;}
@@ -584,28 +598,45 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 
 <!-- VOTE DIALOG -->
 <div class="dialog-scrim" id="voteDialog">
-  <div class="dialog">
+  <div class="dialog" style="max-width:460px">
     <div class="dialog-eyebrow" id="voteEyebrow"></div>
-    <div class="dialog-headline">Record Votes</div>
-    <div class="vs-row">
-      <div class="vs-card" id="vsCardA" onclick="selectWinner(0)"><div class="vs-card-name" id="vsNameA">—</div><div class="vs-card-seed" id="vsSeedA"></div></div>
-      <div class="vs-divider">vs</div>
-      <div class="vs-card" id="vsCardB" onclick="selectWinner(1)"><div class="vs-card-name" id="vsNameB">—</div><div class="vs-card-seed" id="vsSeedB"></div></div>
-    </div>
-    <div class="vote-fields">
+    <div class="dialog-headline" id="voteDialogTitle">Record Votes</div>
+    <div style="font-size:.8rem;color:var(--md-on-surface-variant);margin-bottom:1rem;" id="voteDialogSub"></div>
+
+    <!-- Poem A row -->
+    <div class="finalize-poem-row" id="finalizePoemA" onclick="selectWinner(0)" style="cursor:pointer">
       <div>
-        <div class="vote-field-label" id="voteLabelA">Number of Votes:</div>
-        <div class="m3-field"><input type="number" id="voteA" min="0" placeholder=" " oninput="syncVoteWinner()"><label></label></div>
+        <div class="finalize-poem-name" id="vsNameA">—</div>
+        <div style="font-size:.7rem;color:var(--md-on-surface-variant)" id="vsSeedA"></div>
       </div>
-      <div>
-        <div class="vote-field-label" id="voteLabelB">Number of Votes:</div>
-        <div class="m3-field"><input type="number" id="voteB" min="0" placeholder=" " oninput="syncVoteWinner()"><label></label></div>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <div style="font-size:.7rem;font-weight:600;color:var(--md-on-surface-variant)" id="voteLabelA">Votes</div>
+        <input class="finalize-vote-input" type="number" id="voteA" min="0" placeholder="0" oninput="syncVoteWinner()">
       </div>
     </div>
-    <div class="m3-field-error" id="voteError">Please select a winner and enter vote counts.</div>
-    <div class="dialog-actions">
+
+    <div style="text-align:center;font-size:.75rem;font-weight:700;color:var(--md-on-surface-variant);margin:.25rem 0">vs</div>
+
+    <!-- Poem B row -->
+    <div class="finalize-poem-row" id="finalizePoemB" onclick="selectWinner(1)" style="cursor:pointer">
+      <div>
+        <div class="finalize-poem-name" id="vsNameB">—</div>
+        <div style="font-size:.7rem;color:var(--md-on-surface-variant)" id="vsSeedB"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <div style="font-size:.7rem;font-weight:600;color:var(--md-on-surface-variant)" id="voteLabelB">Votes</div>
+        <input class="finalize-vote-input" type="number" id="voteB" min="0" placeholder="0" oninput="syncVoteWinner()">
+      </div>
+    </div>
+
+    <div style="font-size:.72rem;color:var(--md-on-surface-variant);margin:.75rem 0 .25rem;padding:.6rem .75rem;background:var(--md-surface-container);border-radius:var(--shape-md);">
+      💡 Tap a row to set the winner. Adjust vote counts if any students voted by hand.
+    </div>
+
+    <div class="m3-field-error" id="voteError" style="margin:.25rem 0">Please select a winner and enter vote counts.</div>
+    <div class="dialog-actions" style="margin-top:.75rem">
       <button class="btn-text" onclick="closeVoteDialog()">Cancel</button>
-      <button class="btn-filled" onclick="saveMatchup()">Save Result</button>
+      <button class="btn-filled" id="saveMatchupBtn" onclick="saveMatchup()">Save Result</button>
     </div>
   </div>
 </div>
@@ -1402,7 +1433,11 @@ function openVoteDialog(key,pA,pB,md){
 }
 function selectWinner(i){selectedWinner=i;updateVoteSel();}
 function syncVoteWinner(){const a=parseInt(document.getElementById('voteA').value)||0,b=parseInt(document.getElementById('voteB').value)||0;if(a>0||b>0){selectedWinner=a>=b?0:1;updateVoteSel();}}
-function updateVoteSel(){document.getElementById('vsCardA').classList.toggle('selected',selectedWinner===0);document.getElementById('vsCardB').classList.toggle('selected',selectedWinner===1);}
+function updateVoteSel(){
+  const rowA=document.getElementById('finalizePoemA'),rowB=document.getElementById('finalizePoemB');
+  if(rowA){rowA.classList.toggle('winner-row',selectedWinner===0);rowA.style.borderColor=selectedWinner===0?'':'var(--md-outline-variant)';}
+  if(rowB){rowB.classList.toggle('winner-row',selectedWinner===1);rowB.style.borderColor=selectedWinner===1?'':'var(--md-outline-variant)';}
+}
 function getMatchData(key){const b=bkt();if(key.type==='rR1'||key.type==='rQF')return b.regionRounds[key.ri][key.mi];if(key.type==='semi')return b.semis[key.ri];return b.final;}
 function clearDownstream(key){const b=bkt();if(key.type==='rR1'){b.regionRounds[key.ri][2]={winnerIdx:null,votes:[null,null]};clearSF(key.ri);}else if(key.type==='rQF'){clearSF(key.ri);}else if(key.type==='semi'){b.semis[key.ri]={winnerIdx:null,votes:[null,null]};b.final={winnerIdx:null,votes:[null,null]};}else{b.final={winnerIdx:null,votes:[null,null]};}}
 function clearSF(ri){const b=bkt(),si=ri<=1?0:1;b.semis[si]={winnerIdx:null,votes:[null,null]};b.final={winnerIdx:null,votes:[null,null]};}
@@ -1430,7 +1465,13 @@ function saveMatchup(){
     if(bkt().final.winnerIdx!==null) setTimeout(launchConfetti,500);
   }
 }
-function closeVoteDialog(){document.getElementById('voteDialog').classList.remove('open');activeKey=null;selectedWinner=null;}
+function closeVoteDialog(){
+  document.getElementById('voteDialog').classList.remove('open');
+  document.getElementById('voteDialogTitle').textContent='Record Votes';
+  document.getElementById('voteDialogSub').textContent='';
+  document.getElementById('saveMatchupBtn').textContent='Save Result';
+  activeKey=null;selectedWinner=null;
+}
 
 function openSetup(){
   document.getElementById('setupHeadline').textContent=`Edit Poems — ${activeClass().name}`;
@@ -1567,6 +1608,27 @@ function playSound(type) {
   } catch(e) {}
 }
 
+// ── Emoji Reactions ──
+const REACTIONS = ['❤️','👍','😄','🔥','⚡'];
+function launchReaction(emoji, btn) {
+  try { getAudio(); } catch(e) {} // wake audio context
+  const rect = btn.getBoundingClientRect();
+  const count = Math.floor(Math.random() * 2) + 1;
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'emoji-float';
+      const xOffset = (Math.random() - 0.5) * 80;
+      const size = 1.5 + Math.random() * 1.2;
+      const duration = 1.8 + Math.random() * 0.8;
+      el.style.cssText = `left:${rect.left + rect.width/2 + xOffset}px;top:${rect.top}px;font-size:${size}rem;animation-duration:${duration}s;`;
+      el.textContent = emoji;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), duration * 1000 + 100);
+    }, i * 120);
+  }
+}
+
 // ── +1 Float ──
 function showVoteFloat(sideIndex) {
   const block = document.getElementById('votePoemBlock'+sideIndex); if (!block) return;
@@ -1594,24 +1656,12 @@ function showCountdownThenClose() {
 }
 
 function runTeacherCountdown() {
-  const overlay = document.createElement('div'); overlay.className='countdown-overlay'; overlay.style.zIndex='550';
-  const numEl = document.createElement('div'); numEl.className='countdown-num';
-  const lbl = document.createElement('div'); lbl.className='countdown-label'; lbl.textContent='Polls closing…';
-  overlay.appendChild(numEl); overlay.appendChild(lbl);
-  document.body.appendChild(overlay);
-  let count=3;
-  const tick=()=>{
-    if (count===0) {
-      playSound('whoosh');
-      overlay.style.transition='opacity .4s'; overlay.style.opacity='0';
-      setTimeout(()=>{ overlay.remove(); confirmCloseVoting(); },420);
-      return;
-    }
-    numEl.style.animation='none'; void numEl.offsetWidth; numEl.style.animation='countPop .9s ease-in-out forwards';
-    numEl.textContent=count; playSound('tick'); count--;
-    setTimeout(tick,1000);
-  };
-  tick();
+  // Students see the countdown on their screens — teacher just waits silently
+  showSnack('Countdown started… Finalize dialog opening shortly.');
+  playSound('tick');
+  setTimeout(()=>playSound('tick'), 1000);
+  setTimeout(()=>playSound('tick'), 2000);
+  setTimeout(()=>{ playSound('whoosh'); confirmCloseVoting(); }, 3200);
 }
 
 let studentCountdownTimer = null;
@@ -1626,7 +1676,7 @@ function showStudentCountdown() {
   numEl.style.animation='none'; void numEl.offsetWidth; numEl.style.animation='countPop .9s ease-in-out forwards';
   numEl.textContent=count; playSound('tick'); count--;
   studentCountdownTimer = setInterval(()=>{
-    if (count===0) { clearInterval(studentCountdownTimer); studentCountdownTimer=null; return; }
+    if (count===0) { clearInterval(studentCountdownTimer); studentCountdownTimer=null; hideStudentCountdown(); showTallyingOverlay(); return; }
     numEl.style.animation='none'; void numEl.offsetWidth; numEl.style.animation='countPop .9s ease-in-out forwards';
     numEl.textContent=count; playSound('tick'); count--;
   },1000);
@@ -1695,11 +1745,14 @@ async function confirmCloseVoting() {
   // Open pre-filled score dialog for teacher
   activeKey = key; selectedWinner = winnerIdx;
   const cls = app.classes.find(c=>c.id===app.voting?.classId)||activeClass();
-  document.getElementById('voteEyebrow').textContent = esc(cls?.name||'')+' · '+getRoundLabel(key)+' · From Voting';
+  document.getElementById('voteEyebrow').textContent = esc(cls?.name||'')+' · '+getRoundLabel(key);
+  document.getElementById('voteDialogTitle').textContent = 'Finalize Votes';
+  document.getElementById('voteDialogSub').textContent = 'Review the results. Adjust counts if any students voted by hand, then finalize.';
+  document.getElementById('saveMatchupBtn').textContent = '🏁 Finalize & Announce';
   document.getElementById('vsNameA').textContent = pA?.name||'—'; document.getElementById('vsSeedA').textContent = pA?'Seed #'+pA.seed:'';
   document.getElementById('vsNameB').textContent = pB?.name||'—'; document.getElementById('vsSeedB').textContent = pB?'Seed #'+pB.seed:'';
-  document.getElementById('voteLabelA').textContent = 'Votes:';
-  document.getElementById('voteLabelB').textContent = 'Votes:';
+  document.getElementById('voteLabelA').textContent = 'Votes';
+  document.getElementById('voteLabelB').textContent = 'Votes';
   document.getElementById('voteA').value = liveVoteCounts[0];
   document.getElementById('voteB').value = liveVoteCounts[1];
   updateVoteSel(); document.getElementById('voteError').classList.remove('show');
@@ -1817,6 +1870,20 @@ function renderVoteView() {
     wrap.appendChild(block);
   });
   el.appendChild(wrap);
+
+  // Emoji reactions bar
+  const reactBar = document.createElement('div'); reactBar.className = 'reactions-bar';
+  const reactLabel = document.createElement('div');
+  reactLabel.style.cssText = 'text-align:center;font-size:.7rem;color:var(--md-on-surface-variant);margin-bottom:.25rem;letter-spacing:.04em;';
+  reactLabel.textContent = 'Tap to react while you wait';
+  el.appendChild(reactLabel);
+  REACTIONS.forEach(emoji => {
+    const btn = document.createElement('button'); btn.className = 'reaction-btn';
+    btn.textContent = emoji;
+    btn.addEventListener('click', function() { launchReaction(emoji, this); });
+    reactBar.appendChild(btn);
+  });
+  el.appendChild(reactBar);
 }
 
 async function submitStudentVote(choice) {
