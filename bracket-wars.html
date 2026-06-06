@@ -677,6 +677,7 @@ body.projection .fullscreen-btn{display:none;}
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
       <button class="seg-btn" id="btnResults" onclick="setView('results')"><span class="nav-icon">📊</span> Results</button>
+      <button class="seg-btn" id="btnEngagement" onclick="setView('engagement')"><span class="nav-icon">⚡</span> Engagement</button>
     </div>
   </div>
 </div>
@@ -685,7 +686,7 @@ body.projection .fullscreen-btn{display:none;}
 <div id="leaderboardView" style="display:none"><div class="leaderboard-view" id="lbContent"></div></div>
 <div id="listView" style="display:none"><div class="list-view" id="listContent"></div></div>
 <div id="bracketView" style="display:none"><div class="bracket-scroll"><div class="mm-bracket" id="bracket"></div></div></div>
-<div id="trendsView" style="display:none"><div class="home-view" id="trendsContent"></div></div>
+<div id="engagementView" style="display:none;background:#fff;"><div class="home-view" id="engagementContent"></div></div>
 </div>
 
 <!-- PASSWORD DIALOG -->
@@ -999,7 +1000,7 @@ function setMode(m) {
     document.getElementById('homeView').style.display = 'none';
     document.getElementById('leaderboardView').style.display = 'none';
     document.getElementById('listView').style.display = 'none';
-    document.getElementById('trendsView').style.display = 'none';
+    document.getElementById('engagementView').style.display = 'none';
     document.getElementById('bracketView').style.display = 'block';
     currentView = 'bracket';
   }
@@ -1008,16 +1009,16 @@ function setMode(m) {
 
 function setTeacherView(v) {
   currentView = v;
-  document.getElementById('bracketView').style.display = v === 'trends' ? 'none' : 'block';
-  document.getElementById('trendsView').style.display = v === 'trends' ? 'block' : 'none';
-  if (v === 'trends') renderTrends();
+  document.getElementById('bracketView').style.display = v === 'engagement' ? 'none' : 'block';
+  document.getElementById('engagementView').style.display = v === 'engagement' ? 'block' : 'none';
+  if (v === 'engagement') renderEngagement();
   renderTabs();
 }
 
 function setView(v) {
   currentView = v;
   saveStudentPrefs();
-  ['home','leaderboard','list','bracket','results'].forEach(x => {
+  ['home','leaderboard','list','bracket','results','engagement'].forEach(x => {
     const el = document.getElementById('btn'+x.charAt(0).toUpperCase()+x.slice(1));
     if (el) el.classList.toggle('active', v===x);
   });
@@ -1026,7 +1027,7 @@ function setView(v) {
 }
 function showCurrentView() {
   if (MODE === 'teacher') return;
-  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView', results:'resultsView'};
+  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView', results:'resultsView', engagement:'engagementView'};
   Object.entries(views).forEach(([key, id]) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1055,6 +1056,7 @@ function showCurrentView() {
   if (currentView==='leaderboard') renderLeaderboard();
   if (currentView==='vote') renderVoteView();
   if (currentView==='results') renderResults();
+  if (currentView==='engagement') renderEngagement();
 }
 
 // ── Tournament round progress helper ──
@@ -1577,9 +1579,9 @@ function renderTabs() {
   if (MODE === 'teacher') {
     const trendsTab = document.createElement('button');
     trendsTab.id = 'btnTrendsTab';
-    trendsTab.className = 'm3-tab home-tab' + (currentView === 'trends' ? ' active' : '');
-    trendsTab.innerHTML = '📈 Trends';
-    trendsTab.onclick = () => setTeacherView('trends');
+    trendsTab.className = 'm3-tab home-tab' + (currentView === 'engagement' ? ' active' : '');
+    trendsTab.innerHTML = '⚡ Engagement';
+    trendsTab.onclick = () => setTeacherView('engagement');
     bar.appendChild(trendsTab);
   }
   app.classes.forEach((cls, ci) => {
@@ -1588,12 +1590,13 @@ function renderTabs() {
     tab.appendChild(dot); tab.appendChild(document.createTextNode(cls.name));
     tab.onclick = e => {
       if(e.target.classList.contains('tab-close'))return;
-      if(app.activeId===cls.id&&currentView!=='home'&&currentView!=='trends')return;
+      if(app.activeId===cls.id&&currentView!=='home'&&currentView!=='engagement')return;
       const card=document.getElementById('contentCard');
       card.classList.add('content-switching');
       setTimeout(()=>{
         app.activeId=cls.id;
-        if(currentView==='home'||currentView==='vote'||currentView==='trends') currentView='leaderboard';
+        if(currentView==='home'||currentView==='vote'||currentView==='engagement') currentView='leaderboard';
+        if(MODE==='teacher'&&currentView==='engagement'){document.getElementById('engagementView').style.display='none';document.getElementById('bracketView').style.display='block';currentView='bracket';}
         saveStudentPrefs();
         if(MODE==='teacher')saveApp();
         renderAll();
@@ -1807,56 +1810,158 @@ function buildListMatchup(pA,pB,md){
   return wrap;
 }
 
-function renderTrends() {
-  const panel = document.getElementById('trendsContent');
-  if (!panel) return;
-  panel.innerHTML = '';
-  if (MODE !== 'teacher') return;
+// ── Engagement helpers ──
+function getAllMatchups() {
+  const b = bkt(); if (!b) return [];
+  const matchups = [];
+  const addM = (round, order, pA, pB, m, cat) => {
+    if (!pA || !pB || m.winnerIdx === null) return;
+    const [v0,v1] = [m.votes[0]||0, m.votes[1]||0], total = v0+v1;
+    const winner = m.winnerIdx===0?pA:pB, loser = m.winnerIdx===0?pB:pA;
+    const wv = m.votes[m.winnerIdx]||0, lv = m.votes[1-m.winnerIdx]||0;
+    matchups.push({round,roundOrder:order,pA,pB,winner,loser,wv,lv,votes:[v0,v1],total,
+      pct:total>0?Math.round(wv/total*100):50, margin:Math.abs(v0-v1),
+      cat, isUpset:winner.seed>loser.seed, seedGap:Math.abs(winner.seed-loser.seed)});
+  };
+  for (let ri=0;ri<4;ri++) {
+    const cat=CATEGORIES[ri], pairs=[[0,1],[2,3]];
+    for (let mi=0;mi<2;mi++) {
+      const sA=cat.seeds[pairs[mi][0]], sB=cat.seeds[pairs[mi][1]];
+      addM('Round of 16',1,{name:b.poems[sA],seed:sA+1},{name:b.poems[sB],seed:sB+1},b.regionRounds[ri][mi],cat);
+    }
+    addM('Quarterfinals',2,qfPoem(ri,0),qfPoem(ri,1),b.regionRounds[ri][2],cat);
+  }
+  for (let si=0;si<2;si++) addM('Semifinals',3,semiPoem(si,0),semiPoem(si,1),b.semis[si],null);
+  addM('Final',4,finalPoem(0),finalPoem(1),b.final,null);
+  return matchups;
+}
+function engSection(title, parent) {
+  const s=document.createElement('div'); s.style.marginBottom='.25rem';
+  const h=document.createElement('div');
+  h.style.cssText='font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);padding:1.25rem 1.5rem .5rem;display:flex;align-items:center;gap:.5rem;';
+  h.innerHTML=`${title} <span style="flex:1;height:1px;background:var(--md-outline-variant);display:inline-block"></span>`;
+  s.appendChild(h); parent.appendChild(s); return s;
+}
+function dramaCard(parent, icon, label, title, sub, detail) {
+  const c=document.createElement('div');
+  c.style.cssText='background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);border:1px solid var(--md-outline-variant);padding:1rem 1.1rem;';
+  c.innerHTML=`<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;"><span style="font-size:1.4rem">${icon}</span><span style="font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant)">${label}</span></div><div style="font-size:.95rem;font-weight:700;color:var(--md-on-surface);margin-bottom:.2rem">${esc(title)}</div><div style="font-size:.75rem;color:var(--md-on-surface-variant)">${sub}</div><div style="font-size:.7rem;color:var(--md-on-surface-variant);margin-top:.15rem">${detail}</div>`;
+  parent.appendChild(c);
+}
 
-  const crossStats = computeCrossClassStats();
-  const anyTaste = app.classes.some(cls => computeClassTasteProfile(cls) !== null);
-  if (!crossStats && !anyTaste) return;
+function renderEngagement() {
+  const el = document.getElementById('engagementContent'); if (!el) return;
+  el.innerHTML = '';
+  if (!activeClass()) return;
 
-  const sectionLabel = document.createElement('div');
-  sectionLabel.style.cssText = 'font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);padding:1.5rem 1.5rem .6rem;display:flex;align-items:center;gap:.5rem;max-width:1000px;margin:0 auto;';
-  sectionLabel.innerHTML = '🔍 Class Insights <span style="flex:1;height:1px;background:var(--md-outline-variant);display:inline-block"></span>';
-  panel.appendChild(sectionLabel);
-
-  const grid = document.createElement('div'); grid.className = 'cross-class-grid';
-
-  if (crossStats) {
-    const compCard = document.createElement('div'); compCard.className = 'cross-card';
-    const compHdr = document.createElement('div'); compHdr.className = 'cross-card-header';
-    compHdr.innerHTML = `<div class="cross-card-title">⚔️ Class vs Class</div><div style="font-size:.7rem;color:var(--md-on-surface-variant);margin-top:.2rem">${crossStats.total} shared matchup${crossStats.total!==1?'s':''}</div>`;
-    compCard.appendChild(compHdr);
-    const compBody = document.createElement('div'); compBody.className = 'cross-card-body';
-    compBody.innerHTML = `
-      <div class="cross-stat-row"><span class="cross-stat-label">Agreement rate</span><span class="cross-stat-value">${crossStats.agreementRate}%</span></div>
-      <div class="cross-stat-row"><span class="cross-stat-label">Matchups agreed</span><span class="cross-stat-value">${crossStats.agreementCount}/${crossStats.total}</span></div>
-      ${crossStats.classStats.map(c=>`<div class="cross-stat-row"><span class="cross-stat-label">${esc(c.name)} avg margin</span><span class="cross-stat-value">${c.avgMargin}%</span></div>`).join('')}
-      ${crossStats.mostDivisive?`<div style="margin-top:.65rem;padding:.55rem .7rem;background:var(--md-surface-container);border-radius:var(--shape-md);font-size:.78rem;"><span style="font-weight:700;color:var(--md-error)">Most Divisive:</span><br><span style="color:var(--md-on-surface)">${esc(crossStats.mostDivisive.pAName)} vs ${esc(crossStats.mostDivisive.pBName)}</span><br><span style="color:var(--md-on-surface-variant);font-size:.7rem">${crossStats.mostDivisive.results.map(r=>r.className+' → '+(r.winnerIdx===0?crossStats.mostDivisive.pAName:crossStats.mostDivisive.pBName)).join(' · ')}</span></div>`:''}`;
-    compCard.appendChild(compBody);
-    grid.appendChild(compCard);
+  const matchups = getAllMatchups();
+  if (matchups.length === 0) {
+    el.innerHTML='<div style="text-align:center;padding:3rem 1.5rem;color:var(--md-on-surface-variant);font-size:.9rem">No matchups completed yet.<br>Check back after the first round.</div>';
+    return;
   }
 
-  app.classes.forEach(cls => {
-    const tp = computeClassTasteProfile(cls);
-    if (!tp) return;
-    const tCard = document.createElement('div'); tCard.className = 'cross-card';
-    const tHdr = document.createElement('div'); tHdr.className = 'cross-card-header';
-    tHdr.innerHTML = `<div class="cross-card-title">${esc(cls.name)} Taste Profile</div>`;
-    tCard.appendChild(tHdr);
-    const tBody = document.createElement('div'); tBody.className = 'cross-card-body';
-    tBody.innerHTML = `
-      <div class="cross-stat-row"><span class="cross-stat-label">Matchups complete</span><span class="cross-stat-value">${tp.total}</span></div>
-      <div class="cross-stat-row"><span class="cross-stat-label">Avg winning margin</span><span class="cross-stat-value">${tp.avgDecisiveness}%</span></div>
-      <div class="cross-stat-row"><span class="cross-stat-label">Upset rate</span><span class="cross-stat-value">${tp.upsetRate}%</span></div>
-      <div class="taste-profile-chip">${tp.icon} ${esc(tp.profile)}</div>`;
-    tCard.appendChild(tBody);
-    grid.appendChild(tCard);
+  // ── Build poem stats ──
+  const poemStats = {};
+  matchups.forEach(m => {
+    [m.pA, m.pB].forEach((p, idx) => {
+      if (!poemStats[p.name]) poemStats[p.name]={name:p.name,seed:p.seed,totalV:0,totalMV:0,wins:0,losses:0,rounds:[],bestPct:0};
+      const myV=m.votes[idx]||0, pct=m.total>0?Math.round(myV/m.total*100):50;
+      poemStats[p.name].totalV+=myV; poemStats[p.name].totalMV+=m.total;
+      if(m.winnerIdx===idx) poemStats[p.name].wins++; else poemStats[p.name].losses++;
+      if(pct>poemStats[p.name].bestPct) poemStats[p.name].bestPct=pct;
+      poemStats[p.name].rounds.push({round:m.round,myV,oppV:m.votes[1-idx]||0,pct});
+    });
   });
 
-  if (grid.children.length) panel.appendChild(grid);
+  // ── Stats ──
+  const totalVotes=matchups.reduce((s,m)=>s+m.total,0);
+  const avgVotes=Math.round(totalVotes/matchups.length);
+  const roundOrder=['Round of 16','Quarterfinals','Semifinals','Final'];
+  const byRound={};
+  matchups.forEach(m=>{if(!byRound[m.round])byRound[m.round]={total:0,count:0,order:m.roundOrder};byRound[m.round].total+=m.total;byRound[m.round].count++;});
+  const roundAvgs=roundOrder.filter(r=>byRound[r]).map(r=>({round:r,avg:Math.round(byRound[r].total/byRound[r].count),total:byRound[r].total,count:byRound[r].count}));
+  const maxAvg=Math.max(...roundAvgs.map(r=>r.avg),1);
+  const rankings=Object.values(poemStats).filter(p=>p.totalMV>0).map(p=>({...p,cumPct:Math.round(p.totalV/p.totalMV*100)})).sort((a,b)=>b.cumPct-a.cumPct);
+  const nailbiters=[...matchups].filter(m=>m.total>0).sort((a,b)=>a.pct-b.pct).slice(0,3);
+  const upsets=[...matchups].filter(m=>m.isUpset&&m.seedGap>0).sort((a,b)=>b.seedGap-a.seedGap||b.pct-a.pct).slice(0,3);
+  const blowouts=[...matchups].filter(m=>m.total>0).sort((a,b)=>b.pct-a.pct).slice(0,3);
+  const alive=Object.values(poemStats).filter(p=>p.losses===0&&p.wins>0);
+  const graveyard=Object.values(poemStats).filter(p=>p.losses>0).sort((a,b)=>b.bestPct-a.bestPct);
+
+  // ── Header stats ──
+  const statsRow=document.createElement('div'); statsRow.className='results-stats-row';
+  statsRow.innerHTML=`<div class="results-stat"><div class="results-stat-num">${matchups.length}</div><div class="results-stat-label">MATCHUPS DONE</div></div><div class="results-stat"><div class="results-stat-num">${totalVotes}</div><div class="results-stat-label">TOTAL VOTES</div></div><div class="results-stat"><div class="results-stat-num">${avgVotes}</div><div class="results-stat-label">AVG PER MATCHUP</div></div>`;
+  el.appendChild(statsRow);
+
+  // ── Participation by Round ──
+  if (roundAvgs.length > 1) {
+    const sec=engSection('📈 Participation by Round', el);
+    const chart=document.createElement('div');
+    chart.style.cssText='display:flex;align-items:flex-end;gap:1rem;padding:.75rem 1.5rem 0;height:110px;';
+    roundAvgs.forEach(r=>{
+      const col=document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:.35rem;flex:1;';
+      const h=Math.max(Math.round((r.avg/maxAvg)*72),4);
+      col.innerHTML=`<div style="font-size:.72rem;font-weight:700;color:var(--md-primary)">${r.avg}</div><div style="width:100%;height:${h}px;background:var(--md-primary-container);border-radius:6px 6px 0 0;"></div><div style="font-size:.6rem;color:var(--md-on-surface-variant);text-align:center;line-height:1.2">${r.round.replace('Round of ','R')}</div>`;
+      chart.appendChild(col);
+    });
+    sec.appendChild(chart);
+    const last=roundAvgs[roundAvgs.length-1].avg, first=roundAvgs[0].avg;
+    const trend=last>first?'📈 Engagement is heating up as the rounds go on!':last<first?'📉 Early rounds pulled the most votes.':'➡️ Engagement stayed steady throughout.';
+    const note=document.createElement('div'); note.style.cssText='font-size:.73rem;color:var(--md-on-surface-variant);padding:.5rem 1.5rem 1rem;'; note.textContent=trend;
+    sec.appendChild(note);
+  }
+
+  // ── Power Rankings ──
+  if (rankings.length) {
+    const sec=engSection('🏆 Power Rankings', el);
+    const sub=document.createElement('div'); sub.style.cssText='font-size:.7rem;color:var(--md-on-surface-variant);padding:0 1.5rem .6rem;'; sub.textContent='Cumulative vote % across all matchups played'; sec.appendChild(sub);
+    rankings.forEach((p,i)=>{
+      const undefeated=p.losses===0&&p.wins>0;
+      const cat=CATEGORIES.find(c=>c.seeds.includes(p.seed-1));
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.5rem 1.5rem;'+(i<rankings.length-1?'border-bottom:1px solid var(--md-outline-variant);':'');
+      row.innerHTML=`<div style="font-size:.75rem;font-weight:700;color:var(--md-on-surface-variant);width:1.4rem;text-align:right">${i+1}</div><div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:var(--md-on-surface)">${esc(p.name)}</div><div style="font-size:.65rem;color:var(--md-on-surface-variant)">${p.wins}W–${p.losses}L · ${p.totalMV} votes cast</div></div>${undefeated?`<div style="font-size:.58rem;font-weight:700;background:rgba(0,180,80,.12);color:#008040;padding:.15rem .5rem;border-radius:999px;white-space:nowrap">UNDEFEATED</div>`:''}${cat?`<div style="width:6px;height:6px;border-radius:50%;background:${cat.bg};flex-shrink:0"></div>`:''}<div style="font-size:1rem;font-weight:800;color:var(--md-primary);min-width:2.8rem;text-align:right">${p.cumPct}%</div><div style="width:52px;height:5px;background:var(--md-surface-container-high);border-radius:3px;overflow:hidden;flex-shrink:0"><div style="height:100%;width:${p.cumPct}%;background:${i<3?'var(--md-primary)':'var(--md-secondary)'};border-radius:3px"></div></div>`;
+      sec.appendChild(row);
+    });
+  }
+
+  // ── Drama Corner ──
+  if (nailbiters.length||upsets.length||blowouts.length) {
+    const sec=engSection('⚡ Drama Corner', el);
+    const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;padding:0 1.5rem 1.25rem;'; sec.appendChild(grid);
+    if (nailbiters.length) { const m=nailbiters[0]; dramaCard(grid,'⚖️','Nail-Biter',m.winner.name,`${m.pct}% vs ${100-m.pct}% · ${m.round}`,`Just ${m.margin} vote${m.margin===1?'':'s'} apart`); }
+    if (upsets.length) { const m=upsets[0]; dramaCard(grid,'🌪️','Biggest Upset',m.winner.name,`Knocked out #${m.loser.seed} seed · ${m.round}`,`Seed gap: ${m.seedGap} — nobody saw it coming`); }
+    if (blowouts.length) { const m=blowouts[0]; dramaCard(grid,'💥','Blowout',m.winner.name,`${m.pct}% of the vote · ${m.round}`,`${m.wv} vs ${m.lv} — wasn't even close`); }
+  }
+
+  // ── Category Battle ──
+  const catData=CATEGORIES.map(cat=>({cat,survivors:alive.filter(p=>cat.seeds.includes(p.seed-1)).length,played:Object.values(poemStats).filter(p=>cat.seeds.includes(p.seed-1)).length}));
+  if (catData.some(c=>c.played>0)) {
+    const sec=engSection('🎯 Category Battle', el);
+    const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;padding:0 1.5rem 1.25rem;'; sec.appendChild(grid);
+    catData.forEach(({cat,survivors})=>{
+      const shortName=cat.name.replace(/^[A-D] — /,'');
+      const pct=Math.round(survivors/4*100);
+      const div=document.createElement('div');
+      div.style.cssText='background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);padding:.85rem 1rem;border:1px solid var(--md-outline-variant);';
+      div.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.35rem;"><div style="width:8px;height:8px;border-radius:50%;background:${cat.bg};flex-shrink:0"></div><div style="font-size:.65rem;font-weight:700;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.05em">${esc(shortName)}</div></div><div style="font-size:1.5rem;font-weight:800;color:var(--md-primary)">${survivors}</div><div style="font-size:.68rem;color:var(--md-on-surface-variant);margin-bottom:.35rem">of 4 still alive</div><div style="height:4px;background:var(--md-surface-container-high);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${cat.bg};border-radius:2px"></div></div>`;
+      grid.appendChild(div);
+    });
+  }
+
+  // ── The Graveyard ──
+  if (graveyard.length) {
+    const sec=engSection('🪦 The Graveyard', el);
+    const sub=document.createElement('div'); sub.style.cssText='font-size:.7rem;color:var(--md-on-surface-variant);padding:0 1.5rem .6rem;'; sub.textContent='Eliminated poems — ranked by their best performance'; sec.appendChild(sub);
+    graveyard.forEach((p,i)=>{
+      const bestRound=p.rounds.reduce((best,r)=>r.pct>best.pct?r:best,p.rounds[0]);
+      const cat=CATEGORIES.find(c=>c.seeds.includes(p.seed-1));
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.5rem 1.5rem;'+(i<graveyard.length-1?'border-bottom:1px solid var(--md-outline-variant);':'');
+      row.innerHTML=`<div style="font-size:.9rem;width:1.5rem;text-align:center">💀</div><div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:var(--md-on-surface)">${esc(p.name)}</div><div style="font-size:.65rem;color:var(--md-on-surface-variant)">Best: ${bestRound.pct}% in ${bestRound.round} · ${bestRound.myV}–${bestRound.oppV}</div></div>${cat?`<div style="font-size:.6rem;font-weight:700;padding:.15rem .5rem;border-radius:999px;background:${cat.bg}22;color:${cat.bg}">${esc(cat.name.replace(/^[A-D] — /,''))}</div>`:''}<div style="font-size:.85rem;font-weight:700;color:var(--md-on-surface-variant)">${p.bestPct}%</div>`;
+      sec.appendChild(row);
+    });
+  }
 }
 
 function renderBracket(){
