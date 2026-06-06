@@ -1595,8 +1595,12 @@ function renderTabs() {
       card.classList.add('content-switching');
       setTimeout(()=>{
         app.activeId=cls.id;
+        const wasEngagement = currentView === 'engagement';
         if(currentView==='home'||currentView==='vote'||currentView==='engagement') currentView='leaderboard';
-        if(MODE==='teacher'&&currentView==='engagement'){document.getElementById('engagementView').style.display='none';document.getElementById('bracketView').style.display='block';currentView='bracket';}
+        if(MODE==='teacher'){
+          if(wasEngagement){document.getElementById('engagementView').style.display='none';document.getElementById('bracketView').style.display='block';}
+          currentView='bracket';
+        }
         saveStudentPrefs();
         if(MODE==='teacher')saveApp();
         renderAll();
