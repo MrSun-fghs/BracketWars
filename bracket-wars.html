@@ -1595,16 +1595,18 @@ function renderTabs() {
       card.classList.add('content-switching');
       setTimeout(()=>{
         app.activeId=cls.id;
-        const wasEngagement = currentView === 'engagement';
-        if(currentView==='home'||currentView==='vote'||currentView==='engagement') currentView='leaderboard';
         if(MODE==='teacher'){
-          if(wasEngagement){document.getElementById('engagementView').style.display='none';document.getElementById('bracketView').style.display='block';}
+          saveApp();
+          document.getElementById('engagementView').style.display='none';
+          document.getElementById('bracketView').style.display='block';
           currentView='bracket';
+          renderAll();
+        } else {
+          if(currentView==='home'||currentView==='vote'||currentView==='engagement') currentView='leaderboard';
+          saveStudentPrefs();
+          renderAll();
+          showCurrentView();
         }
-        saveStudentPrefs();
-        if(MODE==='teacher')saveApp();
-        renderAll();
-        showCurrentView();
         card.classList.remove('content-switching');
         card.classList.add('content-entering');
         setTimeout(()=>card.classList.remove('content-entering'),250);
