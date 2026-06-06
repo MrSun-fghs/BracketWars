@@ -677,7 +677,6 @@ body.projection .fullscreen-btn{display:none;}
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
       <button class="seg-btn" id="btnResults" onclick="setView('results')"><span class="nav-icon">📊</span> Results</button>
-      <button class="seg-btn" id="btnEngagement" onclick="setView('engagement')"><span class="nav-icon">⚡</span> Engagement</button>
     </div>
   </div>
 </div>
@@ -1018,7 +1017,7 @@ function setTeacherView(v) {
 function setView(v) {
   currentView = v;
   saveStudentPrefs();
-  ['home','leaderboard','list','bracket','results','engagement'].forEach(x => {
+  ['home','leaderboard','list','bracket','results'].forEach(x => {
     const el = document.getElementById('btn'+x.charAt(0).toUpperCase()+x.slice(1));
     if (el) el.classList.toggle('active', v===x);
   });
@@ -1027,7 +1026,7 @@ function setView(v) {
 }
 function showCurrentView() {
   if (MODE === 'teacher') return;
-  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView', results:'resultsView', engagement:'engagementView'};
+  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView', results:'resultsView'};
   Object.entries(views).forEach(([key, id]) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1056,7 +1055,6 @@ function showCurrentView() {
   if (currentView==='leaderboard') renderLeaderboard();
   if (currentView==='vote') renderVoteView();
   if (currentView==='results') renderResults();
-  if (currentView==='engagement') renderEngagement();
 }
 
 // ── Tournament round progress helper ──
