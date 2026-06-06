@@ -399,6 +399,57 @@ body.projection .fullscreen-btn{display:none;}
 .reaction-btn{background:var(--md-surface-container);border:1.5px solid var(--md-outline-variant);border-radius:var(--shape-full);width:3rem;height:3rem;font-size:1.4rem;cursor:pointer;transition:transform .15s,background .15s;display:flex;align-items:center;justify-content:center;}
 .reaction-btn:hover{background:var(--md-primary-container);transform:scale(1.15);}
 .reaction-btn:active{transform:scale(.9);}
+/* ── Vote View v2 ── */
+.v2-view{padding:.75rem 1rem 1.5rem;}
+.v2-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:.4rem;}
+.v2-round-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.v2-pills{display:flex;align-items:center;gap:6px;}
+.v2-timer-pill{display:inline-flex;align-items:center;gap:5px;background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);padding:.25rem .7rem;border-radius:var(--shape-full);font-size:12px;font-weight:700;font-family:monospace;}
+.v2-timer-pill.urgent{background:var(--md-error-container);color:var(--md-error);animation:timerUrgent .5s ease-in-out infinite;}
+.v2-count-pill{display:inline-flex;align-items:center;gap:5px;background:var(--md-surface-container-lowest);color:var(--md-on-surface-variant);border:1px solid var(--md-outline-variant);padding:.25rem .7rem;border-radius:var(--shape-full);font-size:11px;font-weight:500;}
+.v2-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+.v2-card{border-radius:var(--shape-xl);padding:.85rem .75rem;transition:transform .18s ease,box-shadow .18s ease;}
+.v2-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
+.v2-card.poem-a{background:#F5F7FF;border:2px solid var(--md-primary);}
+.v2-card.poem-b{background:#FAF7FF;border:1.5px solid #c4b5fd;}
+.v2-card.poem-b.leading{border:2px solid var(--md-secondary);}
+.v2-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:.5rem;min-height:1.5rem;}
+.v2-cat-badge{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .5rem;border-radius:var(--shape-full);color:#fff;white-space:nowrap;flex-shrink:0;}
+.v2-leading-badge{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:#F59E0B;color:#1C1400;display:inline-flex;align-items:center;gap:3px;padding:.18rem .5rem;border-radius:var(--shape-full);white-space:nowrap;opacity:0;transition:opacity .3s;flex-shrink:0;}
+.v2-leading-badge.show{opacity:1;animation:leadingBadgePop 1.6s ease-in-out infinite;}
+.v2-poem-title{font-size:1.05rem;font-weight:800;color:var(--md-on-surface);margin-bottom:.5rem;line-height:1.25;}
+.v2-count{font-size:1.9rem;font-weight:500;line-height:1;}
+.v2-count-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;}
+.v2-card.poem-a .v2-count,.v2-card.poem-a .v2-bar-fill{color:var(--md-primary);}
+.v2-card.poem-b .v2-count,.v2-card.poem-b .v2-bar-fill{color:var(--md-secondary);}
+.v2-card.poem-a .v2-count-label{color:var(--md-primary);}
+.v2-card.poem-b .v2-count-label{color:var(--md-secondary);}
+.v2-bar-track{height:5px;border-radius:var(--shape-full);overflow:hidden;margin-bottom:.2rem;}
+.v2-card.poem-a .v2-bar-track{background:rgba(74,58,255,.12);}
+.v2-card.poem-b .v2-bar-track{background:rgba(124,92,191,.12);}
+.v2-bar-fill{height:100%;border-radius:var(--shape-full);transition:width .6s var(--motion-decel);}
+.v2-card.poem-a .v2-bar-fill{background:var(--md-primary);}
+.v2-card.poem-b .v2-bar-fill{background:var(--md-secondary);}
+.v2-bar-pct{font-size:10px;font-weight:700;text-align:right;margin-bottom:.55rem;}
+.v2-card.poem-a .v2-bar-pct{color:var(--md-primary);}
+.v2-card.poem-b .v2-bar-pct{color:var(--md-secondary);}
+.v2-vote-btn{width:100%;padding:.5rem;border-radius:var(--shape-full);font-size:.8rem;font-weight:700;cursor:pointer;transition:background .2s,border-color .2s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:6px;border:2px solid transparent;}
+.v2-card.poem-a .v2-vote-btn{background:var(--md-primary);color:#fff;border-color:var(--md-primary);}
+.v2-card.poem-b .v2-vote-btn{background:var(--md-secondary);color:#fff;border-color:var(--md-secondary);}
+.v2-vote-btn.voted-state{background:#5B21B6 !important;border-color:#5B21B6 !important;}
+.v2-vote-btn.unvoted-ghost{background:var(--md-surface-container) !important;border:1.5px solid var(--md-outline-variant) !important;color:var(--md-on-surface) !important;opacity:.7;cursor:default;}
+@keyframes v2Jiggle{0%{transform:rotate(0)}15%{transform:rotate(-4deg) scale(1.04)}30%{transform:rotate(4deg) scale(1.06)}45%{transform:rotate(-3deg) scale(1.04)}60%{transform:rotate(2deg) scale(1.02)}75%{transform:rotate(-1deg)}100%{transform:rotate(0) scale(1)}}
+@keyframes v2CheckPop{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.3) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes v2VotedIn{0%{opacity:0;transform:translateY(6px)}60%{opacity:1;transform:translateY(-1px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes v2CardBounce{0%{transform:translateY(0)}30%{transform:translateY(-6px)}60%{transform:translateY(2px)}80%{transform:translateY(-2px)}100%{transform:translateY(0)}}
+.v2-vote-btn.v2-jiggle{animation:v2Jiggle .55s ease-in-out forwards;}
+.v2-card.bouncing{animation:v2CardBounce .4s ease-out;}
+.v2-splitbar-wrap{background:var(--md-surface-container-lowest);border-radius:var(--shape-full);border:1px solid var(--md-outline-variant);padding:.5rem .85rem;display:flex;align-items:center;gap:8px;margin-top:2px;}
+.v2-splitbar-pct{font-size:10px;font-weight:700;min-width:26px;}
+.v2-splitbar{flex:1;height:14px;border-radius:var(--shape-full);display:flex;position:relative;}
+.v2-splitbar-a{height:100%;background:var(--md-primary);border-radius:9999px 0 0 9999px;transition:width .6s var(--motion-decel);}
+.v2-splitbar-b{height:100%;background:var(--md-secondary);border-radius:0 9999px 9999px 0;transition:width .6s var(--motion-decel);}
+.v2-bolt{position:absolute;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:var(--md-surface-container-lowest);border:2px solid var(--md-outline-variant);display:flex;align-items:center;justify-content:center;z-index:2;transition:left .6s var(--motion-decel);font-size:11px;}
 /* Finalize dialog overrides */
 .finalize-poem-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:var(--md-surface-container-low);border-radius:var(--shape-lg);border:1.5px solid var(--md-outline-variant);margin-bottom:.6rem;}
 .finalize-poem-row.winner-row{border-color:var(--md-primary);background:var(--md-primary-container);}
@@ -2661,7 +2712,34 @@ function stopVotePolling() {
 }
 
 function updateVoteLiveUI() {
-  if (currentView === 'vote') { renderVoteView(); return; }
+  if (currentView !== 'vote') return;
+  if (!document.getElementById('v2Card0')) { renderVoteView(); return; }
+  const total=liveVoteCounts[0]+liveVoteCounts[1];
+  const sc=app.voting?.studentCount||0;
+  [0,1].forEach(i=>{
+    const cnt=liveVoteCounts[i];
+    const pct=total>0?Math.round(cnt/total*100):0;
+    const isLeading=total>0&&liveVoteCounts[i]>liveVoteCounts[1-i];
+    const cntEl=document.getElementById('v2Cnt'+i);
+    if (cntEl&&parseInt(cntEl.textContent)<cnt) {
+      const card=document.getElementById('v2Card'+i);
+      if (card){card.classList.remove('bouncing');void card.offsetWidth;card.classList.add('bouncing');}
+    }
+    if (cntEl) cntEl.textContent=cnt;
+    const lblEl=document.getElementById('v2CntLbl'+i); if(lblEl) lblEl.textContent='vote'+(cnt!==1?'s':'');
+    const barEl=document.getElementById('v2Bar'+i); if(barEl) barEl.style.width=pct+'%';
+    const pctEl=document.getElementById('v2Pct'+i); if(pctEl) pctEl.textContent=pct+'%';
+    const leadEl=document.getElementById('v2Lead'+i); if(leadEl) leadEl.classList.toggle('show',isLeading&&total>0);
+    const card=document.getElementById('v2Card'+i); if(card) card.classList.toggle('leading',isLeading);
+  });
+  const pctA=total>0?Math.round(liveVoteCounts[0]/total*100):50;
+  const pctB=100-pctA;
+  const sa=document.getElementById('v2SplitA'); if(sa) sa.style.width=pctA+'%';
+  const sb=document.getElementById('v2SplitB'); if(sb) sb.style.width=pctB+'%';
+  const bolt=document.getElementById('v2Bolt'); if(bolt) bolt.style.left=pctA+'%';
+  const spa=document.getElementById('v2SPctA'); if(spa) spa.textContent=pctA+'%';
+  const spb=document.getElementById('v2SPctB'); if(spb) spb.textContent=pctB+'%';
+  const cp=document.getElementById('v2CountPill'); if(cp) cp.innerHTML='👥 '+(sc>0?total+' of '+sc:total+' votes');
 }
 
 function renderVoteView() {
@@ -2675,106 +2753,138 @@ function renderVoteView() {
   const total=liveVoteCounts[0]+liveVoteCounts[1];
   const sc=v.studentCount||0;
   const cls=app.classes.find(c=>c.id===v.classId);
+  const remaining=v.timerEndsAt?v.timerEndsAt-Date.now():null;
+  const isUrgent=remaining!==null&&remaining<30000;
 
-  // Header
-  const hdr=document.createElement('div'); hdr.style.cssText='text-align:center;padding:1.5rem 1.25rem .5rem;';
-  const timerHtml = v.timerEndsAt ? `<div style="display:flex;justify-content:center;margin-bottom:.5rem"><div class="voting-timer voting-timer-display${v.timerEndsAt-Date.now()<30000?' urgent':''}">⏱ ${v.timerEndsAt>Date.now()?formatTimer(v.timerEndsAt-Date.now()):'0:00'}</div></div>` : '';
-  hdr.innerHTML=`
-    <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);margin-bottom:.3rem">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</div>
-    <div style="font-size:1.35rem;font-weight:800;color:var(--md-on-surface);margin-bottom:.5rem">${hasVoted?'Vote recorded 🗳️':'Choose your pick'}</div>
-    ${timerHtml}
-    <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.5rem">
-      <div class="live-dot"></div>
-      <span id="voteTotalCount" style="font-size:.8rem;font-weight:600;color:var(--md-on-surface)">${sc>0?total+' of '+sc+' students voted':total+' votes in'}</span>
-    </div>
-    <div class="vote-total-strip"><div class="vote-total-a" id="voteTotalStripA" style="width:${total>0?Math.round(liveVoteCounts[0]/total*100):50}%"></div><div class="vote-total-b"></div></div>`;
-  el.appendChild(hdr);
+  const view=document.createElement('div'); view.className='v2-view';
 
-  // Poem blocks
-  const wrap=document.createElement('div'); wrap.style.cssText='padding:0 1.25rem 1.25rem;';
+  // ── Header ──
+  const timerPill=v.timerEndsAt?`<div class="v2-timer-pill voting-timer-display${isUrgent?' urgent':''}">⏱ ${remaining>0?formatTimer(remaining):'0:00'}</div>`:'';
+  const hdr=document.createElement('div'); hdr.className='v2-header';
+  hdr.innerHTML=`<span class="v2-round-label">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</span><div class="v2-pills">${timerPill}<div class="v2-count-pill" id="v2CountPill">👥 ${sc>0?total+' of '+sc:total+' votes'}</div></div>`;
+  view.appendChild(hdr);
+
+  // ── Cards grid ──
+  const grid=document.createElement('div'); grid.className='v2-grid';
   [v.poemA,v.poemB].forEach((poem,i)=>{
-    if (i===1) { const vs=document.createElement('div'); vs.className='vote-vs-divider'; vs.textContent='vs'; wrap.appendChild(vs); }
     const pct=total>0?Math.round(liveVoteCounts[i]/total*100):0;
     const cnt=liveVoteCounts[i];
     const isLeading=total>0&&liveVoteCounts[i]>liveVoteCounts[1-i];
-    const margin=total>0?Math.abs(liveVoteCounts[0]-liveVoteCounts[1]):0;
     const isMyVote=hasVoted&&myVote===i;
-
-    const block=document.createElement('div');
-    block.id='votePoemBlock'+i;
-    block.className='vote-poem-block'+(isLeading&&!isMyVote?' is-leading':'')+(isMyVote?' is-voted':'');
-
-    // Category badge
+    const letter=i===0?'a':'b';
     const seedIdx=(poem.seed||1)-1;
     const poemCat=CATEGORIES.find(c=>c.seeds.includes(seedIdx));
-    const catBadgeHtml=poemCat?`<div class="vote-cat-badge" style="background:${poemCat.bg}">${esc(poemCat.name.replace(/^[A-D] — /,''))}</div>`:'';
+    const catColor=poemCat?poemCat.bg:'var(--md-outline)';
+    const catName=poemCat?poemCat.name.replace(/^[A-D] — /,''):'';
 
-    // Category + leading badge row (opposite ends)
-    block.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;min-height:1.4rem;margin-bottom:.55rem;">${catBadgeHtml||'<span></span>'}<div class="vote-leading-badge${isLeading?' show':''}" id="voteLead${i}" style="margin-bottom:0">Leading</div></div>`;
+    const card=document.createElement('div');
+    card.id='v2Card'+i;
+    card.className=`v2-card poem-${letter}${isLeading?' leading':''}`;
 
-    // Stats row
-    const statsRow=document.createElement('div'); statsRow.className='vote-stats-row';
-    statsRow.innerHTML=`
-      <div class="vote-stat"><div class="vote-stat-num" id="votePct${i}">${pct}%</div><div class="vote-stat-label">of votes</div></div>
-      <div class="vote-stat-divider"></div>
-      <div class="vote-stat"><div class="vote-stat-num" id="voteCnt${i}">${cnt}</div><div class="vote-stat-label">vote${cnt!==1?'s':''}</div></div>
-      <div class="vote-stat-divider"></div>
-      <div class="vote-stat" style="${!isLeading||margin===0?'opacity:.3':''}"><div class="vote-stat-num" id="voteMargin${i}" style="font-size:1.3rem;color:var(--md-tertiary)">${isLeading&&margin>0?'+'+margin:'—'}</div><div class="vote-stat-label">leading by</div></div>`;
-    block.appendChild(statsRow);
-
-    // Pill button
-    const pill=document.createElement('button');
-    pill.className='vote-pill-btn'+(isMyVote?' my-vote-pill':isLeading&&!hasVoted?' leading-pill':(!hasVoted&&pendingVoteChoice===i)?' selected':'');
-    pill.textContent=poem.name;
-    if (!hasVoted) {
-      pill.onclick=()=>{ pendingVoteChoice=i; submitStudentVote(i); };
+    let btnContent, btnClass;
+    if (isMyVote) {
+      btnContent=`<span id="v2BtnIcon${i}" style="font-size:15px;animation:v2CheckPop .4s cubic-bezier(.17,.67,.35,1.4) both">✓</span><span id="v2BtnLabel${i}">Voted</span>`;
+      btnClass='v2-vote-btn voted-state';
+    } else if (hasVoted) {
+      btnContent=`<span id="v2BtnLabel${i}">${esc(poem.name)}</span>`;
+      btnClass='v2-vote-btn unvoted-ghost';
+    } else {
+      btnContent=`<span id="v2BtnLabel${i}">${esc(poem.name)}</span>`;
+      btnClass='v2-vote-btn';
     }
-    block.appendChild(pill);
 
-    // Bar track
-    const barTrack=document.createElement('div'); barTrack.className='vote-bar-track';
-    const barFill=document.createElement('div'); barFill.className='vote-bar-fill'; barFill.id='voteBar'+i; barFill.style.width=pct+'%';
-    barTrack.appendChild(barFill); block.appendChild(barTrack);
-
-    wrap.appendChild(block);
+    card.innerHTML=`
+      <div class="v2-card-top">
+        <span class="v2-cat-badge" style="background:${catColor}">${esc(catName)}</span>
+        <span class="v2-leading-badge${isLeading&&total>0?' show':''}" id="v2Lead${i}">🏆 Leading</span>
+      </div>
+      <div class="v2-poem-title">${esc(poem.name)}</div>
+      <div class="v2-count" id="v2Cnt${i}">${cnt}</div>
+      <div class="v2-count-label" id="v2CntLbl${i}">vote${cnt!==1?'s':''}</div>
+      <div class="v2-bar-track"><div class="v2-bar-fill" id="v2Bar${i}" style="width:${pct}%"></div></div>
+      <div class="v2-bar-pct" id="v2Pct${i}">${pct}%</div>
+      <button class="${btnClass}" id="v2Btn${i}" ${!hasVoted?`onclick="handleVoteBtnClick(${i})"`:''} ${hasVoted?'disabled':''}>
+        ${btnContent}
+      </button>`;
+    grid.appendChild(card);
   });
-  el.appendChild(wrap);
+  view.appendChild(grid);
 
-  // Emoji reactions bar
-  const reactBar = document.createElement('div'); reactBar.className = 'reactions-bar';
-  const reactLabel = document.createElement('div');
-  reactLabel.style.cssText = 'text-align:center;font-size:.7rem;color:var(--md-on-surface-variant);margin-bottom:.25rem;letter-spacing:.04em;';
-  reactLabel.textContent = 'Tap to react while you wait';
-  el.appendChild(reactLabel);
-  REACTIONS.forEach(emoji => {
-    const btn = document.createElement('button'); btn.className = 'reaction-btn';
-    btn.textContent = emoji;
-    btn.addEventListener('click', function() { launchReaction(emoji, this); });
+  // ── Split bar ──
+  const pctA=total>0?Math.round(liveVoteCounts[0]/total*100):50;
+  const pctB=100-pctA;
+  const splitWrap=document.createElement('div'); splitWrap.className='v2-splitbar-wrap';
+  splitWrap.innerHTML=`
+    <span class="v2-splitbar-pct" id="v2SPctA" style="color:var(--md-primary);text-align:right">${pctA}%</span>
+    <div class="v2-splitbar" id="v2Splitbar">
+      <div class="v2-splitbar-a" id="v2SplitA" style="width:${pctA}%"></div>
+      <div class="v2-splitbar-b" id="v2SplitB" style="width:${pctB}%"></div>
+      <div class="v2-bolt" id="v2Bolt" style="left:${pctA}%">⚡</div>
+    </div>
+    <span class="v2-splitbar-pct" id="v2SPctB" style="color:var(--md-secondary)">${pctB}%</span>`;
+  view.appendChild(splitWrap);
+
+  // ── Emoji reactions ──
+  const reactLabel=document.createElement('div');
+  reactLabel.style.cssText='text-align:center;font-size:.7rem;color:var(--md-on-surface-variant);margin:.85rem 0 .25rem;letter-spacing:.04em;';
+  reactLabel.textContent='Tap to react while you wait';
+  view.appendChild(reactLabel);
+  const reactBar=document.createElement('div'); reactBar.className='reactions-bar';
+  REACTIONS.forEach(emoji=>{
+    const btn=document.createElement('button'); btn.className='reaction-btn';
+    btn.textContent=emoji; btn.addEventListener('click',function(){launchReaction(emoji,this);});
     reactBar.appendChild(btn);
   });
-  el.appendChild(reactBar);
+  view.appendChild(reactBar);
+  el.appendChild(view);
+}
+
+function handleVoteBtnClick(choice) {
+  pendingVoteChoice=choice;
+  submitStudentVote(choice);
 }
 
 async function submitStudentVote(choice) {
   if (submittingVote) return;
-  const sessionId = app.voting?.sessionId; if (!sessionId) return;
-  const storageKey = 'voted-'+sessionId;
+  const sessionId=app.voting?.sessionId; if(!sessionId) return;
+  const storageKey='voted-'+sessionId;
   if (localStorage.getItem(storageKey)!==null) return;
-  submittingVote = true;
-  document.querySelectorAll('.vote-pill-btn').forEach(p=>p.classList.add('submitting'));
+  submittingVote=true;
+  // Disable both buttons immediately
+  [0,1].forEach(i=>{ const b=document.getElementById('v2Btn'+i); if(b) b.disabled=true; });
+  // Jiggle the chosen button
+  const btn=document.getElementById('v2Btn'+choice);
+  if (btn) { btn.classList.add('v2-jiggle'); btn.addEventListener('animationend',()=>btn.classList.remove('v2-jiggle'),{once:true}); }
   try {
-    const { error } = await db.from('votes').insert({session_id:sessionId,choice});
+    const {error}=await db.from('votes').insert({session_id:sessionId,choice});
     if (error) throw error;
-    localStorage.setItem(storageKey, String(choice));
+    localStorage.setItem(storageKey,String(choice));
     pendingVoteChoice=null;
     playSound('pop');
-    renderVoteView();
+    // Animate Vote → Voted on the chosen button
+    setTimeout(()=>{
+      if (btn) {
+        const label=document.getElementById('v2BtnLabel'+choice);
+        if (label) { label.style.animation='v2VotedIn .35s ease forwards'; label.textContent='Voted'; }
+        // Inject checkmark
+        if (!document.getElementById('v2BtnIcon'+choice)) {
+          const ico=document.createElement('span'); ico.id='v2BtnIcon'+choice;
+          ico.style.cssText='font-size:15px;animation:v2CheckPop .4s cubic-bezier(.17,.67,.35,1.4) both';
+          ico.textContent='✓'; btn.insertBefore(ico,btn.firstChild);
+        }
+        btn.classList.add('voted-state');
+      }
+      // Ghost the other button
+      const other=document.getElementById('v2Btn'+(1-choice));
+      if (other) { other.className='v2-vote-btn unvoted-ghost'; other.disabled=true; }
+    },300);
+    setTimeout(()=>renderVoteView(),900);
     showSnack('Vote submitted! 🗳️');
   } catch(e) {
-    document.querySelectorAll('.vote-pill-btn').forEach(p=>p.classList.remove('submitting'));
+    [0,1].forEach(i=>{ const b=document.getElementById('v2Btn'+i); if(b) b.disabled=false; });
     showSnack('Vote failed — please try again.');
   } finally {
-    submittingVote = false;
+    submittingVote=false;
   }
 }
 
