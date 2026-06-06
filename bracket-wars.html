@@ -211,8 +211,10 @@ body.projection .results-view{padding-top:1rem;}
 body.projection .vote-view{padding-top:1rem;}
 .projection-exit{position:fixed;top:.75rem;right:.75rem;z-index:9999;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:var(--shape-full);padding:.45rem 1rem;font-size:.82rem;font-weight:600;cursor:pointer;letter-spacing:.02em;backdrop-filter:blur(4px);}
 .projection-exit:hover{background:rgba(0,0,0,.85);}
-.fullscreen-btn{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:600;padding:.3rem .7rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:transparent;color:var(--md-on-surface-variant);transition:background .15s;}
-.fullscreen-btn:hover{background:rgba(74,58,255,.1);color:var(--md-primary);}
+.fullscreen-btn{display:inline-flex;align-items:center;gap:0;font-size:.82rem;font-weight:600;padding:.3rem .55rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:transparent;color:var(--md-on-surface-variant);transition:background .2s,color .2s,gap .2s,padding .2s;}
+.fullscreen-btn .fs-label{display:inline-block;max-width:0;overflow:hidden;white-space:nowrap;opacity:0;font-size:.72rem;transition:max-width .25s ease,opacity .2s ease;}
+.fullscreen-btn:hover{background:rgba(74,58,255,.1);color:var(--md-primary);gap:.35rem;padding:.3rem .75rem;}
+.fullscreen-btn:hover .fs-label{max-width:80px;opacity:1;}
 body.projection .fullscreen-btn{display:none;}
 /* Presence chip */
 .presence-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:600;padding:.3rem .75rem;border-radius:var(--shape-full);background:rgba(0,150,80,.12);color:#008040;border:1px solid rgba(0,150,80,.25);}
@@ -676,7 +678,6 @@ body.projection .fullscreen-btn{display:none;}
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
       <button class="seg-btn" id="btnResults" onclick="setView('results')"><span class="nav-icon">📊</span> Results</button>
     </div>
-    <button class="fullscreen-btn" id="studentFullscreenBtn" title="Fullscreen" onclick="toggleStudentFullscreen()" style="display:none">⛶</button>
   </div>
 </div>
 
@@ -1050,8 +1051,6 @@ function showCurrentView() {
   }
   const ss = document.querySelector('.toolbar-status-stack');
   if (ss) ss.style.display = currentView === 'home' ? 'none' : 'flex';
-  const sfBtn = document.getElementById('studentFullscreenBtn');
-  if (sfBtn) sfBtn.style.display = (MODE === 'student' && currentView !== 'home') ? 'inline-flex' : 'none';
   if (currentView==='home') renderHome();
   if (currentView==='leaderboard') renderLeaderboard();
   if (currentView==='vote') renderVoteView();
@@ -1553,6 +1552,8 @@ function buildAppBar() {
     const b = document.createElement('button'); b.className='btn-tonal'; b.innerHTML='👁 Student View'; b.onclick=()=>setMode('student'); el.appendChild(b);
   } else {
     const chip = document.createElement('div'); chip.className='live-chip'; chip.innerHTML='<div class="live-dot"></div>Live'; el.appendChild(chip);
+    const fsBtn = document.createElement('button'); fsBtn.className='fullscreen-btn'; fsBtn.title='Fullscreen'; fsBtn.onclick=toggleStudentFullscreen;
+    fsBtn.innerHTML='⛶<span class="fs-label">Fullscreen</span>'; el.appendChild(fsBtn);
     const b = document.createElement('button'); b.className='btn-tonal'; b.innerHTML='✎ Teacher'; b.onclick=requestTeacherMode; el.appendChild(b);
   }
 }
