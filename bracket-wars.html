@@ -369,6 +369,8 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .vr-stat-label{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);margin-top:.2rem;}
 /* Pill submitting state */
 .vote-pill-btn.submitting{opacity:.6;cursor:wait;}
+/* Student countdown */
+.student-countdown-num{font-size:11rem;font-weight:900;color:#fff;line-height:1;animation:countPop .9s ease-in-out forwards;}
 /* Vote button live glow */
 @keyframes voteGlow{0%,100%{box-shadow:0 0 0 0 rgba(0,104,116,.6);}50%{box-shadow:0 0 0 7px rgba(0,104,116,0);}}
 .seg-btn.vote-live{background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);animation:voteGlow 1.8s ease-in-out infinite;}
@@ -389,7 +391,7 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 .tallying-bar:nth-child(5){animation-delay:.8s;}
 @keyframes tallyBar{0%,100%{transform:scaleY(.25);background:rgba(255,255,255,.15);}50%{transform:scaleY(1);background:#4A3AFF;}}
 /* DIALOGS */
-.dialog-scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:200;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(2px);}
+.dialog-scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:600;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(2px);}
 .dialog-scrim.open{display:flex;}
 .dialog{background:var(--md-surface-container-high);border-radius:var(--shape-xl);padding:1.5rem 1.5rem 1.25rem;width:100%;max-width:420px;box-shadow:var(--elev-4);animation:dialogIn .25s var(--motion-decel);}
 @keyframes dialogIn{from{opacity:0;transform:scale(.92) translateY(16px);}to{opacity:1;transform:none;}}
@@ -655,6 +657,12 @@ body{background:var(--md-surface-container-high);color:var(--md-on-surface);font
 
 <!-- VOTE VIEW -->
 <div id="voteView" style="display:none"><div class="vote-view" id="voteContent"></div></div>
+
+<!-- STUDENT COUNTDOWN OVERLAY -->
+<div id="studentCountdownOverlay" class="tallying-overlay" style="z-index:550">
+  <div class="student-countdown-num" id="studentCountNum">3</div>
+  <div class="tallying-sub" style="margin-top:1rem">Polls are closing…</div>
+</div>
 
 <!-- TALLYING OVERLAY -->
 <div id="tallyingOverlay" class="tallying-overlay">
@@ -1400,14 +1408,16 @@ function saveMatchup(){
   if (pendingCelebrationData) {
     ensureVoting(app);
     const celebData = {...pendingCelebrationData, classId: app.voting.classId};
-    app.voting = {open:false,tallying:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
+    app.voting = {open:false,tallying:false,countdown:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
     app.lastVoteResult = {...celebData, ts:Date.now()};
-    saveApp();
+    saveApp(); // broadcasts lastVoteResult + clears tallying — students will show winner
     closeVoteDialog(); renderAll();
     hideTallyingOverlay();
-    showSnack('Result saved ✓');
-    setTimeout(()=>{ showVoteResultCelebration(celebData); pendingCelebrationData=null; },500);
-    if(bkt().final.winnerIdx!==null) setTimeout(launchConfetti,700);
+    pendingCelebrationData=null;
+    showSnack('Result saved ✓ — students are seeing the winner');
+    if(bkt().final.winnerIdx!==null) setTimeout(launchConfetti,500);
+    // Teacher does NOT see celebration — navigate to bracket instead
+    setTimeout(()=>{ if(MODE==='teacher') { renderAll(); } },300);
   } else {
     saveApp();closeVoteDialog();renderAll();showSnack('Result saved ✓');
     if(bkt().final.winnerIdx!==null) setTimeout(launchConfetti,500);
@@ -1450,9 +1460,12 @@ let pendingVotingKey = null;
 let pendingVoteChoice = null;
 let pendingCelebrationData = null;
 let submittingVote = false;
+let autoCloseTriggered = false;
 
 function ensureVoting(app) {
-  if (!app.voting) app.voting = {open:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
+  if (!app.voting) app.voting = {open:false,tallying:false,countdown:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
+  if (typeof app.voting.countdown === 'undefined') app.voting.countdown = false;
+  if (typeof app.voting.tallying === 'undefined') app.voting.tallying = false;
   return app;
 }
 
@@ -1560,9 +1573,21 @@ function showVoteFloat(sideIndex) {
 }
 
 // ── Countdown ──
+async function initiateCountdownClose() {
+  // Broadcast countdown state to all students
+  ensureVoting(app);
+  app.voting.countdown = true;
+  await saveApp();
+  runTeacherCountdown();
+}
+
 function showCountdownThenClose() {
   document.getElementById('closeVotingConfirmDialog').classList.remove('open');
-  const overlay = document.createElement('div'); overlay.className='countdown-overlay';
+  initiateCountdownClose();
+}
+
+function runTeacherCountdown() {
+  const overlay = document.createElement('div'); overlay.className='countdown-overlay'; overlay.style.zIndex='550';
   const numEl = document.createElement('div'); numEl.className='countdown-num';
   const lbl = document.createElement('div'); lbl.className='countdown-label'; lbl.textContent='Polls closing…';
   overlay.appendChild(numEl); overlay.appendChild(lbl);
@@ -1580,6 +1605,27 @@ function showCountdownThenClose() {
     setTimeout(tick,1000);
   };
   tick();
+}
+
+let studentCountdownTimer = null;
+function showStudentCountdown() {
+  const overlay = document.getElementById('studentCountdownOverlay');
+  const numEl = document.getElementById('studentCountNum');
+  if (!overlay||!numEl) return;
+  overlay.classList.add('visible');
+  let count=3;
+  if (studentCountdownTimer) clearInterval(studentCountdownTimer);
+  numEl.style.animation='none'; void numEl.offsetWidth; numEl.style.animation='countPop .9s ease-in-out forwards';
+  numEl.textContent=count; playSound('tick'); count--;
+  studentCountdownTimer = setInterval(()=>{
+    if (count===0) { clearInterval(studentCountdownTimer); studentCountdownTimer=null; return; }
+    numEl.style.animation='none'; void numEl.offsetWidth; numEl.style.animation='countPop .9s ease-in-out forwards';
+    numEl.textContent=count; playSound('tick'); count--;
+  },1000);
+}
+function hideStudentCountdown() {
+  if (studentCountdownTimer) { clearInterval(studentCountdownTimer); studentCountdownTimer=null; }
+  document.getElementById('studentCountdownOverlay')?.classList.remove('visible');
 }
 
 function showVoteResultCelebration(r) {
@@ -1605,6 +1651,7 @@ async function startVotingSession() {
   ensureVoting(app);
   app.voting = {open:true,sessionId,classId:app.activeId,matchupKey:key,poemA:{name:pA.name,seed:pA.seed},poemB:{name:pB.name,seed:pB.seed},studentCount:count};
   closeOpenVotingDialog();
+  autoCloseTriggered = false;
   await saveApp();
   liveVoteCounts=[0,0];
   subscribeToVotes(sessionId);
@@ -1627,9 +1674,9 @@ async function confirmCloseVoting() {
     loseVotes:liveVoteCounts[1-winnerIdx],
     winPct:total>0?Math.round(liveVoteCounts[winnerIdx]/total*100):0
   };
-  // Set tallying state — broadcasts to students, holds classId for winner nav
+  // Set tallying state — clears countdown, shows tallying on all devices
   const savedClassId = app.voting.classId;
-  app.voting = {open:false,tallying:true,sessionId:null,classId:savedClassId,matchupKey:key,poemA,poemB,studentCount:app.voting.studentCount};
+  app.voting = {open:false,tallying:true,countdown:false,sessionId:null,classId:savedClassId,matchupKey:key,poemA,poemB,studentCount:app.voting.studentCount};
   await saveApp();
   stopVotePolling();
   showTallyingOverlay();
@@ -1663,6 +1710,13 @@ async function fetchVoteCounts(sessionId) {
         }
         liveVoteCounts = newCounts;
         updateVoteLiveUI();
+      }
+      // Auto-close when all students have voted (teacher only)
+      const total = newCounts[0]+newCounts[1];
+      ensureVoting(app);
+      if (MODE==='teacher' && !autoCloseTriggered && app.voting.studentCount>0 && total>=app.voting.studentCount) {
+        autoCloseTriggered = true;
+        initiateCountdownClose();
       }
     }
   } catch(e) {}
@@ -1802,9 +1856,10 @@ async function boot() {
   buildAppBar();
   buildSecondaryToolbar();
   setMode('student');
-  // Restore tallying overlay if active
+  // Restore overlay states if active on load
   ensureVoting(app);
-  if (app.voting.tallying) showTallyingOverlay();
+  if (app.voting.countdown) showStudentCountdown();
+  if (app.voting.tallying) { hideStudentCountdown(); showTallyingOverlay(); }
   // Real-time sync — students see teacher votes live
   db.channel('bracket_state_changes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'bracket_state', filter: `id=eq.${STORAGE_KEY}` }, payload => {
@@ -1812,6 +1867,7 @@ async function boot() {
         const incoming = payload.new.data;
         const prevSessionId = app.voting?.sessionId;
         const prevTallying = app.voting?.tallying;
+        const prevCountdown = app.voting?.countdown;
         incoming.activeId = app.activeId;
         app = incoming;
         ensureVoting(app);
@@ -1823,12 +1879,20 @@ async function boot() {
           stopVotePolling(); liveVoteCounts=[0,0];
           if (currentView==='vote') setView('home');
         }
+        // Countdown state
+        if (!prevCountdown && app.voting.countdown) {
+          showStudentCountdown();
+        } else if (prevCountdown && !app.voting.countdown) {
+          hideStudentCountdown();
+        }
+        // Tallying state
         if (!prevTallying && app.voting.tallying) {
+          hideStudentCountdown();
           showTallyingOverlay();
         } else if (prevTallying && !app.voting.tallying) {
           hideTallyingOverlay();
           if (app.lastVoteResult && app.lastVoteResult.ts > Date.now()-15000) {
-            setTimeout(()=>showVoteResultCelebration(app.lastVoteResult), 300);
+            setTimeout(()=>showVoteResultCelebration(app.lastVoteResult), 400);
           }
         }
         renderAll(); showCurrentView();
