@@ -676,7 +676,6 @@ body.projection .fullscreen-btn{display:none;}
       <button class="seg-btn active" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
       <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
-      <button class="seg-btn" id="btnResults" onclick="setView('results')"><span class="nav-icon">📊</span> Results</button>
     </div>
   </div>
 </div>
@@ -1017,7 +1016,7 @@ function setTeacherView(v) {
 function setView(v) {
   currentView = v;
   saveStudentPrefs();
-  ['home','leaderboard','list','bracket','results'].forEach(x => {
+  ['home','leaderboard','list','bracket'].forEach(x => {
     const el = document.getElementById('btn'+x.charAt(0).toUpperCase()+x.slice(1));
     if (el) el.classList.toggle('active', v===x);
   });
