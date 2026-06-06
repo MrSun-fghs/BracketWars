@@ -424,8 +424,19 @@ body.projection .fullscreen-btn{display:none;}
 .vr-stat-label{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-top:.2rem;}
 /* Pill submitting state */
 .vote-pill-btn.submitting{opacity:.6;cursor:wait;}
-/* Student countdown */
-.student-countdown-num{font-size:15rem;font-weight:900;color:#fff;line-height:1;animation:countPop .9s ease-in-out forwards;}
+/* Polls closed overlay */
+@keyframes pollsLockPop{0%{transform:scale(0) rotate(-15deg);opacity:0;}60%{transform:scale(1.2) rotate(4deg);opacity:1;}80%{transform:scale(.95) rotate(-2deg);}100%{transform:scale(1) rotate(0deg);opacity:1;}}
+@keyframes pollsBangSlam{0%{transform:translateY(-80px) scale(1.8);opacity:0;}55%{transform:translateY(6px) scale(.92);opacity:1;}75%{transform:translateY(-3px) scale(1.04);}100%{transform:translateY(0) scale(1);opacity:1;}}
+@keyframes pollsBangShake{0%,100%{transform:rotate(0deg);}20%{transform:rotate(-6deg);}40%{transform:rotate(6deg);}60%{transform:rotate(-4deg);}80%{transform:rotate(3deg);}}
+@keyframes pollsBangGlow{0%,100%{text-shadow:0 0 0 rgba(186,26,26,0);}50%{text-shadow:0 0 40px rgba(186,26,26,.8),0 0 80px rgba(186,26,26,.4);}}
+@keyframes pollsHeadlineIn{0%{transform:translateY(20px);opacity:0;}100%{transform:translateY(0);opacity:1;}}
+@keyframes pollsSubPulse{0%,100%{opacity:.5;}50%{opacity:.9;}}
+@keyframes pollsFlash{0%{background:rgba(186,26,26,.35);}100%{background:rgba(6,0,28,.96);}}
+.polls-closed-lock{font-size:3.5rem;animation:pollsLockPop .6s cubic-bezier(.17,.67,.35,1.4) .1s both;}
+.polls-closed-bang{font-size:9rem;font-weight:900;color:#fff;line-height:1;animation:pollsBangSlam .5s cubic-bezier(.22,.61,.36,1) .3s both;}
+.polls-closed-bang.shake{animation:pollsBangSlam .5s cubic-bezier(.22,.61,.36,1) .3s both, pollsBangShake .4s ease-in-out .85s both, pollsBangGlow 1.8s ease-in-out 1.2s infinite;}
+.polls-closed-headline{font-size:1.5rem;font-weight:900;color:#fff;letter-spacing:.06em;text-transform:uppercase;margin:.75rem 0 0;animation:pollsHeadlineIn .5s ease-out .7s both;line-height:1.2;}
+.polls-closed-sub{font-size:.9rem;color:rgba(255,255,255,.55);margin-top:.65rem;font-weight:500;animation:pollsSubPulse 2s ease-in-out 1.2s infinite;}
 /* Vote button live glow */
 @keyframes voteGlow{0%,100%{box-shadow:0 0 0 0 rgba(0,104,116,.6);}50%{box-shadow:0 0 0 7px rgba(0,104,116,0);}}
 .seg-btn.vote-live{background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);animation:voteGlow 1.8s ease-in-out infinite;}
@@ -838,11 +849,12 @@ body.projection .fullscreen-btn{display:none;}
 <!-- RESULTS VIEW -->
 <div id="resultsView" style="display:none"><div class="results-view" id="resultsContent"></div></div>
 
-<!-- STUDENT COUNTDOWN OVERLAY -->
-<div id="studentCountdownOverlay" class="tallying-overlay" style="z-index:550">
-  <div class="student-countdown-num" id="studentCountNum">3</div>
-  <div style="font-size:1.5rem;font-weight:800;color:#fff;margin-top:1.25rem;letter-spacing:-.01em">Polls Are Closing</div>
-  <div style="font-size:1rem;color:rgba(255,255,255,.6);margin-top:.5rem">Votes are being finalized…</div>
+<!-- POLLS CLOSED OVERLAY -->
+<div id="studentCountdownOverlay" class="tallying-overlay" style="z-index:550" id="pollsClosedOverlay">
+  <div class="polls-closed-lock">🔒</div>
+  <div class="polls-closed-bang" id="pollsBang">!</div>
+  <div class="polls-closed-headline">The Polls Are<br>Now Closed</div>
+  <div class="polls-closed-sub">Stand by for results…</div>
 </div>
 
 <!-- TALLYING OVERLAY -->
@@ -2509,22 +2521,26 @@ let studentCountdownTimer = null;
 function showStudentCountdown() {
   if (MODE === 'teacher') return;
   const overlay = document.getElementById('studentCountdownOverlay');
-  const numEl = document.getElementById('studentCountNum');
-  if (!overlay||!numEl) return;
+  if (!overlay) return;
+  // Reset bang animation so it replays each time
+  const bang = document.getElementById('pollsBang');
+  if (bang) { bang.classList.remove('shake'); void bang.offsetWidth; bang.classList.add('shake'); }
+  // Flash the overlay red briefly then settle to dark
+  overlay.style.animation = 'none'; void overlay.offsetWidth;
+  overlay.style.animation = 'pollsFlash .6s ease-out forwards';
   overlay.classList.add('visible');
-  let count=3;
-  if (studentCountdownTimer) clearInterval(studentCountdownTimer);
-  numEl.style.animation='none'; void numEl.offsetWidth; numEl.style.animation='countPop .9s ease-in-out forwards';
-  numEl.textContent=count; playSound('tick'); count--;
-  studentCountdownTimer = setInterval(()=>{
-    if (count===0) { clearInterval(studentCountdownTimer); studentCountdownTimer=null; hideStudentCountdown(); showTallyingOverlay(); return; }
-    numEl.style.animation='none'; void numEl.offsetWidth; numEl.style.animation='countPop .9s ease-in-out forwards';
-    numEl.textContent=count; playSound('tick'); count--;
-  },1000);
+  playSound('fanfare');
+  if (studentCountdownTimer) clearTimeout(studentCountdownTimer);
+  studentCountdownTimer = setTimeout(() => {
+    studentCountdownTimer = null;
+    hideStudentCountdown();
+    showTallyingOverlay();
+  }, 3000);
 }
 function hideStudentCountdown() {
-  if (studentCountdownTimer) { clearInterval(studentCountdownTimer); studentCountdownTimer=null; }
-  document.getElementById('studentCountdownOverlay')?.classList.remove('visible');
+  if (studentCountdownTimer) { clearTimeout(studentCountdownTimer); studentCountdownTimer=null; }
+  const overlay = document.getElementById('studentCountdownOverlay');
+  if (overlay) { overlay.classList.remove('visible'); overlay.style.animation=''; }
 }
 
 function showVoteResultCelebration(r) {
