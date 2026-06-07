@@ -302,7 +302,9 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .lmc-tag.close{background:#FEF3C7;color:#92400E;}
 .lmc-tag.dom{background:#DCFCE7;color:#166534;}
 .lmc-tag.upset{background:#FEE2E2;color:#991B1B;}
+.lmc-tag.solid{background:#EFF6FF;color:#1E40AF;}
 .lmc-tag.none{visibility:hidden;}
+.lmc-latest{font-size:.58rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 8px;border-radius:var(--shape-full);background:#EDE9FE;color:#5B21B6;}
 .lmc-round{font-size:.7rem;color:var(--md-on-surface-variant);}
 .lmc-poems{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
 .lmc-winner{font-size:.88rem;font-weight:600;color:var(--md-on-surface);flex:1;line-height:1.3;}
@@ -1926,6 +1928,8 @@ function renderList() {
     {label:'Quarterfinals',matchups:CATEGORIES.map((cat,ri)=>[qfPoem(ri,0),qfPoem(ri,1),bkt().regionRounds[ri][2]])},
     {label:'Round of 16',matchups:CATEGORIES.flatMap((cat,ri)=>[[r1Poem(ri,0,0),r1Poem(ri,0,1),bkt().regionRounds[ri][0]],[r1Poem(ri,1,0),r1Poem(ri,1,1),bkt().regionRounds[ri][1]]])},
   ];
+  let latestLabel=null;
+  for(const {label,matchups} of rounds){if(matchups.some(([,,md])=>md&&md.winnerIdx!==null)){latestLabel=label;break;}}
   rounds.forEach(({label,matchups})=>{
     const section=document.createElement('div');section.className='lm-section';
     const hdr=document.createElement('div');hdr.className='lm-section-hdr';
@@ -1934,11 +1938,11 @@ function renderList() {
     hdr.appendChild(tt);hdr.appendChild(ln);section.appendChild(hdr);
     const done=matchups.filter(([pA,pB,md])=>md&&md.winnerIdx!==null);
     if(!done.length)return;
-    done.forEach(([pA,pB,md])=>section.appendChild(buildMatchCard(pA,pB,md,label)));
+    done.forEach(([pA,pB,md])=>section.appendChild(buildMatchCard(pA,pB,md,label===latestLabel)));
     el.appendChild(section);
   });
 }
-function buildMatchCard(pA,pB,md,roundLabel){
+function buildMatchCard(pA,pB,md,isLatest){
   const card=document.createElement('div');card.className='lmc';
   const isC=md&&md.winnerIdx!==null;
   const tv=isC?(md.votes[0]||0)+(md.votes[1]||0):0;
@@ -1948,12 +1952,14 @@ function buildMatchCard(pA,pB,md,roundLabel){
   const pctW=isC&&tv>0?Math.round(wv/tv*100):0;
   const isUpset=isC&&winner&&loser&&(winner.seed>loser.seed)&&Math.abs(winner.seed-loser.seed)>=2;
   const highPct=Math.max(pctW,100-pctW);
-  const tagClass=!isC?'none':(isUpset?'upset':highPct<=55?'close':highPct>=75?'dom':'none');
-  const tagLabel=tagClass==='upset'?'UPSET':tagClass==='close'?'CLOSE CALL':tagClass==='dom'?'DOMINANT':'·';
-  if(tagClass!=='none'){
+  const tagClass=!isC?'none':(isUpset?'upset':highPct<=55?'close':highPct>=75?'dom':highPct>55?'solid':'none');
+  const tagLabel=tagClass==='upset'?'UPSET':tagClass==='close'?'CLOSE CALL':tagClass==='dom'?'DOMINANT':tagClass==='solid'?'SOLID WIN':'·';
+  if(tagClass!=='none'||isLatest){
     const top=document.createElement('div');top.className='lmc-top';
-    const tag=document.createElement('span');tag.className='lmc-tag '+tagClass;tag.textContent=tagLabel;
-    top.appendChild(tag);card.appendChild(top);
+    if(tagClass!=='none'){const tag=document.createElement('span');tag.className='lmc-tag '+tagClass;tag.textContent=tagLabel;top.appendChild(tag);}
+    else{top.appendChild(document.createElement('span'));}
+    if(isLatest){const lt=document.createElement('span');lt.className='lmc-latest';lt.textContent='LATEST';top.appendChild(lt);}
+    card.appendChild(top);
   }
   if(!isC){
     const pr=document.createElement('div');pr.className='lmc-pending-row';
