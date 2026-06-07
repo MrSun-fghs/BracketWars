@@ -703,8 +703,6 @@ body.projection .fullscreen-btn{display:none;}
 .cross-stat-label{font-size:.8rem;color:var(--md-on-surface-variant);}
 .cross-stat-value{font-size:.88rem;font-weight:700;color:var(--md-primary);font-family:monospace;}
 .taste-profile-chip{display:inline-flex;align-items:center;gap:.4rem;background:var(--md-primary-container);border-radius:var(--shape-full);padding:.35rem .9rem;font-size:.82rem;font-weight:700;color:var(--md-on-primary-container);margin-top:.5rem;}
-/* ── Bracket SVG connector lines ── */
-.bracket-lines-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:0;}
 .mm-bracket{position:relative;}
 /* ── Category color accent in list ── */
 .list-cat-dot{width:5px;border-radius:var(--shape-full);flex-shrink:0;align-self:stretch;min-height:20px;}
@@ -1287,51 +1285,6 @@ function updateVotingTimerUI() {
   }
 }
 
-// ── Bracket connector lines ──
-function drawBracketLines() {
-  const bracket = document.getElementById('bracket'); if (!bracket) return;
-  const old = bracket.querySelector('.bracket-lines-svg'); if (old) old.remove();
-  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-  svg.className = 'bracket-lines-svg';
-  bracket.appendChild(svg);
-
-  const getRect = (key) => {
-    const el = bracket.querySelector(`[data-matchup-key='${JSON.stringify(key)}']`); if (!el) return null;
-    const bR = bracket.getBoundingClientRect(), r = el.getBoundingClientRect();
-    return { left:r.left-bR.left, right:r.right-bR.left, midY:(r.top+r.bottom)/2-bR.top };
-  };
-  const drawStep = (fx,fy,tx,ty) => {
-    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
-    const mx=(fx+tx)/2;
-    p.setAttribute('d',`M${fx},${fy} H${mx} V${ty} H${tx}`);
-    p.setAttribute('fill','none'); p.setAttribute('stroke','rgba(74,58,255,.45)');
-    p.setAttribute('stroke-width','2'); p.setAttribute('stroke-linecap','round'); p.setAttribute('stroke-dasharray','4 3');
-    svg.appendChild(p);
-  };
-
-  // Left: ri=0 R16→QF, ri=1 R16→QF
-  for(let ri=0;ri<2;ri++){
-    for(let mi=0;mi<2;mi++){
-      const r=getRect({type:'rR1',ri,mi}),q=getRect({type:'rQF',ri,mi:2});
-      if(r&&q) drawStep(r.right,r.midY,q.left,q.midY);
-    }
-    const q=getRect({type:'rQF',ri,mi:2}),s=getRect({type:'semi',ri:0,mi:null});
-    if(q&&s) drawStep(q.right,q.midY,s.left,s.midY);
-  }
-  const ls=getRect({type:'semi',ri:0,mi:null}),fin=getRect({type:'final',ri:null,mi:null});
-  if(ls&&fin) drawStep(ls.right,ls.midY,fin.left,fin.midY);
-  // Right: ri=2,3 R16→QF, QF→Semi, Semi→Final
-  for(let ri=2;ri<4;ri++){
-    for(let mi=0;mi<2;mi++){
-      const r=getRect({type:'rR1',ri,mi}),q=getRect({type:'rQF',ri,mi:2});
-      if(r&&q) drawStep(r.left,r.midY,q.right,q.midY);
-    }
-    const q=getRect({type:'rQF',ri,mi:2}),s=getRect({type:'semi',ri:1,mi:null});
-    if(q&&s) drawStep(q.left,q.midY,s.right,s.midY);
-  }
-  const rs=getRect({type:'semi',ri:1,mi:null});
-  if(rs&&fin) drawStep(rs.left,rs.midY,fin.right,fin.midY);
-}
 
 // ── Results summary view ──
 function renderResults() {
@@ -2141,8 +2094,6 @@ function renderBracket(){
   const rS=mcol('bc right','5','2');rS.style.justifyContent='center';rS.style.paddingTop='2rem';rS.appendChild(bcard('semi',1,null,true,isT));bracket.appendChild(rS);
   const rQF=mcol('bc right','6','2');rQF.style.justifyContent='space-around';rQF.style.paddingTop='2.75rem';bracket.appendChild(rQF);rQF.appendChild(bcard('rQF',2,2,true,isT));rQF.appendChild(bcard('rQF',3,2,true,isT));
   const rR1=mcol('bc right','7','2');rR1.appendChild(catBan(CATEGORIES[2]));rR1.appendChild(bcard('rR1',2,0,true,isT));rR1.appendChild(bcard('rR1',2,1,true,isT));rR1.appendChild(catBan(CATEGORIES[3]));rR1.appendChild(bcard('rR1',3,0,true,isT));rR1.appendChild(bcard('rR1',3,1,true,isT));bracket.appendChild(rR1);
-  // Draw connector lines after layout
-  requestAnimationFrame(()=>setTimeout(drawBracketLines,50));
 }
 function sp(f){const d=document.createElement('div');d.style.flex=f;return d;}
 function mcol(cls,col,row){const d=document.createElement('div');d.className=cls;d.style.cssText=`grid-column:${col};grid-row:${row};`;return d;}
