@@ -163,8 +163,9 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .col-header{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,font-size .45s,border-bottom-color .45s;position:relative;}
 .col-header span{display:block;font-size:.65rem;font-weight:400;text-transform:none;color:var(--md-outline);margin-top:.1rem;}
 .col-header[data-collapsed]{font-size:0;padding:0;border-bottom-color:transparent;overflow:hidden;}
-.col-hide-btn{position:absolute;bottom:5px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--md-surface-container-high);color:var(--md-on-surface-variant);border:1.5px solid var(--md-outline-variant);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;opacity:.75;transition:opacity .15s,background .15s,color .15s,border-color .15s;line-height:1;}
-.col-hide-btn:hover{opacity:1;background:var(--md-primary-container);color:var(--md-on-primary-container);border-color:transparent;}
+.col-header-row{display:flex;align-items:center;justify-content:center;gap:5px;}
+.col-hide-btn{width:18px;height:18px;border-radius:50%;background:var(--md-surface-container-high);color:var(--md-on-surface-variant);border:1.5px solid var(--md-outline-variant);font-size:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background .15s,color .15s,border-color .15s;line-height:1;}
+.col-hide-btn:hover{background:var(--md-primary);color:#fff;border-color:transparent;}
 .col-header[data-collapsed] .col-hide-btn{display:none;}
 .bc{display:flex;flex-direction:column;padding:.6rem .3rem 0;height:100%;}
 .bc.right{align-items:flex-end;}
@@ -2142,18 +2143,24 @@ function manualCollapseCol(col){
 function renderBracket(){
   const bracket=document.getElementById('bracket');bracket.innerHTML='';if(!activeClass())return;
   const isT=MODE==='teacher';
+  const subs=['4 matchups','2 matchups','','','','2 matchups','4 matchups'];
+  // Which rounds are complete (determines if hide btn shows)
+  const roundDone={1:isR16Complete(),2:isQFComplete(),3:isSFComplete(),5:isSFComplete(),6:isQFComplete(),7:isR16Complete()};
   ['Round of 16','Quarterfinals','Semifinals','👑 The Crown','Semifinals','Quarterfinals','Round of 16'].forEach((h,i)=>{
     const colNum=i+1;
     const hd=document.createElement('div');hd.className='col-header';hd.style.cssText=`grid-column:${colNum};grid-row:1;`;
     hd.setAttribute('data-bhdr',String(colNum));
-    const subs=['4 matchups','2 matchups','','','','2 matchups','4 matchups'];
-    hd.innerHTML=h+(subs[i]?`<span>${subs[i]}</span>`:'');
-    if(colNum!==4){
+    // Title row (label + optional hide button)
+    const row=document.createElement('div');row.className='col-header-row';
+    const lbl=document.createElement('span');lbl.textContent=h;row.appendChild(lbl);
+    if(colNum!==4 && roundDone[colNum]){
       const hbtn=document.createElement('button');hbtn.className='col-hide-btn';
       hbtn.textContent=colNum>=5?'›':'‹';hbtn.title='Collapse this round';
       hbtn.onclick=(e)=>{e.stopPropagation();manualCollapseCol(colNum);};
-      hd.appendChild(hbtn);
+      row.appendChild(hbtn);
     }
+    hd.appendChild(row);
+    if(subs[i]){const sub=document.createElement('span');sub.textContent=subs[i];hd.appendChild(sub);}
     bracket.appendChild(hd);
   });
   // Helper to build a collapse strip
