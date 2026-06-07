@@ -2877,6 +2877,8 @@ async function submitStudentVote(choice) {
     const {error}=await db.from('votes').insert({session_id:sessionId,choice});
     if (error) throw error;
     localStorage.setItem(storageKey,String(choice));
+    liveVoteCounts[choice]++; // optimistic: reflect own vote instantly
+    fetchVoteCounts(sessionId); // force immediate poll so all other devices update too
     pendingVoteChoice=null;
     playSound('pop');
     // Animate Vote → Voted on the chosen button
