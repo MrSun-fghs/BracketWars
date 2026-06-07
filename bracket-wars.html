@@ -442,7 +442,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .reaction-btn{background:var(--md-surface-container);border:1.5px solid var(--md-outline-variant);border-radius:var(--shape-full);width:3rem;height:3rem;font-size:1.4rem;cursor:pointer;transition:transform .15s,background .15s;display:flex;align-items:center;justify-content:center;}
 .reaction-btn:hover{background:var(--md-primary-container);transform:scale(1.15);}
 .reaction-btn:active{transform:scale(.9);}
-.reaction-count{font-size:.65rem;font-weight:700;color:var(--md-error,#B3261E);min-height:13px;text-align:center;}
+.reaction-count{font-size:.65rem;font-weight:700;color:var(--md-on-surface,#1C1B1F);min-height:13px;text-align:center;}
 /* ── Vote View v2 ── */
 .v2-view{padding:.75rem 0 1.5rem;background:#fff;}
 .v2-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:.4rem;}
@@ -482,10 +482,10 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .v2-card.poem-a .v2-bar-pct{color:var(--md-primary);}
 .v2-card.poem-b .v2-bar-pct{color:var(--md-secondary);}
 .v2-vote-btn{width:100%;padding:.5rem;border-radius:var(--shape-full);font-size:.8rem;font-weight:700;cursor:pointer;transition:background .2s,border-color .2s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:6px;border:2px solid transparent;}
-.v2-card.poem-a .v2-vote-btn{background:var(--md-primary);color:#fff;border-color:var(--md-primary);opacity:.6;}
-.v2-card.poem-b .v2-vote-btn{background:var(--md-secondary);color:#fff;border-color:var(--md-secondary);opacity:.6;}
-.v2-card.poem-a .v2-vote-btn.voted-state{background:var(--md-primary) !important;border-color:var(--md-primary) !important;opacity:1;}
-.v2-card.poem-b .v2-vote-btn.voted-state{background:var(--md-secondary) !important;border-color:var(--md-secondary) !important;opacity:1;}
+.v2-card.poem-a .v2-vote-btn{background:var(--md-primary);color:#fff;border-color:var(--md-primary);}
+.v2-card.poem-b .v2-vote-btn{background:var(--md-secondary);color:#fff;border-color:var(--md-secondary);}
+.v2-card.poem-a .v2-vote-btn.voted-state{background:var(--md-primary) !important;border-color:var(--md-primary) !important;opacity:.55;}
+.v2-card.poem-b .v2-vote-btn.voted-state{background:var(--md-secondary) !important;border-color:var(--md-secondary) !important;opacity:.55;}
 .v2-vote-btn.unvoted-ghost{background:var(--md-surface-container) !important;border:1.5px solid var(--md-outline-variant) !important;color:var(--md-on-surface) !important;opacity:.7;cursor:default;}
 @keyframes v2Jiggle{0%{transform:rotate(0)}15%{transform:rotate(-4deg) scale(1.04)}30%{transform:rotate(4deg) scale(1.06)}45%{transform:rotate(-3deg) scale(1.04)}60%{transform:rotate(2deg) scale(1.02)}75%{transform:rotate(-1deg)}100%{transform:rotate(0) scale(1)}}
 @keyframes v2CheckPop{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.3) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
@@ -498,7 +498,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .v2-splitbar{flex:1;height:22px;border-radius:var(--shape-full);display:flex;position:relative;overflow:visible;}
 .v2-splitbar-a{height:100%;background:var(--md-primary);border-radius:9999px 0 0 9999px;transition:width .6s var(--motion-decel);}
 .v2-splitbar-b{height:100%;background:var(--md-secondary);border-radius:0 9999px 9999px 0;transition:width .6s var(--motion-decel);}
-.v2-bolt{position:absolute;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:var(--md-surface-container-lowest);border:2px solid var(--md-outline-variant);display:flex;align-items:center;justify-content:center;z-index:4;transition:left .65s cubic-bezier(0.34,1.56,0.64,1);font-size:15px;}
+.v2-bolt{position:absolute;top:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:var(--md-surface-container-lowest);border:2px solid var(--md-outline-variant);display:flex;align-items:center;justify-content:center;z-index:4;transition:left .7s cubic-bezier(0.34,2.4,0.64,1);font-size:18px;}
 @keyframes barPulseA{0%{filter:brightness(1);transform:scaleY(1);}20%{filter:brightness(2.2) saturate(2) drop-shadow(0 0 10px rgba(74,58,255,.9));transform:scaleY(1.5);}50%{filter:brightness(1.5) saturate(1.4);transform:scaleY(1.1);}75%{transform:scaleY(0.95);}100%{filter:brightness(1);transform:scaleY(1);}}
 @keyframes barPulseB{0%{filter:brightness(1);transform:scaleY(1);}20%{filter:brightness(2.2) saturate(2) drop-shadow(0 0 10px rgba(0,104,116,.9));transform:scaleY(1.5);}50%{filter:brightness(1.5) saturate(1.4);transform:scaleY(1.1);}75%{transform:scaleY(0.95);}100%{filter:brightness(1);transform:scaleY(1);}}
 @keyframes boltBounce{0%,100%{transform:translate(-50%,-50%) scale(1);}40%{transform:translate(-50%,-50%) scale(1.5);}}
@@ -2677,13 +2677,17 @@ function playSound(type) {
 // ── Emoji Reactions ──
 const REACTIONS = ['❤️','👍','😄','🔥','💯'];
 let reactionCounts = {};
+function _reactKey(){try{return app.voting?.sessionId?'react-'+app.voting.sessionId:null;}catch(e){return null;}}
+function loadReactionCounts(){try{const k=_reactKey();if(k){const s=localStorage.getItem(k);if(s){reactionCounts=JSON.parse(s)||{};}}}catch(e){}}
 function incrementReactionCount(emoji){
   reactionCounts[emoji]=(reactionCounts[emoji]||0)+1;
   const el=document.getElementById('react-cnt-'+REACTIONS.indexOf(emoji));
   if(el)el.textContent=reactionCounts[emoji];
+  try{const k=_reactKey();if(k)localStorage.setItem(k,JSON.stringify(reactionCounts));}catch(e){}
 }
 function resetReactionCounts(){
   reactionCounts={};
+  try{const k=_reactKey();if(k)localStorage.removeItem(k);}catch(e){}
   REACTIONS.forEach((e,i)=>{const el=document.getElementById('react-cnt-'+i);if(el)el.textContent='';});
 }
 
@@ -3131,6 +3135,7 @@ function renderVoteView() {
   view.appendChild(splitWrap);
 
   // ── Emoji reactions ──
+  loadReactionCounts();
   const reactLabel=document.createElement('div');
   reactLabel.style.cssText='text-align:center;font-size:.7rem;color:var(--md-on-surface-variant);margin:.85rem 0 .25rem;letter-spacing:.04em;';
   reactLabel.textContent='Click to react while you wait';
@@ -3171,7 +3176,6 @@ async function submitStudentVote(choice) {
     const {error}=await db.from('votes').insert({session_id:sessionId,choice});
     if (error) throw error;
     localStorage.setItem(storageKey,String(choice));
-    resetReactionCounts();
     liveVoteCounts[choice]++; // optimistic: reflect own vote instantly
     updateVoteLiveUI();        // push updated count to DOM immediately
     pendingVoteChoice=null;
