@@ -468,7 +468,11 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .v2-card.poem-b .v2-count,.v2-card.poem-b .v2-bar-fill{color:var(--md-secondary);}
 .v2-card.poem-a .v2-count-label{color:var(--md-primary);}
 .v2-card.poem-b .v2-count-label{color:var(--md-secondary);}
-.v2-bar-track{height:5px;border-radius:var(--shape-full);overflow:hidden;margin-bottom:.2rem;}
+.v2-bar-track{height:8px;border-radius:var(--shape-full);overflow:hidden;margin-bottom:.2rem;}
+@keyframes barGlowA{0%,100%{box-shadow:none;}50%{box-shadow:0 0 0 3px rgba(74,58,255,.2),0 0 14px rgba(74,58,255,.35);}}
+@keyframes barGlowB{0%,100%{box-shadow:none;}50%{box-shadow:0 0 0 3px rgba(0,104,116,.2),0 0 14px rgba(0,104,116,.35);}}
+.v2-card.poem-a.leading .v2-bar-track{animation:barGlowA 1.4s ease-in-out infinite;}
+.v2-card.poem-b.leading .v2-bar-track{animation:barGlowB 1.4s ease-in-out infinite;}
 .v2-card.poem-a .v2-bar-track{background:rgba(74,58,255,.12);}
 .v2-card.poem-b .v2-bar-track{background:rgba(124,92,191,.12);}
 .v2-bar-fill{height:100%;border-radius:var(--shape-full);transition:width .6s var(--motion-decel);}
@@ -478,10 +482,10 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .v2-card.poem-a .v2-bar-pct{color:var(--md-primary);}
 .v2-card.poem-b .v2-bar-pct{color:var(--md-secondary);}
 .v2-vote-btn{width:100%;padding:.5rem;border-radius:var(--shape-full);font-size:.8rem;font-weight:700;cursor:pointer;transition:background .2s,border-color .2s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:6px;border:2px solid transparent;}
-.v2-card.poem-a .v2-vote-btn{background:var(--md-primary);color:#fff;border-color:var(--md-primary);}
-.v2-card.poem-b .v2-vote-btn{background:var(--md-secondary);color:#fff;border-color:var(--md-secondary);}
-.v2-card.poem-a .v2-vote-btn.voted-state{background:var(--md-primary) !important;border-color:var(--md-primary) !important;}
-.v2-card.poem-b .v2-vote-btn.voted-state{background:var(--md-secondary) !important;border-color:var(--md-secondary) !important;}
+.v2-card.poem-a .v2-vote-btn{background:var(--md-primary);color:#fff;border-color:var(--md-primary);opacity:.6;}
+.v2-card.poem-b .v2-vote-btn{background:var(--md-secondary);color:#fff;border-color:var(--md-secondary);opacity:.6;}
+.v2-card.poem-a .v2-vote-btn.voted-state{background:var(--md-primary) !important;border-color:var(--md-primary) !important;opacity:1;}
+.v2-card.poem-b .v2-vote-btn.voted-state{background:var(--md-secondary) !important;border-color:var(--md-secondary) !important;opacity:1;}
 .v2-vote-btn.unvoted-ghost{background:var(--md-surface-container) !important;border:1.5px solid var(--md-outline-variant) !important;color:var(--md-on-surface) !important;opacity:.7;cursor:default;}
 @keyframes v2Jiggle{0%{transform:rotate(0)}15%{transform:rotate(-4deg) scale(1.04)}30%{transform:rotate(4deg) scale(1.06)}45%{transform:rotate(-3deg) scale(1.04)}60%{transform:rotate(2deg) scale(1.02)}75%{transform:rotate(-1deg)}100%{transform:rotate(0) scale(1)}}
 @keyframes v2CheckPop{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.3) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
@@ -2683,6 +2687,7 @@ function resetReactionCounts(){
 const reactionChannel = db.channel('bw-reactions');
 reactionChannel.on('broadcast', { event: 'react' }, ({ payload }) => {
   spawnReactionFloat(payload.emoji, payload.x, payload.y);
+  incrementReactionCount(payload.emoji);
 }).subscribe();
 
 function launchReaction(emoji, btn) {
