@@ -316,82 +316,44 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .list-vs{display:flex;align-items:center;justify-content:center;padding:0 .6rem;font-size:.72rem;font-weight:700;color:var(--md-on-surface-variant);border-left:1px solid var(--md-outline-variant);border-right:1px solid var(--md-outline-variant);background:var(--md-surface-container);min-width:2.4rem;}
 .list-bar-row{height:4px;background:var(--md-surface-container-high);display:flex;}
 .list-bar-fill{background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));transition:width .8s var(--motion-decel);}
-/* LEADERBOARD */
+/* RECORDS TAB */
 .leaderboard-view{padding:1.25rem;max-width:700px;margin:0 auto;}
-.lb-champion-banner{border-radius:var(--shape-xl);background:linear-gradient(135deg,#1a0533,#4A3AFF,#7C5CBF);padding:1.75rem 2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1.5rem;box-shadow:0 8px 40px rgba(74,58,255,.35);animation:champGlow 2.5s ease-in-out infinite alternate;position:relative;overflow:hidden;}
-.lb-champion-banner.crowned{background:linear-gradient(135deg,#78350F,#F59E0B,#EF4444,#8B5CF6);box-shadow:0 12px 48px rgba(245,158,11,.5);}
-.lb-champion-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 55%);pointer-events:none;}
-.lb-champ-trophy{font-size:4rem;flex-shrink:0;filter:drop-shadow(0 4px 16px rgba(245,158,11,.7));animation:crownFloat 2.2s ease-in-out infinite;}
-.lb-champ-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:.4rem;}
-.lb-champ-name{font-size:2.2rem;font-weight:800;color:#FFF;line-height:1.05;text-shadow:0 2px 16px rgba(0,0,0,.25);}
-.lb-champ-name.empty{font-size:1.1rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.6);}
-.lb-champ-sub{font-size:.8rem;color:rgba(255,255,255,.8);margin-top:.3rem;font-weight:500;}
-/* Podium rows */
-/* 1st place — gold glow + shimmer sweep */
-.lb-poem-row.rank-1st{border:2px solid #F59E0B;background:linear-gradient(135deg,#FFFBEB,#FEF3C7);animation:goldPulse 2s ease-in-out infinite alternate;}
-.lb-poem-row.rank-1st::before{background:linear-gradient(180deg,#F59E0B,#EF4444);}
-.lb-poem-row.rank-1st::after{content:'';position:absolute;top:0;left:-75%;bottom:0;width:50%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:shineSweep 2.8s ease-in-out infinite;pointer-events:none;}
-@keyframes goldPulse{from{box-shadow:var(--elev-1),0 0 6px rgba(245,158,11,.25);}to{box-shadow:var(--elev-3),0 0 24px rgba(245,158,11,.55),0 0 40px rgba(239,68,68,.2);}}
-@keyframes shineSweep{0%{left:-75%;}65%,100%{left:120%;}}
-/* 2nd place — silver pulse */
-.lb-poem-row.rank-2nd{border:2px solid #94a3b8;background:linear-gradient(135deg,#f8fafc,#e2e8f0);animation:silverPulse 2.5s ease-in-out infinite alternate;}
-.lb-poem-row.rank-2nd::before{background:linear-gradient(180deg,#94a3b8,#64748b);}
-.lb-poem-row.rank-2nd::after{content:'';position:absolute;top:0;left:-75%;bottom:0;width:50%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shineSweep 4s ease-in-out infinite;pointer-events:none;}
-@keyframes silverPulse{from{box-shadow:var(--elev-1);}to{box-shadow:var(--elev-2),0 0 16px rgba(148,163,184,.5);}}
-/* 3rd place — bronze pulse */
-.lb-poem-row.rank-3rd{border:2px solid #cd7c2f;background:linear-gradient(135deg,#fdf8f0,#fef3e2);animation:bronzePulse 3s ease-in-out infinite alternate;}
-.lb-poem-row.rank-3rd::before{background:linear-gradient(180deg,#cd7c2f,#a16207);}
-@keyframes bronzePulse{from{box-shadow:var(--elev-1);}to{box-shadow:var(--elev-2),0 0 14px rgba(205,124,47,.4);}}
-/* Champion banner shimmer when crowned */
-.lb-champion-banner.crowned::after{content:'';position:absolute;top:0;left:-60%;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);animation:bannerShimmer 3s ease-in-out infinite;pointer-events:none;}
-@keyframes bannerShimmer{0%{left:-60%;}70%,100%{left:120%;}}
-.lb-podium-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.65rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .6rem;border-radius:var(--shape-full);margin-top:.3rem;}
-.lb-podium-badge.gold{background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;animation:badgeGlow 1.8s ease-in-out infinite alternate;}
-.lb-podium-badge.silver{background:linear-gradient(135deg,#94a3b8,#64748b);color:#fff;}
-.lb-podium-badge.bronze{background:linear-gradient(135deg,#cd7c2f,#a16207);color:#fff;}
-@keyframes badgeGlow{from{box-shadow:0 2px 8px rgba(245,158,11,.4);}to{box-shadow:0 2px 16px rgba(245,158,11,.8),0 0 24px rgba(239,68,68,.3);}}
-.lb-section-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);margin:1.1rem 0 .5rem .25rem;display:flex;align-items:center;gap:.5rem;}
-.lb-section-label::after{content:'';flex:1;height:1px;background:var(--md-outline-variant);}
-.lb-poem-row{display:flex;align-items:center;gap:.85rem;padding:.75rem 1rem;border-radius:var(--shape-lg);background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);margin-bottom:.5rem;box-shadow:var(--elev-1);position:relative;overflow:hidden;}
-.lb-poem-row.alive{border-color:var(--md-primary);}
-.lb-poem-row.alive::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--md-primary),var(--md-secondary));border-radius:var(--shape-sm) 0 0 var(--shape-sm);}
-.lb-poem-row.champion{border-color:#F59E0B;background:linear-gradient(135deg,#FFFBEB,#FEF3C7);}
-.lb-poem-row.champion::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#F59E0B,#EF4444);border-radius:var(--shape-sm) 0 0 var(--shape-sm);}
-.lb-poem-row.eliminated{opacity:.55;background:var(--md-surface-container);}
-.lb-poem-row.pending{opacity:.65;background:var(--md-surface-container);border-style:dashed;}
-.lb-rank{font-family:monospace;font-size:.75rem;font-weight:700;color:var(--md-on-surface-variant);min-width:1.5rem;text-align:center;flex-shrink:0;}
-.lb-poem-row.alive .lb-rank{color:var(--md-primary);}
-.lb-poem-row.champion .lb-rank{color:#F59E0B;font-size:1rem;}
-.lb-status-icon{font-size:1.2rem;flex-shrink:0;width:1.75rem;text-align:center;}
-.lb-poem-info{flex:1;min-width:0;}
-.lb-poem-title{font-size:.95rem;font-weight:600;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lb-poem-row.eliminated .lb-poem-title{text-decoration:line-through;color:var(--md-on-surface-variant);}
-.lb-poem-row.champion .lb-poem-title{color:#92400E;font-size:1rem;font-weight:700;}
-.lb-poem-round{font-size:.7rem;color:var(--md-on-surface-variant);margin-top:.1rem;}
-.lb-poem-row.alive .lb-poem-round{color:var(--md-primary);font-weight:500;}
-.lb-votes-block{text-align:right;flex-shrink:0;}
-.lb-vote-pct{font-family:monospace;font-size:1.5rem;font-weight:800;color:var(--md-primary);line-height:1;letter-spacing:-.02em;}
-.lb-poem-row.champion .lb-vote-pct{color:#92400E;}
-.lb-poem-row.eliminated .lb-vote-pct{color:var(--md-on-surface-variant);}
-.lb-total-votes{font-family:monospace;font-size:.72rem;font-weight:500;color:var(--md-on-surface-variant);margin-top:.1rem;}
-.lb-poem-row.alive .lb-vote-pct{color:var(--md-primary);}
-.lb-poem-row.champion .lb-total-votes{color:#92400E;}
-.lb-split-bar-wrap{position:absolute;bottom:0;left:0;right:0;height:5px;display:flex;overflow:hidden;border-radius:0 0 var(--shape-lg) var(--shape-lg);}
-.lb-split-winner{background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));transition:width .8s var(--motion-decel);}
-.lb-split-loser{background:var(--md-surface-container-highest);flex:1;}
-.lb-poem-row.champion .lb-split-winner{background:linear-gradient(90deg,#F59E0B,#EF4444);}
-.lb-poem-row.eliminated .lb-split-winner{background:var(--md-outline);}
-.lb-round-chips{display:flex;gap:.3rem;margin-top:.3rem;flex-wrap:wrap;}
-.lb-round-chip{font-size:.6rem;font-weight:700;padding:.12rem .45rem;border-radius:var(--shape-full);letter-spacing:.02em;}
-.lb-round-chip.won{background:#dcfce7;color:#166534;}
-.lb-round-chip.lost{background:#fee2e2;color:#991b1b;}
-.lb-rival{font-size:.68rem;color:var(--md-error);margin-top:.3rem;font-weight:500;}
-.lb-spark{font-size:.68rem;font-weight:700;margin-top:.15rem;letter-spacing:.01em;}
-.lb-spark.up{color:#16a34a;}
-.lb-spark.down{color:#dc2626;}
-.lb-spark.flat{color:var(--md-on-surface-variant);}
-.lb-waiting{text-align:center;padding:3rem 1rem;font-size:1rem;font-weight:500;color:var(--md-on-surface-variant);}
-.lb-waiting-icon{font-size:3rem;margin-bottom:.75rem;}
+.rec-waiting{text-align:center;padding:3rem 1rem;font-size:1rem;font-weight:500;color:var(--md-on-surface-variant);}
+.rec-waiting-icon{font-size:3rem;margin-bottom:.75rem;}
+.rec-cat-header{display:flex;align-items:center;gap:.6rem;margin:1.5rem 0 .6rem;}
+.rec-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.rec-cat-title{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);white-space:nowrap;}
+.rec-cat-line{flex:1;height:1px;background:var(--md-outline-variant);}
+.rec-card{background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);border-radius:var(--shape-lg);padding:.85rem 1rem;margin-bottom:.5rem;transition:opacity .3s;}
+.rec-card.champion{border:1.5px solid #F59E0B;background:#FFFBEB;}
+.rec-card.alive{border-color:var(--md-primary);}
+.rec-card.eliminated{opacity:.55;}
+.rec-card.pending{opacity:.5;border-style:dashed;}
+.rec-card-top{display:flex;align-items:center;gap:.75rem;}
+.rec-ranks{display:flex;flex-direction:column;align-items:center;flex-shrink:0;min-width:2.2rem;}
+.rec-global-rank{font-size:.85rem;font-weight:700;color:var(--md-on-surface-variant);line-height:1;}
+.rec-card.champion .rec-global-rank{color:#B45309;font-size:1rem;}
+.rec-card.alive .rec-global-rank{color:var(--md-primary);}
+.rec-cat-rank{font-size:.6rem;font-weight:600;color:var(--md-on-surface-variant);opacity:.65;margin-top:2px;}
+.rec-info{flex:1;min-width:0;}
+.rec-name{font-size:.95rem;font-weight:600;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rec-card.eliminated .rec-name{text-decoration:line-through;color:var(--md-on-surface-variant);}
+.rec-card.champion .rec-name{color:#92400E;}
+.rec-subtitle{font-size:.7rem;color:var(--md-on-surface-variant);margin-top:2px;}
+.rec-card.alive .rec-subtitle{color:var(--md-primary);font-weight:500;}
+.rec-card.champion .rec-subtitle{color:#B45309;}
+.rec-placement{font-size:.65rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:.15rem .55rem;border-radius:var(--shape-full);flex-shrink:0;}
+.rec-placement.champ{background:#FEF3C7;color:#92400E;}
+.rec-placement.runner{background:var(--md-surface-container-highest);color:var(--md-on-surface-variant);}
+.rec-placement.semi{background:#FDF8F0;color:#92400E;}
+.rec-trail{display:flex;align-items:flex-end;gap:3px;margin-top:.6rem;flex-wrap:wrap;}
+.rec-trail-arrow{font-size:10px;color:var(--md-on-surface-variant);line-height:2;}
+.rec-step{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.rec-step-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.rec-step-pill{font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:var(--shape-full);}
+.rec-step-pill.won{background:#dcfce7;color:#166534;}
+.rec-step-pill.lost{background:#fee2e2;color:#991b1b;}
+.rec-step-pill.pending{background:var(--md-surface-container-highest);color:var(--md-on-surface-variant);}
 /* VOTE VIEW */
 .vote-view{padding:1.25rem;max-width:960px;margin:0 auto;}
 .vote-tab-pulse{width:7px;height:7px;border-radius:50%;background:var(--md-tertiary);animation:livePulse 1.8s ease-in-out infinite;display:inline-block;margin-right:.4rem;vertical-align:middle;}
@@ -813,7 +775,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
       <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
       <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
-      <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">⊙</span> Ranks</button>
+      <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">⌗</span> Records</button>
     </div>
   </div>
 </div>
@@ -1748,25 +1710,82 @@ function updateStatus() {
 function renderLeaderboard() {
   const el=document.getElementById('lbContent'); if(!el||!activeClass())return; el.innerHTML='';
   const b=bkt(), results=b.poems.map((_,idx)=>computePoemStatus(idx,b));
-  const sortByPct=(a,b2)=>{
-    if(a.status==='champion')return -1; if(b2.status==='champion')return 1;
-    const pA=a.totalMatchVotes>0?a.totalVotes/a.totalMatchVotes:0, pB=b2.totalMatchVotes>0?b2.totalVotes/b2.totalMatchVotes:0;
-    return pB!==pA?pB-pA:b2.roundsWon-a.roundsWon;
-  };
-  const champ=champion();
-  const banner=document.createElement('div');banner.className='lb-champion-banner'+(champ?' crowned':'');
-  banner.innerHTML=`<div class="lb-champ-trophy">${champ?'👑':'⏳'}</div><div style="min-width:0"><div class="lb-champ-eyebrow">${champ?'🥇 Poetry Champion · 1st Place':'Tournament in Progress'}</div><div class="lb-champ-name${champ?'':' empty'}">${champ?esc(champ.name):'Who will be crowned?'}</div>${champ?'<div class="lb-champ-sub">Undefeated · Last poem standing · The Crown</div>':''}</div>`;
-  el.appendChild(banner);
-  if(!results.some(r=>r.status!=='pending')){const w=document.createElement('div');w.className='lb-waiting';w.innerHTML='<div class="lb-waiting-icon">🎯</div>Tournament hasn\'t started yet.<br>Check back soon!';el.appendChild(w);return;}
-  const getPlacement=r=>{if(r.status==='champion')return '1st';if(r.status==='eliminated'&&r.roundsWon===3)return '2nd';if(r.status==='eliminated'&&r.roundsWon===2)return '3rd';return null;};
-  const alive=results.filter(r=>r.status==='alive'||r.status==='champion').sort(sortByPct);
-  const elim=results.filter(r=>r.status==='eliminated').sort(sortByPct);
-  const pend=results.filter(r=>r.status==='pending');
-  const maxV=Math.max(...results.map(r=>r.totalVotes),1);
-  let rank=1;
-  if(alive.length){const l=document.createElement('div');l.className='lb-section-label';l.innerHTML=`🔥 Still Alive <span style="background:var(--md-primary);color:var(--md-on-primary);border-radius:var(--shape-full);padding:.1rem .5rem;font-size:.65rem">${alive.length}</span>`;el.appendChild(l);alive.forEach(r=>el.appendChild(buildLbRow(r,rank++,maxV,b,getPlacement(r))));}
-  if(elim.length){const l=document.createElement('div');l.className='lb-section-label';l.innerHTML=`💀 Eliminated <span style="background:var(--md-surface-container-highest);color:var(--md-on-surface-variant);border-radius:var(--shape-full);padding:.1rem .5rem;font-size:.65rem">${elim.length}</span>`;el.appendChild(l);elim.forEach(r=>el.appendChild(buildLbRow(r,rank++,maxV,b,getPlacement(r))));}
-  if(pend.length){const l=document.createElement('div');l.className='lb-section-label';l.textContent='⏳ Yet to Play';el.appendChild(l);pend.forEach(r=>el.appendChild(buildLbRow(r,rank++,maxV,b,getPlacement(r))));}
+  if(!results.some(r=>r.status!=='pending')){
+    const w=document.createElement('div');w.className='rec-waiting';
+    w.innerHTML='<div class="rec-waiting-icon">🎯</div>Tournament hasn\'t started yet.<br>Check back soon!';
+    el.appendChild(w);return;
+  }
+  // Global sort: champion first, then by rounds won desc, then vote share desc
+  const globalSorted=[...results].sort((a,z)=>{
+    if(a.status==='champion')return -1; if(z.status==='champion')return 1;
+    if(a.roundsWon!==z.roundsWon)return z.roundsWon-a.roundsWon;
+    const pA=a.totalMatchVotes>0?a.totalVotes/a.totalMatchVotes:0;
+    const pZ=z.totalMatchVotes>0?z.totalVotes/z.totalMatchVotes:0;
+    return pZ-pA;
+  });
+  const globalRankMap=new Map(globalSorted.map((r,i)=>[ r.idx, i+1 ]));
+  const CAT_COLORS=['#7C3AED','#0891B2','#B45309','#16A34A'];
+  CATEGORIES.forEach((cat,ci)=>{
+    // Sort poems in this category
+    const catResults=cat.seeds.map(idx=>results.find(r=>r.idx===idx)).filter(Boolean);
+    const catSorted=[...catResults].sort((a,z)=>{
+      if(a.status==='champion')return -1; if(z.status==='champion')return 1;
+      if(a.roundsWon!==z.roundsWon)return z.roundsWon-a.roundsWon;
+      const pA=a.totalMatchVotes>0?a.totalVotes/a.totalMatchVotes:0;
+      const pZ=z.totalMatchVotes>0?z.totalVotes/z.totalMatchVotes:0;
+      return pZ-pA;
+    });
+    const catRankMap=new Map(catSorted.map((r,i)=>[r.idx,i+1]));
+    // Category header
+    const hdr=document.createElement('div');hdr.className='rec-cat-header';
+    hdr.innerHTML=`<div class="rec-cat-dot" style="background:${CAT_COLORS[ci]}"></div><span class="rec-cat-title">${esc(cat.name)}</span><div class="rec-cat-line"></div>`;
+    el.appendChild(hdr);
+    catSorted.forEach(r=>{
+      el.appendChild(buildRecCard(r, globalRankMap.get(r.idx), catRankMap.get(r.idx), cat.seeds.length));
+    });
+  });
+}
+
+function buildRecCard(r, globalRank, catRank, catTotal) {
+  const card=document.createElement('div');
+  card.className='rec-card '+(r.status==='champion'?'champion':r.status==='alive'?'alive':r.status==='eliminated'?'eliminated':'pending');
+  // Placement label
+  const placementLabel=r.status==='champion'?'Champion':r.roundsWon===3?'Runner-up':r.roundsWon===2?'Semifinalist':null;
+  const placementClass=r.status==='champion'?'champ':r.roundsWon===3?'runner':r.roundsWon===2?'semi':null;
+  // Subtitle
+  const subtitleMap={champion:'Won all matches · Undefeated',alive:'Still in the tournament'};
+  const lostRound=r.rounds.length>0?r.rounds[r.rounds.length-1].label:null;
+  const lostLabel=lostRound?`Lost in ${lostRound==='R16'?'round of 16':lostRound==='QF'?'quarterfinal':lostRound==='SF'?'semifinal':'final'}`:'Yet to play';
+  const subtitle=r.status==='champion'?subtitleMap.champion:r.status==='alive'?subtitleMap.alive:r.status==='pending'?'Waiting for their match':lostLabel;
+  // Top row
+  const top=document.createElement('div');top.className='rec-card-top';
+  const ranks=document.createElement('div');ranks.className='rec-ranks';
+  const gr=document.createElement('div');gr.className='rec-global-rank';gr.textContent=r.status==='champion'?'👑':globalRank;
+  const cr=document.createElement('div');cr.className='rec-cat-rank';cr.textContent=`${catRank}/${catTotal} in cat.`;
+  ranks.appendChild(gr);ranks.appendChild(cr);
+  const info=document.createElement('div');info.className='rec-info';
+  const name=document.createElement('div');name.className='rec-name';name.textContent=r.name;
+  const sub=document.createElement('div');sub.className='rec-subtitle';sub.textContent=subtitle;
+  info.appendChild(name);info.appendChild(sub);
+  top.appendChild(ranks);top.appendChild(info);
+  if(placementLabel){const pl=document.createElement('span');pl.className='rec-placement '+placementClass;pl.textContent=placementLabel;top.appendChild(pl);}
+  card.appendChild(top);
+  // Journey trail
+  if(r.rounds&&r.rounds.length>0){
+    const trail=document.createElement('div');trail.className='rec-trail';
+    r.rounds.forEach((rnd,i)=>{
+      if(i>0){const arr=document.createElement('div');arr.className='rec-trail-arrow';arr.textContent='→';trail.appendChild(arr);}
+      const step=document.createElement('div');step.className='rec-step';
+      const lbl=document.createElement('div');lbl.className='rec-step-label';lbl.textContent=rnd.label;
+      const total=rnd.myVotes+rnd.oppVotes;
+      const pct=total>0?Math.round(rnd.myVotes/total*100):0;
+      const pill=document.createElement('div');pill.className='rec-step-pill '+rnd.result;
+      pill.textContent=(rnd.result==='won'?'W ':'L ')+pct+'%';
+      step.appendChild(lbl);step.appendChild(pill);trail.appendChild(step);
+    });
+    card.appendChild(trail);
+  }
+  return card;
 }
 
 function computePoemStatus(idx,b) {
@@ -1823,66 +1842,6 @@ function computePoemStatus(idx,b) {
   return{name,idx,status:'champion',roundsWon:4,totalVotes,totalMatchVotes,rounds,killedByIdx:null};
 }
 
-function buildLbRow(r,rank,maxV,b,placement) {
-  const placementClass=placement?'rank-'+placement:'';
-  const div=document.createElement('div');div.className='lb-poem-row '+r.status+(placementClass?' '+placementClass:'');
-  const icons={champion:'👑',alive:'🔥',eliminated:'💀',pending:'⏳'};
-  const placementIcon={'1st':'🥇','2nd':'🥈','3rd':'🥉'};
-  // Rank
-  const rankEl=document.createElement('div');rankEl.className='lb-rank';rankEl.textContent=placement?placementIcon[placement]:rank;
-  // Icon
-  const iconEl=document.createElement('div');iconEl.className='lb-status-icon';iconEl.textContent=icons[r.status];
-  // Info
-  const info=document.createElement('div');info.className='lb-poem-info';
-  const title=document.createElement('div');title.className='lb-poem-title';title.textContent=r.name;
-  info.appendChild(title);
-  // Podium badge
-  if(placement){
-    const badgeColors={'1st':'gold','2nd':'silver','3rd':'bronze'};
-    const badgeLabels={'1st':'🥇 1st Place · Champion','2nd':'🥈 2nd Place · Runner-Up','3rd':'🥉 3rd Place · Semi-Finalist'};
-    const badge=document.createElement('div');badge.className='lb-podium-badge '+badgeColors[placement];badge.textContent=badgeLabels[placement];
-    info.appendChild(badge);
-  }
-  // Round journey chips
-  if(r.rounds&&r.rounds.length){
-    const chips=document.createElement('div');chips.className='lb-round-chips';
-    r.rounds.forEach(rnd=>{const c=document.createElement('span');c.className='lb-round-chip '+rnd.result;c.textContent=(rnd.result==='won'?'✓ ':'✗ ')+rnd.label;chips.appendChild(c);});
-    info.appendChild(chips);
-  }
-  // Rival callout
-  if(r.status==='eliminated'&&r.killedByIdx!==null){
-    const rival=document.createElement('div');rival.className='lb-rival';
-    rival.textContent='⚔️ Lost to: '+(b?b.poems[r.killedByIdx]:r.killedByIdx);
-    info.appendChild(rival);
-  }
-  // Votes block
-  const votePct=r.totalMatchVotes>0?Math.round((r.totalVotes/r.totalMatchVotes)*100):null;
-  const vb=document.createElement('div');vb.className='lb-votes-block';
-  if(votePct!==null&&r.status!=='pending'){const vp=document.createElement('div');vp.className='lb-vote-pct';vp.textContent=votePct+'%';vb.appendChild(vp);}
-  // Momentum spark
-  if(r.rounds&&r.rounds.length>=2){
-    const last=r.rounds[r.rounds.length-1],prev=r.rounds[r.rounds.length-2];
-    const lP=last.myVotes+last.oppVotes>0?Math.round(last.myVotes/(last.myVotes+last.oppVotes)*100):0;
-    const pP=prev.myVotes+prev.oppVotes>0?Math.round(prev.myVotes/(prev.myVotes+prev.oppVotes)*100):0;
-    const diff=lP-pP;
-    const spark=document.createElement('div');
-    if(diff>2){spark.className='lb-spark up';spark.textContent='▲ +'+diff+'%';}
-    else if(diff<-2){spark.className='lb-spark down';spark.textContent='▼ '+diff+'%';}
-    else{spark.className='lb-spark flat';spark.textContent='— steady';}
-    vb.appendChild(spark);
-  }
-  const vn=document.createElement('div');vn.className='lb-total-votes';vn.textContent=r.totalVotes>0?r.totalVotes+' votes':'—';
-  vb.appendChild(vn);
-  div.appendChild(rankEl);div.appendChild(iconEl);div.appendChild(info);div.appendChild(vb);
-  // Split bar
-  if(votePct!==null&&r.status!=='pending'){
-    const bw=document.createElement('div');bw.className='lb-split-bar-wrap';
-    const win=document.createElement('div');win.className='lb-split-winner';win.style.width=votePct+'%';
-    const lose=document.createElement('div');lose.className='lb-split-loser';
-    bw.appendChild(win);bw.appendChild(lose);div.appendChild(bw);
-  }
-  return div;
-}
 
 function renderList() {
   const el=document.getElementById('listContent');el.innerHTML='';if(!activeClass())return;
