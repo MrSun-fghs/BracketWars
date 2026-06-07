@@ -204,6 +204,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 @keyframes nudge{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
 .seed{font-family:monospace;font-size:.58rem;font-weight:500;color:var(--md-on-surface-variant);min-width:1rem;text-align:right;flex-shrink:0;background:var(--md-surface-container-high);padding:.1rem .3rem;border-radius:var(--shape-xs);}
 .poem-slot.winner-slot .seed{background:var(--md-primary);color:var(--md-on-primary);}
+.seed.seed-won{background:#F59E0B!important;color:#fff!important;}
 .poem-name{flex:1;font-size:.72rem;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--md-on-surface);}
 .poem-slot.winner-slot .poem-name{color:var(--md-on-primary-container);font-weight:700;}
 .poem-slot.pending .poem-name{color:var(--md-on-surface-variant);font-style:italic;font-weight:400;}
@@ -2115,6 +2116,26 @@ function renderEngagement() {
 }
 
 // ── Bracket collapse helpers ──
+function flipSeedBadge(el){
+  el.style.transition='transform .17s ease-in';
+  el.style.transform='scaleX(0)';
+  setTimeout(()=>{
+    el.textContent='★';el.classList.add('seed-won');
+    el.style.transition='transform .17s ease-out';
+    el.style.transform='scaleX(1)';
+    setTimeout(()=>{el.style.transition='';el.style.transform='';},180);
+  },170);
+}
+function findNewWinnerKey(oldB,newB){
+  if(!oldB||!newB)return null;
+  for(let ri=0;ri<4;ri++){
+    for(let mi=0;mi<2;mi++){if(oldB.regionRounds[ri][mi].winnerIdx===null&&newB.regionRounds[ri][mi].winnerIdx!==null)return{type:'rR1',ri,mi};}
+    if(oldB.regionRounds[ri][2].winnerIdx===null&&newB.regionRounds[ri][2].winnerIdx!==null)return{type:'rQF',ri,mi:2};
+  }
+  for(let si=0;si<2;si++){if(oldB.semis[si].winnerIdx===null&&newB.semis[si].winnerIdx!==null)return{type:'semi',ri:si,mi:null};}
+  if(oldB.final.winnerIdx===null&&newB.final.winnerIdx!==null)return{type:'final',ri:null,mi:null};
+  return null;
+}
 function isR16Complete(){const b=bkt();return b&&b.regionRounds.every(reg=>reg[0].winnerIdx!==null&&reg[1].winnerIdx!==null);}
 function isQFComplete(){const b=bkt();return b&&b.regionRounds.every(reg=>reg[2].winnerIdx!==null);}
 function isSFComplete(){const b=bkt();return b&&b.semis[0].winnerIdx!==null&&b.semis[1].winnerIdx!==null;}
@@ -2232,6 +2253,12 @@ function renderBracket(){
   rR1.appendChild(mkStrip(7,'Round of 16','‹'));bracket.appendChild(rR1);
   // Apply collapse state (immediate for page-load; delayed timer handles post-result-save animation)
   if(!bracketFreshResult)applyBracketCollapse();
+  if(bracketJustSavedKey){
+    setTimeout(()=>{
+      document.querySelectorAll('.seed[data-flip-pending]').forEach(el=>{el.removeAttribute('data-flip-pending');flipSeedBadge(el);});
+      bracketJustSavedKey=null;
+    },120);
+  }
 }
 function sp(f){const d=document.createElement('div');d.style.flex=f;return d;}
 function mcol(cls,col,row){const d=document.createElement('div');d.className=cls;d.style.cssText=`grid-column:${col};grid-row:${row};`;return d;}
@@ -2262,7 +2289,11 @@ function bcard(type,ri,mi,mirrored,isT){
     const poem=poems[i],s=slots[i],v=md.votes[s];
     const iW=isC&&md.winnerIdx===s,iL=isC&&md.winnerIdx!==s,iP=!poem,isA=aliveArr[i]&&iW;
     const slot=document.createElement('div');slot.className='poem-slot'+(iP?' pending':iW?' winner-slot'+(isA?' alive':''):iL?' loser-slot':'');
-    const seed=document.createElement('span');seed.className='seed';seed.textContent=poem?poem.seed:'?';slot.appendChild(seed);
+    const seed=document.createElement('span');seed.className='seed';
+    const _isFresh=iW&&bracketJustSavedKey!==null&&bracketJustSavedKey.type===type&&(bracketJustSavedKey.ri??null)===(ri??null)&&(bracketJustSavedKey.mi??null)===(mi??null);
+    if(iW&&!_isFresh){seed.textContent='★';seed.classList.add('seed-won');}
+    else{seed.textContent=poem?poem.seed:'?';if(_isFresh)seed.setAttribute('data-flip-pending','1');}
+    slot.appendChild(seed);
     const nm=document.createElement('span');nm.className='poem-name';nm.textContent=poem?poem.name:'TBD';slot.appendChild(nm);
     if(isC){const ve=document.createElement('span');ve.className='votes';ve.textContent=v!==null?v:'';slot.appendChild(ve);if(tv>0){const pc=document.createElement('span');pc.className='pct-chip';pc.textContent=Math.round(((v||0)/tv)*100)+'%';slot.appendChild(pc);}const bw=document.createElement('div');bw.className='vote-bar-wrap';const bar=document.createElement('div');bar.className='vote-bar';bar.style.width=(tv>0?Math.round(((v||0)/tv)*100):0)+'%';bw.appendChild(bar);slot.appendChild(bw);}
     card.appendChild(slot);
@@ -2338,7 +2369,7 @@ function saveMatchup(){
     app.voting = {open:false,tallying:false,countdown:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
     app.lastVoteResult = {...celebData, ts:Date.now()};
     saveApp(); // broadcasts lastVoteResult + clears tallying — students will show winner
-    bracketFreshResult=true; scheduleCollapseCheck();
+    bracketJustSavedKey={...activeKey};bracketFreshResult=true; scheduleCollapseCheck();
     closeVoteDialog(); renderAll();
     hideTallyingOverlay();
     pendingCelebrationData=null;
@@ -2347,7 +2378,7 @@ function saveMatchup(){
     // Teacher does NOT see celebration — navigate to bracket instead
     setTimeout(()=>{ if(MODE==='teacher') { renderAll(); } },300);
   } else {
-    bracketFreshResult=true; scheduleCollapseCheck();
+    bracketJustSavedKey={...activeKey};bracketFreshResult=true; scheduleCollapseCheck();
     saveApp();closeVoteDialog();renderAll();showSnack('Result saved ✓');
     if(bkt().final.winnerIdx!==null) setTimeout(launchConfetti,500);
   }
@@ -2614,6 +2645,7 @@ let redoSnapshot = null;
 let bracketCollapseTimer = null;
 let bracketColUserExpanded = new Set();
 let bracketFreshResult = false;
+let bracketJustSavedKey = null;
 function undoLastResult() {
   if (!undoSnapshot) return;
   redoSnapshot = JSON.parse(JSON.stringify(app));
@@ -3103,6 +3135,7 @@ async function boot() {
             setTimeout(()=>showVoteResultCelebration(app.lastVoteResult), 400);
           }
         }
+        bracketJustSavedKey=findNewWinnerKey(bkt(),incoming.classes?.find(c=>c.id===incoming.activeId)?.bracket);
         bracketFreshResult=true; scheduleCollapseCheck();
         renderAll(); showCurrentView();
       }
