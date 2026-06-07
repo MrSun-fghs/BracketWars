@@ -160,11 +160,13 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 /* BRACKET */
 .bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;}
 .mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;min-width:1080px;align-items:stretch;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
-.col-header{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,font-size .45s,border-bottom-color .45s;position:relative;}
-.col-header span{display:block;font-size:.65rem;font-weight:400;text-transform:none;color:var(--md-outline);margin-top:.1rem;}
+.col-header{text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,border-bottom-color .45s;display:flex;align-items:center;justify-content:center;}
 .col-header[data-collapsed]{padding:0;border-bottom-color:transparent;overflow:hidden;}
 .col-header[data-collapsed]>*{display:none;}
-.col-header-row{display:flex;align-items:center;justify-content:center;gap:6px;}
+.col-header-inner{display:inline-flex;align-items:center;gap:8px;}
+.col-header-text{text-align:center;}
+.col-header-title{display:block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.col-header-sub{display:block;font-size:.65rem;font-weight:400;text-transform:none;color:var(--md-outline);margin-top:.1rem;}
 .col-hide-btn{width:30px;height:30px;border-radius:50%;background:var(--md-primary-container);color:var(--md-on-primary-container);border:none;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background .15s,color .15s;line-height:1;}
 .col-hide-btn:hover{background:var(--md-primary);color:#fff;}
 .col-header[data-collapsed] .col-hide-btn{display:none;}
@@ -2151,22 +2153,20 @@ function renderBracket(){
     const colNum=i+1;
     const hd=document.createElement('div');hd.className='col-header';hd.style.cssText=`grid-column:${colNum};grid-row:1;`;
     hd.setAttribute('data-bhdr',String(colNum));
-    // Title row (label + optional hide button on outer edge)
-    const row=document.createElement('div');row.className='col-header-row';
-    const lbl=document.createElement('span');lbl.textContent=h;
+    // Text block: title + subtitle stacked and centered
+    const textBlock=document.createElement('div');textBlock.className='col-header-text';
+    const titleEl=document.createElement('span');titleEl.className='col-header-title';titleEl.textContent=h;textBlock.appendChild(titleEl);
+    if(subs[i]){const sub=document.createElement('span');sub.className='col-header-sub';sub.textContent=subs[i];textBlock.appendChild(sub);}
+    // Inner wrapper: text block + optional button to the right
+    const inner=document.createElement('div');inner.className='col-header-inner';
+    inner.appendChild(textBlock);
     if(colNum!==4 && roundDone[colNum]){
       const hbtn=document.createElement('button');hbtn.className='col-hide-btn';
-      const isRight=colNum>=5;
-      hbtn.textContent=isRight?'›':'‹';hbtn.title='Collapse this round';
+      hbtn.textContent=colNum>=5?'›':'‹';hbtn.title='Collapse this round';
       hbtn.onclick=(e)=>{e.stopPropagation();manualCollapseCol(colNum);};
-      // Left cols: button on left; right cols: button on right
-      if(isRight){row.appendChild(lbl);row.appendChild(hbtn);}
-      else{row.appendChild(hbtn);row.appendChild(lbl);}
-    } else {
-      row.appendChild(lbl);
+      inner.appendChild(hbtn);
     }
-    hd.appendChild(row);
-    if(subs[i]){const sub=document.createElement('span');sub.textContent=subs[i];hd.appendChild(sub);}
+    hd.appendChild(inner);
     bracket.appendChild(hd);
   });
   // Helper to build a collapse strip
