@@ -158,7 +158,8 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .seg-btn .nav-icon{font-size:1.25rem;line-height:1;transition:transform .2s var(--motion-std);}
 .seg-btn.active .nav-icon{transform:scale(1.15);}
 /* BRACKET */
-.bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;display:flex;justify-content:center;align-items:flex-start;}
+.bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;}
+.bracket-scroll>.mm-bracket{margin:0 auto;}
 .mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;min-width:1080px;align-items:stretch;justify-content:center;column-gap:.5rem;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
 .col-header{text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,border-bottom-color .45s;display:flex;align-items:center;justify-content:center;}
 .col-header[data-collapsed]{padding:0;border-bottom-color:transparent;overflow:hidden;}
