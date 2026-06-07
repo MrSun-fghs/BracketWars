@@ -2157,14 +2157,17 @@ function renderBracket(){
     const textBlock=document.createElement('div');textBlock.className='col-header-text';
     const titleEl=document.createElement('span');titleEl.className='col-header-title';titleEl.textContent=h;textBlock.appendChild(titleEl);
     if(subs[i]){const sub=document.createElement('span');sub.className='col-header-sub';sub.textContent=subs[i];textBlock.appendChild(sub);}
-    // Inner wrapper: text block + optional button to the right
+    // Inner wrapper: button on outer edge, text block centered
     const inner=document.createElement('div');inner.className='col-header-inner';
-    inner.appendChild(textBlock);
     if(colNum!==4 && roundDone[colNum]){
       const hbtn=document.createElement('button');hbtn.className='col-hide-btn';
-      hbtn.textContent=colNum>=5?'›':'‹';hbtn.title='Collapse this round';
+      const isRight=colNum>=5;
+      hbtn.textContent=isRight?'›':'‹';hbtn.title='Collapse this round';
       hbtn.onclick=(e)=>{e.stopPropagation();manualCollapseCol(colNum);};
-      inner.appendChild(hbtn);
+      if(isRight){inner.appendChild(textBlock);inner.appendChild(hbtn);}
+      else{inner.appendChild(hbtn);inner.appendChild(textBlock);}
+    } else {
+      inner.appendChild(textBlock);
     }
     hd.appendChild(inner);
     bracket.appendChild(hd);
