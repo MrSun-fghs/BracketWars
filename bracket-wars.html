@@ -2694,20 +2694,27 @@ async function fetchVoteCounts(sessionId) {
     const { data } = await db.from('votes').select('choice').eq('session_id', sessionId);
     if (data) {
       const newCounts = [0, 0];
-      data.forEach(v => newCounts[v.choice]++);
-      if (newCounts[0] !== liveVoteCounts[0] || newCounts[1] !== liveVoteCounts[1]) {
+      data.forEach(v => { const c=parseInt(v.choice); if(c===0||c===1) newCounts[c]++; });
+      // Only update if DB count is >= optimistic count (never regress)
+      const a = Math.max(newCounts[0], liveVoteCounts[0]);
+      const b = Math.max(newCounts[1], liveVoteCounts[1]);
+      const d0 = a - liveVoteCounts[0], d1 = b - liveVoteCounts[1];
+      if (d0 > 0 || d1 > 0) {
         if (currentView === 'vote') {
-          const d0 = newCounts[0]-liveVoteCounts[0], d1 = newCounts[1]-liveVoteCounts[1];
           for (let i=0;i<d0;i++) setTimeout(()=>showVoteFloat(0), i*180);
           for (let i=0;i<d1;i++) setTimeout(()=>showVoteFloat(1), i*180);
         }
-        liveVoteCounts = newCounts;
+        liveVoteCounts = [a, b];
         lastVoteDeltas = [d0, d1];
         updateVoteLiveUI();
         lastVoteDeltas = [0, 0];
+      } else if (newCounts[0] !== liveVoteCounts[0] || newCounts[1] !== liveVoteCounts[1]) {
+        // DB has fewer votes than we think — something was reset, sync down
+        liveVoteCounts = newCounts;
+        updateVoteLiveUI();
       }
       // Auto-close when all students have voted (teacher only)
-      const total = newCounts[0]+newCounts[1];
+      const total = a+b;
       ensureVoting(app);
       if (MODE==='teacher' && !autoCloseTriggered && app.voting.studentCount>0 && total>=app.voting.studentCount) {
         autoCloseTriggered = true;
@@ -2878,7 +2885,7 @@ async function submitStudentVote(choice) {
     if (error) throw error;
     localStorage.setItem(storageKey,String(choice));
     liveVoteCounts[choice]++; // optimistic: reflect own vote instantly
-    fetchVoteCounts(sessionId); // force immediate poll so all other devices update too
+    updateVoteLiveUI();        // push updated count to DOM immediately
     pendingVoteChoice=null;
     playSound('pop');
     // Animate Vote → Voted on the chosen button
