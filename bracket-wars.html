@@ -159,11 +159,23 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .seg-btn.active .nav-icon{transform:scale(1.15);}
 /* BRACKET */
 .bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;}
-.mm-bracket{display:grid;grid-template-columns:1fr 1fr 1fr 190px 1fr 1fr 1fr;grid-template-rows:auto 1fr;min-width:1080px;align-items:stretch;}
-.col-header{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;}
+.mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;min-width:1080px;align-items:stretch;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
+.col-header{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,font-size .45s,border-bottom-color .45s;}
 .col-header span{display:block;font-size:.65rem;font-weight:400;text-transform:none;color:var(--md-outline);margin-top:.1rem;}
+.col-header[data-collapsed]{font-size:0;padding:0;border-bottom-color:transparent;overflow:hidden;}
 .bc{display:flex;flex-direction:column;padding:.6rem .3rem 0;height:100%;}
 .bc.right{align-items:flex-end;}
+/* ── Bracket collapse ── */
+.bc[data-collapsed]{overflow:hidden;}
+.bc[data-collapsed]>*:not(.bc-strip){display:none!important;}
+.bc-strip{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;padding:.75rem 0;gap:14px;height:100%;cursor:pointer;user-select:none;}
+.bc[data-collapsed] .bc-strip{display:flex;}
+.bc-strip-arrow{width:30px;height:30px;border-radius:50%;background:var(--md-primary-container);color:var(--md-on-primary-container);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;transition:background .15s,color .15s;flex-shrink:0;}
+.bc-strip:hover .bc-strip-arrow{background:var(--md-primary);color:#fff;}
+.bc-strip-label{writing-mode:vertical-rl;transform:rotate(180deg);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);opacity:.65;}
+.bracket-expand-btn{display:inline-flex;align-items:center;gap:5px;padding:.26rem .72rem;border-radius:var(--shape-full);background:var(--md-surface-container-high);color:var(--md-on-surface-variant);font-size:.7rem;font-weight:700;cursor:pointer;border:none;transition:background .15s,color .15s;letter-spacing:.03em;}
+.bracket-expand-btn:hover{background:var(--md-primary-container);color:var(--md-on-primary-container);}
+#bracketColToolbar{display:none;padding:.3rem 1.25rem .1rem;text-align:right;}
 .cat-banner{display:flex;align-items:center;font-size:.7rem;font-weight:700;letter-spacing:.04em;padding:.28rem .75rem;border-radius:var(--shape-full);margin:.4rem .35rem .25rem;width:calc(100% - .7rem);}
 .mg{width:100%;position:relative;margin:4px 0;}
 .matchup{border-radius:var(--shape-lg);background:var(--md-surface-container-lowest);box-shadow:var(--elev-1);overflow:hidden;margin:0 .3rem;border:1px solid var(--md-outline-variant);transition:box-shadow .2s,transform .15s;}
@@ -777,7 +789,7 @@ body.projection .fullscreen-btn{display:none;}
 <div id="homeView" style="display:none"><div class="home-view" id="homeContent"></div></div>
 <div id="leaderboardView" style="display:none"><div class="leaderboard-view" id="lbContent"></div></div>
 <div id="listView" style="display:none"><div class="list-view" id="listContent"></div></div>
-<div id="bracketView" style="display:none"><div class="bracket-scroll"><div class="mm-bracket" id="bracket"></div></div></div>
+<div id="bracketView" style="display:none"><div id="bracketColToolbar"><button class="bracket-expand-btn" onclick="expandAllBracketCols()">↔ Show All Rounds</button></div><div class="bracket-scroll"><div class="mm-bracket" id="bracket"></div></div></div>
 <div id="engagementView" style="display:none;background:#fff;"><div class="home-view" id="engagementContent"></div></div>
 </div>
 
@@ -2076,24 +2088,88 @@ function renderEngagement() {
   }
 }
 
+// ── Bracket collapse helpers ──
+function isR16Complete(){const b=bkt();return b&&b.regionRounds.every(reg=>reg[0].winnerIdx!==null&&reg[1].winnerIdx!==null);}
+function isQFComplete(){const b=bkt();return b&&b.regionRounds.every(reg=>reg[2].winnerIdx!==null);}
+function isSFComplete(){const b=bkt();return b&&b.semis[0].winnerIdx!==null&&b.semis[1].winnerIdx!==null;}
+function setColCollapsed(col,collapsed){
+  const bracket=document.getElementById('bracket');if(!bracket)return;
+  if(collapsed)bracket.style.setProperty(`--bcol${col}`,'44px');
+  else bracket.style.removeProperty(`--bcol${col}`);
+  const colEl=bracket.querySelector(`[data-bcol="${col}"]`);
+  if(colEl){if(collapsed)colEl.setAttribute('data-collapsed','');else colEl.removeAttribute('data-collapsed');}
+  const hdrEl=bracket.querySelector(`[data-bhdr="${col}"]`);
+  if(hdrEl){if(collapsed)hdrEl.setAttribute('data-collapsed','');else hdrEl.removeAttribute('data-collapsed');}
+}
+function applyBracketCollapse(){
+  bracketFreshResult=false;
+  if(!activeClass())return;
+  const auto=new Set();
+  if(isR16Complete()){auto.add(1);auto.add(7);}
+  if(isQFComplete()){auto.add(2);auto.add(6);}
+  if(isSFComplete()){auto.add(3);auto.add(5);}
+  [1,2,3,5,6,7].forEach(col=>setColCollapsed(col,auto.has(col)&&!bracketColUserExpanded.has(col)));
+  updateExpandAllBtn();
+}
+function scheduleCollapseCheck(){
+  if(bracketCollapseTimer)clearTimeout(bracketCollapseTimer);
+  bracketCollapseTimer=setTimeout(applyBracketCollapse,2000);
+}
+function updateExpandAllBtn(){
+  const tb=document.getElementById('bracketColToolbar');if(!tb)return;
+  const bracket=document.getElementById('bracket');
+  tb.style.display=(bracket&&bracket.querySelector('[data-bcol][data-collapsed]'))?'':'none';
+}
+function expandAllBracketCols(){
+  bracketColUserExpanded=new Set([1,2,3,5,6,7]);
+  [1,2,3,5,6,7].forEach(col=>setColCollapsed(col,false));
+  updateExpandAllBtn();
+}
+function toggleBracketColExpand(col){
+  bracketColUserExpanded.add(col);
+  setColCollapsed(col,false);
+  updateExpandAllBtn();
+}
+
 function renderBracket(){
   const bracket=document.getElementById('bracket');bracket.innerHTML='';if(!activeClass())return;
   const isT=MODE==='teacher';
   ['Round of 16','Quarterfinals','Semifinals','👑 The Crown','Semifinals','Quarterfinals','Round of 16'].forEach((h,i)=>{
     const hd=document.createElement('div');hd.className='col-header';hd.style.cssText=`grid-column:${i+1};grid-row:1;`;
+    hd.setAttribute('data-bhdr',String(i+1));
     const subs=['4 matchups','2 matchups','','','','2 matchups','4 matchups'];
     hd.innerHTML=h+(subs[i]?`<span>${subs[i]}</span>`:'');bracket.appendChild(hd);
   });
-  const lR1=mcol('bc left','1','2');lR1.appendChild(catBan(CATEGORIES[0]));lR1.appendChild(bcard('rR1',0,0,false,isT));lR1.appendChild(bcard('rR1',0,1,false,isT));lR1.appendChild(catBan(CATEGORIES[1]));lR1.appendChild(bcard('rR1',1,0,false,isT));lR1.appendChild(bcard('rR1',1,1,false,isT));bracket.appendChild(lR1);
-  const lQF=mcol('bc left','2','2');lQF.style.justifyContent='space-around';lQF.style.paddingTop='2.75rem';bracket.appendChild(lQF);lQF.appendChild(bcard('rQF',0,2,false,isT));lQF.appendChild(bcard('rQF',1,2,false,isT));
-  const lS=mcol('bc left','3','2');lS.style.justifyContent='center';lS.style.paddingTop='2rem';lS.appendChild(bcard('semi',0,null,false,isT));bracket.appendChild(lS);
+  // Helper to build a collapse strip
+  function mkStrip(col,label,arrow){
+    const s=document.createElement('div');s.className='bc-strip';
+    s.innerHTML=`<div class="bc-strip-arrow">${arrow}</div><div class="bc-strip-label">${label}</div>`;
+    s.onclick=()=>toggleBracketColExpand(col);return s;
+  }
+  const lR1=mcol('bc left','1','2');lR1.setAttribute('data-bcol','1');
+  lR1.appendChild(catBan(CATEGORIES[0]));lR1.appendChild(bcard('rR1',0,0,false,isT));lR1.appendChild(bcard('rR1',0,1,false,isT));lR1.appendChild(catBan(CATEGORIES[1]));lR1.appendChild(bcard('rR1',1,0,false,isT));lR1.appendChild(bcard('rR1',1,1,false,isT));
+  lR1.appendChild(mkStrip(1,'Round of 16','›'));bracket.appendChild(lR1);
+  const lQF=mcol('bc left','2','2');lQF.setAttribute('data-bcol','2');lQF.style.justifyContent='space-around';lQF.style.paddingTop='2.75rem';
+  lQF.appendChild(bcard('rQF',0,2,false,isT));lQF.appendChild(bcard('rQF',1,2,false,isT));
+  lQF.appendChild(mkStrip(2,'Quarters','›'));bracket.appendChild(lQF);
+  const lS=mcol('bc left','3','2');lS.setAttribute('data-bcol','3');lS.style.justifyContent='center';lS.style.paddingTop='2rem';
+  lS.appendChild(bcard('semi',0,null,false,isT));
+  lS.appendChild(mkStrip(3,'Semis','›'));bracket.appendChild(lS);
   const center=document.createElement('div');center.className='center-col';center.style.cssText='grid-column:4;grid-row:2;';
   const ch2=document.createElement('div');ch2.className='col-header center-header';ch2.textContent='The Crown';center.appendChild(ch2);
   const champ=champion();const cc=document.createElement('div');cc.className='champion-card'+(champ?' crowned':'');cc.innerHTML=`<div class="champion-trophy">👑</div><div class="champion-label">Poetry Champion</div><div class="champion-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div>`;center.appendChild(cc);
   const fl=document.createElement('div');fl.className='final-label';fl.style.marginTop='.7rem';fl.textContent='Final';center.appendChild(fl);center.appendChild(bcard('final',null,null,false,isT));bracket.appendChild(center);
-  const rS=mcol('bc right','5','2');rS.style.justifyContent='center';rS.style.paddingTop='2rem';rS.appendChild(bcard('semi',1,null,true,isT));bracket.appendChild(rS);
-  const rQF=mcol('bc right','6','2');rQF.style.justifyContent='space-around';rQF.style.paddingTop='2.75rem';bracket.appendChild(rQF);rQF.appendChild(bcard('rQF',2,2,true,isT));rQF.appendChild(bcard('rQF',3,2,true,isT));
-  const rR1=mcol('bc right','7','2');rR1.appendChild(catBan(CATEGORIES[2]));rR1.appendChild(bcard('rR1',2,0,true,isT));rR1.appendChild(bcard('rR1',2,1,true,isT));rR1.appendChild(catBan(CATEGORIES[3]));rR1.appendChild(bcard('rR1',3,0,true,isT));rR1.appendChild(bcard('rR1',3,1,true,isT));bracket.appendChild(rR1);
+  const rS=mcol('bc right','5','2');rS.setAttribute('data-bcol','5');rS.style.justifyContent='center';rS.style.paddingTop='2rem';
+  rS.appendChild(bcard('semi',1,null,true,isT));
+  rS.appendChild(mkStrip(5,'Semis','‹'));bracket.appendChild(rS);
+  const rQF=mcol('bc right','6','2');rQF.setAttribute('data-bcol','6');rQF.style.justifyContent='space-around';rQF.style.paddingTop='2.75rem';
+  rQF.appendChild(bcard('rQF',2,2,true,isT));rQF.appendChild(bcard('rQF',3,2,true,isT));
+  rQF.appendChild(mkStrip(6,'Quarters','‹'));bracket.appendChild(rQF);
+  const rR1=mcol('bc right','7','2');rR1.setAttribute('data-bcol','7');
+  rR1.appendChild(catBan(CATEGORIES[2]));rR1.appendChild(bcard('rR1',2,0,true,isT));rR1.appendChild(bcard('rR1',2,1,true,isT));rR1.appendChild(catBan(CATEGORIES[3]));rR1.appendChild(bcard('rR1',3,0,true,isT));rR1.appendChild(bcard('rR1',3,1,true,isT));
+  rR1.appendChild(mkStrip(7,'Round of 16','‹'));bracket.appendChild(rR1);
+  // Apply collapse state (immediate for page-load; delayed timer handles post-result-save animation)
+  if(!bracketFreshResult)applyBracketCollapse();
 }
 function sp(f){const d=document.createElement('div');d.style.flex=f;return d;}
 function mcol(cls,col,row){const d=document.createElement('div');d.className=cls;d.style.cssText=`grid-column:${col};grid-row:${row};`;return d;}
@@ -2200,6 +2276,7 @@ function saveMatchup(){
     app.voting = {open:false,tallying:false,countdown:false,sessionId:null,classId:null,matchupKey:null,poemA:null,poemB:null,studentCount:0};
     app.lastVoteResult = {...celebData, ts:Date.now()};
     saveApp(); // broadcasts lastVoteResult + clears tallying — students will show winner
+    bracketFreshResult=true; scheduleCollapseCheck();
     closeVoteDialog(); renderAll();
     hideTallyingOverlay();
     pendingCelebrationData=null;
@@ -2208,6 +2285,7 @@ function saveMatchup(){
     // Teacher does NOT see celebration — navigate to bracket instead
     setTimeout(()=>{ if(MODE==='teacher') { renderAll(); } },300);
   } else {
+    bracketFreshResult=true; scheduleCollapseCheck();
     saveApp();closeVoteDialog();renderAll();showSnack('Result saved ✓');
     if(bkt().final.winnerIdx!==null) setTimeout(launchConfetti,500);
   }
@@ -2471,6 +2549,9 @@ function showCountdownThenClose() {
 // ── Undo / Redo ──
 let undoSnapshot = null;
 let redoSnapshot = null;
+let bracketCollapseTimer = null;
+let bracketColUserExpanded = new Set();
+let bracketFreshResult = false;
 function undoLastResult() {
   if (!undoSnapshot) return;
   redoSnapshot = JSON.parse(JSON.stringify(app));
@@ -2960,6 +3041,7 @@ async function boot() {
             setTimeout(()=>showVoteResultCelebration(app.lastVoteResult), 400);
           }
         }
+        bracketFreshResult=true; scheduleCollapseCheck();
         renderAll(); showCurrentView();
       }
     }).subscribe();
