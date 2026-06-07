@@ -810,9 +810,9 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
     <div id="teacherActions"></div>
     <div class="seg-btn-track" id="viewToggle" style="display:none">
       <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
-      <button class="seg-btn active" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
+      <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
-      <button class="seg-btn" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
+      <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">🔥</span> Leaderboard</button>
     </div>
   </div>
 </div>
@@ -1711,7 +1711,7 @@ function renderTabs() {
           currentView='bracket';
           renderAll();
         } else {
-          if(currentView==='home'||currentView==='vote'||currentView==='engagement') currentView='leaderboard';
+          if(currentView==='home'||currentView==='vote'||currentView==='engagement') currentView='bracket';
           saveStudentPrefs();
           renderAll();
           showCurrentView();
