@@ -1932,7 +1932,9 @@ function renderList() {
     const tt=document.createElement('span');tt.className='lm-section-title';tt.textContent=label;
     const ln=document.createElement('span');ln.className='lm-section-line';
     hdr.appendChild(tt);hdr.appendChild(ln);section.appendChild(hdr);
-    matchups.forEach(([pA,pB,md])=>section.appendChild(buildMatchCard(pA,pB,md,label)));
+    const done=matchups.filter(([pA,pB,md])=>md&&md.winnerIdx!==null);
+    if(!done.length)return;
+    done.forEach(([pA,pB,md])=>section.appendChild(buildMatchCard(pA,pB,md,label)));
     el.appendChild(section);
   });
 }
@@ -1945,7 +1947,8 @@ function buildMatchCard(pA,pB,md,roundLabel){
   const wv=isC?(md.votes[md.winnerIdx]||0):0;
   const pctW=isC&&tv>0?Math.round(wv/tv*100):0;
   const isUpset=isC&&winner&&loser&&(winner.seed>loser.seed)&&Math.abs(winner.seed-loser.seed)>=2;
-  const tagClass=!isC?'none':(isUpset?'upset':pctW<=55?'close':pctW>=75?'dom':'none');
+  const highPct=Math.max(pctW,100-pctW);
+  const tagClass=!isC?'none':(isUpset?'upset':highPct<=55?'close':highPct>=75?'dom':'none');
   const tagLabel=tagClass==='upset'?'UPSET':tagClass==='close'?'CLOSE CALL':tagClass==='dom'?'DOMINANT':'·';
   const top=document.createElement('div');top.className='lmc-top';
   const tag=document.createElement('span');tag.className='lmc-tag '+tagClass;tag.textContent=tagLabel;
