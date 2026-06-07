@@ -324,36 +324,60 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .rec-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .rec-cat-title{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);white-space:nowrap;}
 .rec-cat-line{flex:1;height:1px;background:var(--md-outline-variant);}
-.rec-card{background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);border-radius:var(--shape-lg);padding:.85rem 1rem;margin-bottom:.5rem;transition:opacity .3s;}
+/* Cards */
+.rec-card{background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);border-radius:var(--shape-lg);padding:.9rem 1rem;margin-bottom:.5rem;transition:transform .15s ease,box-shadow .15s ease,opacity .15s ease;}
+.rec-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.07);}
 .rec-card.champion{border:1.5px solid #F59E0B;background:#FFFBEB;}
+.rec-card.champion:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(245,158,11,.18);}
 .rec-card.alive{border-color:var(--md-primary);}
 .rec-card.eliminated{opacity:.55;}
-.rec-card.pending{opacity:.5;border-style:dashed;}
-.rec-card-top{display:flex;align-items:center;gap:.75rem;}
-.rec-ranks{display:flex;flex-direction:column;align-items:center;flex-shrink:0;min-width:2.2rem;}
-.rec-global-rank{font-size:.85rem;font-weight:700;color:var(--md-on-surface-variant);line-height:1;}
-.rec-card.champion .rec-global-rank{color:#B45309;font-size:1rem;}
-.rec-card.alive .rec-global-rank{color:var(--md-primary);}
-.rec-cat-rank{font-size:.6rem;font-weight:600;color:var(--md-on-surface-variant);opacity:.65;margin-top:2px;}
+.rec-card.eliminated:hover{opacity:.75;}
+.rec-card.compact-card{opacity:.5;padding:.65rem 1rem;}
+.rec-card.compact-card:hover{opacity:.78;transform:translateY(-1px);box-shadow:none;}
+.rec-card.pending{opacity:.45;border-style:dashed;}
+/* Card top row */
+.rec-card-top{display:flex;align-items:center;gap:0;}
+/* Rank column — fixed width so all names align */
+.rec-rank-col{width:68px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.rec-rank-num{font-size:2rem;font-weight:600;line-height:1;color:var(--md-on-surface-variant);}
+.rec-rank-overall{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-on-surface-variant);opacity:.5;}
+.rec-card.champion .rec-rank-num{font-size:2.4rem;color:#B45309;}
+.rec-card.champion .rec-rank-overall{color:#B45309;opacity:.7;}
+.rec-card.alive .rec-rank-num{color:var(--md-primary);}
+.rec-card.compact-card .rec-rank-num{font-size:1.4rem;}
+/* Info */
 .rec-info{flex:1;min-width:0;}
-.rec-name{font-size:.95rem;font-weight:600;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.rec-card.eliminated .rec-name{text-decoration:line-through;color:var(--md-on-surface-variant);}
-.rec-card.champion .rec-name{color:#92400E;}
-.rec-subtitle{font-size:.7rem;color:var(--md-on-surface-variant);margin-top:2px;}
+.rec-name{font-size:1rem;font-weight:600;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rec-card.eliminated .rec-name,.rec-card.compact-card .rec-name{text-decoration:line-through;color:var(--md-on-surface-variant);}
+.rec-card.champion .rec-name{color:#92400E;font-size:1.15rem;}
+.rec-card.compact-card .rec-name{font-size:.85rem;}
+.rec-subtitle{font-size:.72rem;color:var(--md-on-surface-variant);margin-top:2px;}
 .rec-card.alive .rec-subtitle{color:var(--md-primary);font-weight:500;}
 .rec-card.champion .rec-subtitle{color:#B45309;}
-.rec-placement{font-size:.65rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:.15rem .55rem;border-radius:var(--shape-full);flex-shrink:0;}
+.rec-card.compact-card .rec-subtitle{font-size:.65rem;}
+/* Placement badge */
+.rec-placement{font-size:.6rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:.18rem .6rem;border-radius:var(--shape-full);flex-shrink:0;margin-left:.5rem;}
 .rec-placement.champ{background:#FEF3C7;color:#92400E;}
 .rec-placement.runner{background:var(--md-surface-container-highest);color:var(--md-on-surface-variant);}
 .rec-placement.semi{background:#FDF8F0;color:#92400E;}
-.rec-trail{display:flex;align-items:flex-end;gap:3px;margin-top:.6rem;flex-wrap:wrap;}
-.rec-trail-arrow{font-size:10px;color:var(--md-on-surface-variant);line-height:2;}
+/* Progress bar */
+.rec-progress-wrap{margin:.7rem 0 .5rem 68px;}
+.rec-progress-bg{height:3px;background:var(--md-outline-variant);border-radius:2px;}
+.rec-progress-fill{height:3px;border-radius:2px;transition:width .6s ease;}
+/* Trail */
+.rec-trail{display:flex;align-items:flex-end;gap:4px;flex-wrap:wrap;padding-left:68px;}
+.rec-trail-arrow{font-size:10px;color:var(--md-on-surface-variant);line-height:2.2;}
 .rec-step{display:flex;flex-direction:column;align-items:center;gap:2px;}
 .rec-step-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);}
-.rec-step-pill{font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:var(--shape-full);}
+.rec-step-pill{font-weight:600;border-radius:var(--shape-full);}
+.rec-step-pill.lg{font-size:.75rem;padding:3px 10px;}
+.rec-step-pill.sm{font-size:.68rem;padding:2px 8px;}
 .rec-step-pill.won{background:#dcfce7;color:#166534;}
 .rec-step-pill.lost{background:#fee2e2;color:#991b1b;}
-.rec-step-pill.pending{background:var(--md-surface-container-highest);color:var(--md-on-surface-variant);}
+/* Compact trail (inline single pill) */
+.rec-compact-pill{font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:var(--shape-full);flex-shrink:0;margin-left:.5rem;}
+.rec-compact-pill.won{background:#dcfce7;color:#166534;}
+.rec-compact-pill.lost{background:#fee2e2;color:#991b1b;}
 /* VOTE VIEW */
 .vote-view{padding:1.25rem;max-width:960px;margin:0 auto;}
 .vote-tab-pulse{width:7px;height:7px;border-radius:50%;background:var(--md-tertiary);animation:livePulse 1.8s ease-in-out infinite;display:inline-block;margin-right:.4rem;vertical-align:middle;}
@@ -1751,39 +1775,78 @@ function renderLeaderboard() {
 }
 
 function buildRecCard(r, globalRank, catRank, catTotal) {
+  // Determine card tier: champion / deep (won ≥1 match) / compact (lost R16 or pending)
+  const isChamp=r.status==='champion';
+  const isDeep=r.roundsWon>=1;
+  const isCompact=!isChamp&&!isDeep;
+  const statusClass=isChamp?'champion':r.status==='alive'?'alive':r.status==='eliminated'?'eliminated':'pending';
   const card=document.createElement('div');
-  card.className='rec-card '+(r.status==='champion'?'champion':r.status==='alive'?'alive':r.status==='eliminated'?'eliminated':'pending');
-  // Placement label
-  const placementLabel=r.status==='champion'?'Champion':r.roundsWon===3?'Runner-up':r.roundsWon===2?'Semifinalist':null;
-  const placementClass=r.status==='champion'?'champ':r.roundsWon===3?'runner':r.roundsWon===2?'semi':null;
+  card.className='rec-card '+statusClass+(isCompact?' compact-card':'');
+
+  // Placement badge
+  const placementLabel=isChamp?'Champion':r.roundsWon===3?'Runner-up':r.roundsWon===2?'Semifinalist':null;
+  const placementClass=isChamp?'champ':r.roundsWon===3?'runner':r.roundsWon===2?'semi':null;
+
   // Subtitle
-  const subtitleMap={champion:'Won all matches · Undefeated',alive:'Still in the tournament'};
   const lostRound=r.rounds.length>0?r.rounds[r.rounds.length-1].label:null;
   const lostLabel=lostRound?`Lost in ${lostRound==='R16'?'round of 16':lostRound==='QF'?'quarterfinal':lostRound==='SF'?'semifinal':'final'}`:'Yet to play';
-  const subtitle=r.status==='champion'?subtitleMap.champion:r.status==='alive'?subtitleMap.alive:r.status==='pending'?'Waiting for their match':lostLabel;
-  // Top row
+  const catOrdinal=catRank===1?'1st':catRank===2?'2nd':catRank===3?'3rd':`${catRank}th`;
+  const catSuffix=` · ${catOrdinal} in category`;
+  const subtitle=isChamp?`Won all matches · Undefeated${catSuffix}`:r.status==='alive'?`Still in the tournament${catSuffix}`:r.status==='pending'?'Waiting for their match':lostLabel+catSuffix;
+
+  // ── Top row ──
   const top=document.createElement('div');top.className='rec-card-top';
-  const ranks=document.createElement('div');ranks.className='rec-ranks';
-  const gr=document.createElement('div');gr.className='rec-global-rank';gr.textContent=r.status==='champion'?'👑':globalRank;
-  const cr=document.createElement('div');cr.className='rec-cat-rank';cr.textContent=`${catRank}/${catTotal} in cat.`;
-  ranks.appendChild(gr);ranks.appendChild(cr);
+
+  // Rank column
+  const rankCol=document.createElement('div');rankCol.className='rec-rank-col';
+  const rankNum=document.createElement('div');rankNum.className='rec-rank-num';rankNum.textContent=globalRank;
+  const rankLbl=document.createElement('div');rankLbl.className='rec-rank-overall';rankLbl.textContent='overall';
+  rankCol.appendChild(rankNum);rankCol.appendChild(rankLbl);
+
+  // Info
   const info=document.createElement('div');info.className='rec-info';
   const name=document.createElement('div');name.className='rec-name';name.textContent=r.name;
   const sub=document.createElement('div');sub.className='rec-subtitle';sub.textContent=subtitle;
   info.appendChild(name);info.appendChild(sub);
-  top.appendChild(ranks);top.appendChild(info);
+
+  top.appendChild(rankCol);top.appendChild(info);
   if(placementLabel){const pl=document.createElement('span');pl.className='rec-placement '+placementClass;pl.textContent=placementLabel;top.appendChild(pl);}
   card.appendChild(top);
-  // Journey trail
+
+  // ── Compact: single inline pill, no trail ──
+  if(isCompact&&r.rounds.length>0){
+    const rnd=r.rounds[0];
+    const total=rnd.myVotes+rnd.oppVotes;
+    const pct=total>0?Math.round(rnd.myVotes/total*100):0;
+    const pill=document.createElement('span');pill.className='rec-compact-pill '+(rnd.result==='won'?'won':'lost');
+    pill.textContent=(rnd.result==='won'?'W ':'L ')+pct+'%';
+    top.appendChild(pill);
+    return card;
+  }
+
+  // ── Deep/Champion: progress bar + full trail ──
   if(r.rounds&&r.rounds.length>0){
+    // Progress bar (% of rounds reached out of 4)
+    const totalRounds=4;
+    const progress=Math.round((r.rounds.length/totalRounds)*100);
+    const progWrap=document.createElement('div');progWrap.className='rec-progress-wrap';
+    const progBg=document.createElement('div');progBg.className='rec-progress-bg';
+    const progFill=document.createElement('div');progFill.className='rec-progress-fill';
+    progFill.style.width=progress+'%';
+    progFill.style.background=isChamp?'#F59E0B':r.status==='alive'?'var(--md-primary)':'var(--md-outline)';
+    progBg.appendChild(progFill);progWrap.appendChild(progBg);
+    card.appendChild(progWrap);
+
+    // Trail
     const trail=document.createElement('div');trail.className='rec-trail';
+    const pillSize=isChamp?'lg':'sm';
     r.rounds.forEach((rnd,i)=>{
       if(i>0){const arr=document.createElement('div');arr.className='rec-trail-arrow';arr.textContent='→';trail.appendChild(arr);}
       const step=document.createElement('div');step.className='rec-step';
       const lbl=document.createElement('div');lbl.className='rec-step-label';lbl.textContent=rnd.label;
       const total=rnd.myVotes+rnd.oppVotes;
       const pct=total>0?Math.round(rnd.myVotes/total*100):0;
-      const pill=document.createElement('div');pill.className='rec-step-pill '+rnd.result;
+      const pill=document.createElement('div');pill.className=`rec-step-pill ${pillSize} ${rnd.result}`;
       pill.textContent=(rnd.result==='won'?'W ':'L ')+pct+'%';
       step.appendChild(lbl);step.appendChild(pill);trail.appendChild(step);
     });
