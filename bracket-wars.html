@@ -382,6 +382,9 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .rec-rm-dot.future{background:var(--md-surface-container);border:2px solid transparent;}
 .rec-rm-label{font-size:8px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--md-on-surface-variant);}
 .rec-rm-pct{font-size:8px;color:var(--md-on-surface-variant);}
+/* Compact result (bottom 2 per category — R16 losers) */
+.rec-compact-result{padding:.3rem 0 .1rem;}
+.rec-compact-result-pill{font-size:.65rem;font-weight:600;padding:2px 9px;border-radius:var(--shape-full);background:#fee2e2;color:#991b1b;}
 /* VOTE VIEW */
 .vote-view{padding:1.25rem;max-width:960px;margin:0 auto;}
 .vote-tab-pulse{width:7px;height:7px;border-radius:50%;background:var(--md-tertiary);animation:livePulse 1.8s ease-in-out infinite;display:inline-block;margin-right:.4rem;vertical-align:middle;}
@@ -1823,30 +1826,43 @@ function buildRecCard(r, globalRank, catRank, catTotal, catColor) {
   if(placementLabel){const pl=document.createElement('span');pl.className='rec-placement '+placementClass;pl.textContent=placementLabel;top.appendChild(pl);}
   body.appendChild(top);
 
-  // Round markers
-  const ALL_ROUNDS=['R16','QF','SF','F'];
-  const dotData=ALL_ROUNDS.map((label,i)=>{
-    const played=r.rounds.find(rd=>rd.label===label);
-    if(played){const total=played.myVotes+played.oppVotes;const pct=total>0?Math.round(played.myVotes/total*100):null;return{label,state:played.result,pct};}
-    if(r.status==='eliminated')return{label,state:'future',pct:null};
-    const nextIdx=r.rounds.length;
-    if(i===nextIdx)return{label,state:'next',pct:null};
-    return{label,state:'future',pct:null};
-  });
-  const markers=document.createElement('div');markers.className='rec-round-markers';
-  dotData.forEach((d,i)=>{
-    if(i>0){const con=document.createElement('div');con.className='rec-rm-con';markers.appendChild(con);}
-    const item=document.createElement('div');item.className='rec-rm-item';
-    const dot=document.createElement('div');dot.className='rec-rm-dot '+d.state;
-    if(d.state==='won')dot.textContent='✓';
-    else if(d.state==='lost')dot.textContent='✗';
-    if(d.state==='next')dot.style.borderColor=catHex;
-    const lbl=document.createElement('div');lbl.className='rec-rm-label';lbl.textContent=d.label;
-    item.appendChild(dot);item.appendChild(lbl);
-    if(d.pct!==null){const pctEl=document.createElement('div');pctEl.className='rec-rm-pct';pctEl.textContent=d.pct+'%';item.appendChild(pctEl);}
-    markers.appendChild(item);
-  });
-  body.appendChild(markers);
+  // Bottom 2 (compact): single R16 result pill — saves space
+  if(isCompact){
+    if(r.rounds.length>0){
+      const rnd=r.rounds[0];
+      const total=rnd.myVotes+rnd.oppVotes;
+      const pct=total>0?Math.round(rnd.myVotes/total*100):0;
+      const cr=document.createElement('div');cr.className='rec-compact-result';
+      const pill=document.createElement('span');pill.className='rec-compact-result-pill';
+      pill.textContent=`R16 · ${rnd.result==='won'?'W':'L'} ${pct}%`;
+      cr.appendChild(pill);body.appendChild(cr);
+    }
+  } else {
+    // Top 2 (deep/champion): full round marker dots
+    const ALL_ROUNDS=['R16','QF','SF','F'];
+    const dotData=ALL_ROUNDS.map((label,i)=>{
+      const played=r.rounds.find(rd=>rd.label===label);
+      if(played){const total=played.myVotes+played.oppVotes;const pct=total>0?Math.round(played.myVotes/total*100):null;return{label,state:played.result,pct};}
+      if(r.status==='eliminated')return{label,state:'future',pct:null};
+      const nextIdx=r.rounds.length;
+      if(i===nextIdx)return{label,state:'next',pct:null};
+      return{label,state:'future',pct:null};
+    });
+    const markers=document.createElement('div');markers.className='rec-round-markers';
+    dotData.forEach((d,i)=>{
+      if(i>0){const con=document.createElement('div');con.className='rec-rm-con';markers.appendChild(con);}
+      const item=document.createElement('div');item.className='rec-rm-item';
+      const dot=document.createElement('div');dot.className='rec-rm-dot '+d.state;
+      if(d.state==='won')dot.textContent='✓';
+      else if(d.state==='lost')dot.textContent='✗';
+      if(d.state==='next')dot.style.borderColor=catHex;
+      const lbl=document.createElement('div');lbl.className='rec-rm-label';lbl.textContent=d.label;
+      item.appendChild(dot);item.appendChild(lbl);
+      if(d.pct!==null){const pctEl=document.createElement('div');pctEl.className='rec-rm-pct';pctEl.textContent=d.pct+'%';item.appendChild(pctEl);}
+      markers.appendChild(item);
+    });
+    body.appendChild(markers);
+  }
   card.appendChild(body);
   return card;
 }
