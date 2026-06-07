@@ -366,24 +366,19 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .rec-placement.champ{background:#FEF3C7;color:#92400E;}
 .rec-placement.runner{background:var(--md-surface-container-highest);color:var(--md-on-surface-variant);}
 .rec-placement.semi{background:#FDF8F0;color:#92400E;}
-/* Progress bar */
-.rec-progress-wrap{margin:.7rem 0 .5rem 92px;}
-.rec-progress-bg{height:3px;background:var(--md-outline-variant);border-radius:2px;}
-.rec-progress-fill{height:3px;border-radius:2px;transition:width .6s ease;}
-/* Trail */
-.rec-trail{display:flex;align-items:flex-end;gap:4px;flex-wrap:wrap;padding-left:92px;}
-.rec-trail-arrow{font-size:10px;color:var(--md-on-surface-variant);line-height:2.2;}
-.rec-step{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.rec-step-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);}
-.rec-step-pill{font-weight:600;border-radius:var(--shape-full);}
-.rec-step-pill.lg{font-size:.75rem;padding:3px 10px;}
-.rec-step-pill.sm{font-size:.68rem;padding:2px 8px;}
-.rec-step-pill.won{background:#dcfce7;color:#166534;}
-.rec-step-pill.lost{background:#fee2e2;color:#991b1b;}
-/* Compact trail (inline single pill) */
-.rec-compact-pill{font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:var(--shape-full);flex-shrink:0;margin-left:.5rem;}
-.rec-compact-pill.won{background:#dcfce7;color:#166534;}
-.rec-compact-pill.lost{background:#fee2e2;color:#991b1b;}
+/* Round markers */
+.rec-card{position:relative;overflow:hidden;}
+.rec-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:120px;background:linear-gradient(to right,var(--cc,transparent),transparent);opacity:.1;pointer-events:none;}
+.rec-round-markers{display:flex;align-items:flex-start;gap:0;padding:.55rem 0 .2rem 92px;}
+.rec-rm-item{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:40px;}
+.rec-rm-con{flex:1;height:1px;background:var(--md-outline-variant);margin-top:11px;min-width:8px;}
+.rec-rm-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.rec-rm-dot.won{background:#dcfce7;border:2px solid #16a34a;color:#166534;}
+.rec-rm-dot.lost{background:#fee2e2;border:2px solid #dc2626;color:#991b1b;}
+.rec-rm-dot.next{background:transparent;border:2px dashed #888;}
+.rec-rm-dot.future{background:var(--md-surface-container);border:2px solid transparent;}
+.rec-rm-label{font-size:8px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.rec-rm-pct{font-size:8px;color:var(--md-on-surface-variant);}
 /* VOTE VIEW */
 .vote-view{padding:1.25rem;max-width:960px;margin:0 auto;}
 .vote-tab-pulse{width:7px;height:7px;border-radius:50%;background:var(--md-tertiary);animation:livePulse 1.8s ease-in-out infinite;display:inline-block;margin-right:.4rem;vertical-align:middle;}
@@ -1775,13 +1770,12 @@ function renderLeaderboard() {
     hdr.innerHTML=`<div class="rec-cat-dot" style="background:${CAT_COLORS[ci]}"></div><span class="rec-cat-title">${esc(cat.name)}</span><div class="rec-cat-line"></div>`;
     el.appendChild(hdr);
     catSorted.forEach(r=>{
-      el.appendChild(buildRecCard(r, globalRankMap.get(r.idx), catRankMap.get(r.idx), cat.seeds.length));
+      el.appendChild(buildRecCard(r, globalRankMap.get(r.idx), catRankMap.get(r.idx), cat.seeds.length, ci));
     });
   });
 }
 
-function buildRecCard(r, globalRank, catRank, catTotal) {
-  // Determine card tier: champion / deep (won ≥1 match) / compact (lost R16 or pending)
+function buildRecCard(r, globalRank, catRank, catTotal, catIdx) {
   const isChamp=r.status==='champion';
   const isDeep=r.roundsWon>=1;
   const isCompact=!isChamp&&!isDeep;
@@ -1789,24 +1783,30 @@ function buildRecCard(r, globalRank, catRank, catTotal) {
   const card=document.createElement('div');
   card.className='rec-card '+statusClass+(isCompact?' compact-card':'');
 
+  // Category color
+  const catHex=['#1565C0','#6A1B9A','#2E7D32','#C62828'][catIdx]||'#555';
+  card.style.setProperty('--cc',catHex);
+  card.style.borderLeft='3px solid '+catHex;
+
   // Placement badge
   const placementLabel=isChamp?'Champion':r.roundsWon===3?'Runner-up':r.roundsWon===2?'Semifinalist':null;
   const placementClass=isChamp?'champ':r.roundsWon===3?'runner':r.roundsWon===2?'semi':null;
 
   // Subtitle
-  const lostRound=r.rounds.length>0?r.rounds[r.rounds.length-1].label:null;
+  const lostRound=r.rounds.length>0&&r.status==='eliminated'?r.rounds[r.rounds.length-1].label:null;
   const lostLabel=lostRound?`Lost in ${lostRound==='R16'?'round of 16':lostRound==='QF'?'quarterfinal':lostRound==='SF'?'semifinal':'final'}`:'Yet to play';
   const catOrdinal=catRank===1?'1st':catRank===2?'2nd':catRank===3?'3rd':`${catRank}th`;
   const catSuffix=` · ${catOrdinal} in category`;
   const subtitle=isChamp?`Won all matches · Undefeated${catSuffix}`:r.status==='alive'?`Still in the tournament${catSuffix}`:r.status==='pending'?'Waiting for their match':lostLabel+catSuffix;
 
-  // ── Top row ──
+  // Top row
   const top=document.createElement('div');top.className='rec-card-top';
 
   // Rank column
   const rankCol=document.createElement('div');rankCol.className='rec-rank-col';
   const rankNum=document.createElement('div');rankNum.className='rec-rank-num';rankNum.textContent=globalRank;
   const rankLbl=document.createElement('div');rankLbl.className='rec-rank-overall';rankLbl.textContent='overall';
+  if(r.status==='alive'||isChamp) rankNum.style.color=catHex;
   rankCol.appendChild(rankNum);rankCol.appendChild(rankLbl);
 
   // Info
@@ -1819,45 +1819,30 @@ function buildRecCard(r, globalRank, catRank, catTotal) {
   if(placementLabel){const pl=document.createElement('span');pl.className='rec-placement '+placementClass;pl.textContent=placementLabel;top.appendChild(pl);}
   card.appendChild(top);
 
-  // ── Compact: single inline pill, no trail ──
-  if(isCompact&&r.rounds.length>0){
-    const rnd=r.rounds[0];
-    const total=rnd.myVotes+rnd.oppVotes;
-    const pct=total>0?Math.round(rnd.myVotes/total*100):0;
-    const pill=document.createElement('span');pill.className='rec-compact-pill '+(rnd.result==='won'?'won':'lost');
-    pill.textContent=(rnd.result==='won'?'W ':'L ')+pct+'%';
-    top.appendChild(pill);
-    return card;
-  }
-
-  // ── Deep/Champion: progress bar + full trail ──
-  if(r.rounds&&r.rounds.length>0){
-    // Progress bar (% of rounds reached out of 4)
-    const totalRounds=4;
-    const progress=Math.round((r.rounds.length/totalRounds)*100);
-    const progWrap=document.createElement('div');progWrap.className='rec-progress-wrap';
-    const progBg=document.createElement('div');progBg.className='rec-progress-bg';
-    const progFill=document.createElement('div');progFill.className='rec-progress-fill';
-    progFill.style.width=progress+'%';
-    progFill.style.background=isChamp?'#F59E0B':r.status==='alive'?'var(--md-primary)':'var(--md-outline)';
-    progBg.appendChild(progFill);progWrap.appendChild(progBg);
-    card.appendChild(progWrap);
-
-    // Trail
-    const trail=document.createElement('div');trail.className='rec-trail';
-    const pillSize=isChamp?'lg':'sm';
-    r.rounds.forEach((rnd,i)=>{
-      if(i>0){const arr=document.createElement('div');arr.className='rec-trail-arrow';arr.textContent='→';trail.appendChild(arr);}
-      const step=document.createElement('div');step.className='rec-step';
-      const lbl=document.createElement('div');lbl.className='rec-step-label';lbl.textContent=rnd.label;
-      const total=rnd.myVotes+rnd.oppVotes;
-      const pct=total>0?Math.round(rnd.myVotes/total*100):0;
-      const pill=document.createElement('div');pill.className=`rec-step-pill ${pillSize} ${rnd.result}`;
-      pill.textContent=(rnd.result==='won'?'W ':'L ')+pct+'%';
-      step.appendChild(lbl);step.appendChild(pill);trail.appendChild(step);
-    });
-    card.appendChild(trail);
-  }
+  // Round markers (all cards)
+  const ALL_ROUNDS=['R16','QF','SF','F'];
+  const dotData=ALL_ROUNDS.map((label,i)=>{
+    const played=r.rounds.find(rd=>rd.label===label);
+    if(played){const total=played.myVotes+played.oppVotes;const pct=total>0?Math.round(played.myVotes/total*100):null;return{label,state:played.result,pct};}
+    if(r.status==='eliminated')return{label,state:'future',pct:null};
+    const nextIdx=r.rounds.length;
+    if(i===nextIdx)return{label,state:'next',pct:null};
+    return{label,state:'future',pct:null};
+  });
+  const markers=document.createElement('div');markers.className='rec-round-markers';
+  dotData.forEach((d,i)=>{
+    if(i>0){const con=document.createElement('div');con.className='rec-rm-con';markers.appendChild(con);}
+    const item=document.createElement('div');item.className='rec-rm-item';
+    const dot=document.createElement('div');dot.className='rec-rm-dot '+d.state;
+    if(d.state==='won')dot.textContent='✓';
+    else if(d.state==='lost')dot.textContent='✗';
+    if(d.state==='next')dot.style.borderColor=catHex;
+    const lbl=document.createElement('div');lbl.className='rec-rm-label';lbl.textContent=d.label;
+    item.appendChild(dot);item.appendChild(lbl);
+    if(d.pct!==null){const pctEl=document.createElement('div');pctEl.className='rec-rm-pct';pctEl.textContent=d.pct+'%';item.appendChild(pctEl);}
+    markers.appendChild(item);
+  });
+  card.appendChild(markers);
   return card;
 }
 
