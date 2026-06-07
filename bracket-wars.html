@@ -162,10 +162,11 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;min-width:1080px;align-items:stretch;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
 .col-header{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,font-size .45s,border-bottom-color .45s;position:relative;}
 .col-header span{display:block;font-size:.65rem;font-weight:400;text-transform:none;color:var(--md-outline);margin-top:.1rem;}
-.col-header[data-collapsed]{font-size:0;padding:0;border-bottom-color:transparent;overflow:hidden;}
-.col-header-row{display:flex;align-items:center;justify-content:center;gap:5px;}
-.col-hide-btn{width:18px;height:18px;border-radius:50%;background:var(--md-surface-container-high);color:var(--md-on-surface-variant);border:1.5px solid var(--md-outline-variant);font-size:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background .15s,color .15s,border-color .15s;line-height:1;}
-.col-hide-btn:hover{background:var(--md-primary);color:#fff;border-color:transparent;}
+.col-header[data-collapsed]{padding:0;border-bottom-color:transparent;overflow:hidden;}
+.col-header[data-collapsed]>*{display:none;}
+.col-header-row{display:flex;align-items:center;justify-content:center;gap:6px;}
+.col-hide-btn{width:30px;height:30px;border-radius:50%;background:var(--md-primary-container);color:var(--md-on-primary-container);border:none;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background .15s,color .15s;line-height:1;}
+.col-hide-btn:hover{background:var(--md-primary);color:#fff;}
 .col-header[data-collapsed] .col-hide-btn{display:none;}
 .bc{display:flex;flex-direction:column;padding:.6rem .3rem 0;height:100%;}
 .bc.right{align-items:flex-end;}
@@ -2150,14 +2151,19 @@ function renderBracket(){
     const colNum=i+1;
     const hd=document.createElement('div');hd.className='col-header';hd.style.cssText=`grid-column:${colNum};grid-row:1;`;
     hd.setAttribute('data-bhdr',String(colNum));
-    // Title row (label + optional hide button)
+    // Title row (label + optional hide button on outer edge)
     const row=document.createElement('div');row.className='col-header-row';
-    const lbl=document.createElement('span');lbl.textContent=h;row.appendChild(lbl);
+    const lbl=document.createElement('span');lbl.textContent=h;
     if(colNum!==4 && roundDone[colNum]){
       const hbtn=document.createElement('button');hbtn.className='col-hide-btn';
-      hbtn.textContent=colNum>=5?'›':'‹';hbtn.title='Collapse this round';
+      const isRight=colNum>=5;
+      hbtn.textContent=isRight?'›':'‹';hbtn.title='Collapse this round';
       hbtn.onclick=(e)=>{e.stopPropagation();manualCollapseCol(colNum);};
-      row.appendChild(hbtn);
+      // Left cols: button on left; right cols: button on right
+      if(isRight){row.appendChild(lbl);row.appendChild(hbtn);}
+      else{row.appendChild(hbtn);row.appendChild(lbl);}
+    } else {
+      row.appendChild(lbl);
     }
     hd.appendChild(row);
     if(subs[i]){const sub=document.createElement('span');sub.textContent=subs[i];hd.appendChild(sub);}
