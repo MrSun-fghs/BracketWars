@@ -243,6 +243,38 @@ body.projection .vote-view{padding-top:1rem;}
 .fullscreen-btn:hover{background:rgba(74,58,255,.1);color:var(--md-primary);gap:.35rem;padding:.3rem .75rem;}
 .fullscreen-btn:hover .fs-label{max-width:80px;opacity:1;}
 body.projection .fullscreen-btn{display:none;}
+/* ── Projection Spotlight ── */
+#projectionSpotlight{position:fixed;inset:0;z-index:9990;background:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;padding:3rem 4rem;text-align:center;}
+body.projection #projectionSpotlight.active{display:flex;}
+.proj-round-tag{font-size:1rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:2.5rem;}
+/* Champion state */
+.proj-champion-wrap{display:flex;flex-direction:column;align-items:center;gap:1.25rem;}
+.proj-trophy-big{font-size:7rem;line-height:1;animation:projCrownPulse 2s ease-in-out infinite alternate;}
+@keyframes projCrownPulse{from{transform:scale(1);}to{transform:scale(1.06);}}
+.proj-champ-label{font-size:1.1rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.proj-champ-name{font-size:5rem;font-weight:800;letter-spacing:-.02em;color:var(--md-primary);line-height:1.05;}
+.proj-champ-class{font-size:1.2rem;font-weight:500;color:var(--md-on-surface-variant);margin-top:.5rem;}
+/* VS state */
+.proj-vs-arena{display:flex;align-items:stretch;gap:2rem;width:100%;max-width:1000px;margin:0 auto;}
+.proj-poem-card{flex:1;border-radius:24px;padding:3rem 2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;}
+.proj-poem-card.side-a{background:var(--md-primary-container);border:3px solid var(--md-primary);}
+.proj-poem-card.side-b{background:var(--md-surface-container);border:3px solid var(--md-outline-variant);}
+.proj-poem-seed{font-size:1rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.proj-poem-name{font-size:3.2rem;font-weight:800;letter-spacing:-.02em;color:var(--md-on-surface);line-height:1.1;}
+.proj-poem-card.side-a .proj-poem-name{color:var(--md-primary);}
+.proj-vs-middle{display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:800;color:var(--md-outline);flex-shrink:0;}
+.proj-voting-badge{margin-top:2.5rem;background:var(--md-primary);color:#fff;font-size:1.1rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.65rem 2rem;border-radius:var(--shape-full);animation:projBadgePulse 1.5s ease-in-out infinite alternate;}
+@keyframes projBadgePulse{from{opacity:.8;}to{opacity:1;box-shadow:0 0 0 8px rgba(74,58,255,.12);}}
+/* Waiting state */
+.proj-waiting-wrap{display:flex;flex-direction:column;align-items:center;gap:1.75rem;max-width:800px;}
+.proj-tournament-title{font-size:1.5rem;font-weight:700;color:var(--md-on-surface-variant);letter-spacing:.04em;}
+.proj-last-result{background:var(--md-primary-container);border-radius:20px;padding:2.5rem 3.5rem;display:flex;flex-direction:column;align-items:center;gap:.75rem;}
+.proj-last-label{font-size:.9rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-primary);opacity:.7;}
+.proj-last-winner{font-size:3.5rem;font-weight:800;color:var(--md-primary);letter-spacing:-.02em;line-height:1.1;}
+.proj-last-defeated{font-size:1.1rem;color:var(--md-on-surface-variant);}
+.proj-next-wrap{font-size:1.3rem;color:var(--md-on-surface-variant);}
+.proj-next-wrap strong{color:var(--md-on-surface);}
+.proj-standing-by{font-size:1.1rem;color:var(--md-on-surface-variant);font-style:italic;}
 /* Presence chip */
 .presence-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:600;padding:.3rem .75rem;border-radius:var(--shape-full);background:rgba(0,150,80,.12);color:#008040;border:1px solid rgba(0,150,80,.25);}
 .presence-dot{width:7px;height:7px;border-radius:50%;background:#00b050;animation:livePulse 1.8s ease-in-out infinite;}
@@ -781,6 +813,7 @@ body.projection .fullscreen-btn{display:none;}
 <canvas id="confettiCanvas"></canvas>
 <div class="m3-snackbar" id="snackbar"></div>
 <button class="projection-exit" id="projectionExitBtn" style="display:none" onclick="exitProjection()">✕ Exit Full Screen</button>
+<div id="projectionSpotlight"></div>
 <div id="timerEdgeGlow"></div>
 
 <div class="app-bar">
@@ -1669,7 +1702,7 @@ function buildSecondaryToolbar() {
   // Teacher controls moved to app bar; no-op
 }
 
-function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); }
+function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); renderProjectionSpotlight(); }
 
 function renderTabs() {
   const bar = document.getElementById('classTabs'); bar.innerHTML = '';
@@ -2685,18 +2718,85 @@ presenceChannel.on('presence', { event: 'sync' }, () => {
   }
 });
 
+// ── Projection Spotlight ──
+function renderProjectionSpotlight() {
+  const el = document.getElementById('projectionSpotlight');
+  if (!el) return;
+  const isProj = document.body.classList.contains('projection');
+  const onBracket = currentView === 'bracket';
+  if (!isProj || !onBracket) { el.classList.remove('active'); return; }
+  el.classList.add('active');
+  const b = bkt(); if (!b) { el.innerHTML = ''; return; }
+  const cls = activeClass();
+  const clsName = cls ? cls.name : '';
+  // ── Champion ──
+  const champ = champion();
+  if (champ) {
+    el.innerHTML = `<div class="proj-champion-wrap"><div class="proj-trophy-big">👑</div><div class="proj-champ-label">Poetry Champion</div><div class="proj-champ-name">${esc(champ.name)}</div><div class="proj-champ-class">${esc(clsName)}</div></div>`;
+    return;
+  }
+  // ── Active vote ──
+  const v = app.voting;
+  if (v && v.open && v.matchupKey) {
+    const key = v.matchupKey;
+    let pA = null, pB = null, roundLabel = '';
+    if (key.type === 'rR1') { pA = r1Poem(key.ri, key.mi, 0); pB = r1Poem(key.ri, key.mi, 1); roundLabel = `${CATEGORIES[key.ri].name} · Round of 16`; }
+    else if (key.type === 'rQF') { pA = qfPoem(key.ri, 0); pB = qfPoem(key.ri, 1); roundLabel = `${CATEGORIES[key.ri].name} · Quarterfinal`; }
+    else if (key.type === 'semi') { pA = semiPoem(key.ri, 0); pB = semiPoem(key.ri, 1); roundLabel = `Semifinal ${key.ri + 1}`; }
+    else { pA = finalPoem(0); pB = finalPoem(1); roundLabel = 'Championship Final'; }
+    if (pA && pB) {
+      el.innerHTML = `<div class="proj-round-tag">${esc(roundLabel)} · ${esc(clsName)}</div>
+        <div class="proj-vs-arena">
+          <div class="proj-poem-card side-a"><div class="proj-poem-seed">Seed #${pA.seed}</div><div class="proj-poem-name">${esc(pA.name)}</div></div>
+          <div class="proj-vs-middle">VS</div>
+          <div class="proj-poem-card side-b"><div class="proj-poem-seed">Seed #${pB.seed}</div><div class="proj-poem-name">${esc(pB.name)}</div></div>
+        </div>
+        <div class="proj-voting-badge">🗳 Voting Is Live</div>`;
+      return;
+    }
+  }
+  // ── Waiting / between matches ──
+  // Find last completed matchup
+  let lastWinner = null, lastLoser = null, lastRound = '';
+  const allRounds = [];
+  for (let ri = 0; ri < 4; ri++) {
+    for (let mi = 0; mi < 2; mi++) {
+      const m = b.regionRounds[ri][mi];
+      if (m.winnerIdx !== null) { const w = r1Poem(ri, mi, m.winnerIdx), l = r1Poem(ri, mi, 1 - m.winnerIdx); if (w && l) allRounds.push({w, l, round: 'Round of 16'}); }
+    }
+    const qm = b.regionRounds[ri][2];
+    if (qm.winnerIdx !== null) { const w = qfPoem(ri, qm.winnerIdx), l = qfPoem(ri, 1 - qm.winnerIdx); if (w && l) allRounds.push({w, l, round: 'Quarterfinal'}); }
+  }
+  b.semis.forEach((m, si) => { if (m.winnerIdx !== null) { const w = semiPoem(si, m.winnerIdx), l = semiPoem(si, 1 - m.winnerIdx); if (w && l) allRounds.push({w, l, round: 'Semifinal'}); }});
+  if (allRounds.length) { const last = allRounds[allRounds.length - 1]; lastWinner = last.w; lastLoser = last.l; lastRound = last.round; }
+  // Find next pending matchup
+  let nextA = null, nextB = null;
+  outer: for (let ri = 0; ri < 4; ri++) {
+    for (let mi = 0; mi < 2; mi++) {
+      const m = b.regionRounds[ri][mi];
+      if (m.winnerIdx === null) { nextA = r1Poem(ri, mi, 0); nextB = r1Poem(ri, mi, 1); break outer; }
+    }
+    const qm = b.regionRounds[ri][2];
+    if (qm.winnerIdx === null) { nextA = qfPoem(ri, 0); nextB = qfPoem(ri, 1); if (nextA && nextB) break outer; }
+  }
+  if (!nextA) { for (let si = 0; si < 2; si++) { if (b.semis[si].winnerIdx === null) { nextA = semiPoem(si, 0); nextB = semiPoem(si, 1); if (nextA && nextB) break; }}}
+  if (!nextA && b.final.winnerIdx === null) { nextA = finalPoem(0); nextB = finalPoem(1); }
+  const lastBlock = lastWinner ? `<div class="proj-last-result"><div class="proj-last-label">${esc(lastRound)} Result</div><div class="proj-last-winner">🏆 ${esc(lastWinner.name)}</div><div class="proj-last-defeated">defeated ${esc(lastLoser.name)}</div></div>` : '';
+  const nextBlock = (nextA && nextB) ? `<div class="proj-next-wrap">Up next: <strong>${esc(nextA.name)}</strong> vs <strong>${esc(nextB.name)}</strong></div>` : `<div class="proj-standing-by">Tournament in progress…</div>`;
+  el.innerHTML = `<div class="proj-round-tag">${esc(clsName)}</div><div class="proj-waiting-wrap">${lastBlock}${nextBlock}</div>`;
+}
 // ── Projection mode ──
 function enterProjection() {
   document.body.classList.add('projection');
   document.getElementById('projectionExitBtn').style.display = 'block';
   document.documentElement.requestFullscreen?.().catch(()=>{});
-  // Stay on current view; just re-render to hide chrome
-  renderAll(); showCurrentView();
+  renderAll(); showCurrentView(); renderProjectionSpotlight();
 }
 function exitProjection() {
   document.body.classList.remove('projection');
   document.getElementById('projectionExitBtn').style.display = 'none';
   if (document.fullscreenElement) document.exitFullscreen?.();
+  renderProjectionSpotlight();
 }
 function toggleStudentFullscreen() {
   if (document.body.classList.contains('projection')) {
