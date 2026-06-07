@@ -1092,6 +1092,10 @@ function setMode(m) {
   }
   document.getElementById('secondaryToolbar').style.display = MODE==='student' ? 'block' : 'block';
   if (MODE === 'student') {
+    ['home','leaderboard','list','bracket'].forEach(x=>{
+      const el=document.getElementById('btn'+x.charAt(0).toUpperCase()+x.slice(1));
+      if(el) el.classList.toggle('active', currentView===x);
+    });
     showCurrentView();
   } else {
     document.getElementById('viewToggle').style.display = 'none';
