@@ -159,7 +159,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .seg-btn.active .nav-icon{transform:scale(1.15);}
 /* BRACKET */
 .bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;display:flex;justify-content:center;align-items:flex-start;}
-.mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;min-width:1080px;align-items:stretch;justify-content:center;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
+.mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;min-width:1080px;align-items:stretch;justify-content:center;column-gap:.5rem;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
 .col-header{text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,border-bottom-color .45s;display:flex;align-items:center;justify-content:center;}
 .col-header[data-collapsed]{padding:0;border-bottom-color:transparent;overflow:hidden;}
 .col-header[data-collapsed]>*{display:none;}
@@ -177,10 +177,10 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .bc[data-collapsed]{overflow:hidden;}
 .bc[data-collapsed]>*:not(.bc-strip){display:none!important;}
 .bc-strip{display:none;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;padding:.75rem 0;gap:14px;height:100%;cursor:pointer;user-select:none;}
-/* Staircase positioning: R16 high, QF mid, SF low */
-.bc[data-bcol="1"] .bc-strip,.bc[data-bcol="7"] .bc-strip{padding-top:2.5rem;}
-.bc[data-bcol="2"] .bc-strip,.bc[data-bcol="6"] .bc-strip{padding-top:6rem;}
-.bc[data-bcol="3"] .bc-strip,.bc[data-bcol="5"] .bc-strip{padding-top:9.5rem;}
+/* Staircase: R16 high → QF mid → SF low, symmetrical */
+.bc[data-bcol="1"] .bc-strip,.bc[data-bcol="7"] .bc-strip{padding-top:2rem;}
+.bc[data-bcol="2"] .bc-strip,.bc[data-bcol="6"] .bc-strip{padding-top:4.5rem;}
+.bc[data-bcol="3"] .bc-strip,.bc[data-bcol="5"] .bc-strip{padding-top:7rem;}
 .bc[data-collapsed] .bc-strip{display:flex;}
 .bc-strip-arrow{width:30px;height:30px;border-radius:50%;background:var(--md-primary-container);color:var(--md-on-primary-container);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;transition:background .15s,color .15s;flex-shrink:0;}
 .bc-strip:hover .bc-strip-arrow{background:var(--md-primary);color:#fff;}
@@ -2119,7 +2119,7 @@ function isQFComplete(){const b=bkt();return b&&b.regionRounds.every(reg=>reg[2]
 function isSFComplete(){const b=bkt();return b&&b.semis[0].winnerIdx!==null&&b.semis[1].winnerIdx!==null;}
 function setColCollapsed(col,collapsed){
   const bracket=document.getElementById('bracket');if(!bracket)return;
-  if(collapsed)bracket.style.setProperty(`--bcol${col}`,'44px');
+  if(collapsed)bracket.style.setProperty(`--bcol${col}`,'72px');
   else bracket.style.removeProperty(`--bcol${col}`);
   const colEl=bracket.querySelector(`[data-bcol="${col}"]`);
   if(colEl){if(collapsed)colEl.setAttribute('data-collapsed','');else colEl.removeAttribute('data-collapsed');}
