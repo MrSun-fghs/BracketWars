@@ -1952,8 +1952,8 @@ function buildMatchCard(pA,pB,md,isLatest){
   const pctW=isC&&tv>0?Math.round(wv/tv*100):0;
   const isUpset=isC&&winner&&loser&&(winner.seed>loser.seed)&&Math.abs(winner.seed-loser.seed)>=2;
   const highPct=Math.max(pctW,100-pctW);
-  const marginClass=!isC?null:(highPct<=55?'close':highPct>=75?'dom':null);
-  const marginLabel=marginClass==='close'?'CLOSE CALL':marginClass==='dom'?'DOMINANT':null;
+  const marginClass=!isC?null:(highPct<=55?'close':highPct>=75?'dom':'solid');
+  const marginLabel=marginClass==='close'?'CLOSE CALL':marginClass==='dom'?'DOMINANT':'SOLID WIN';
   if(isUpset||marginClass||isLatest){
     const top=document.createElement('div');top.className='lmc-top';
     const left=document.createElement('div');left.style.cssText='display:flex;gap:5px;';
