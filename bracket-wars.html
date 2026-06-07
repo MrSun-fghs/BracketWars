@@ -177,10 +177,10 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .bc[data-collapsed]{overflow:hidden;}
 .bc[data-collapsed]>*:not(.bc-strip){display:none!important;}
 .bc-strip{display:none;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;padding:.75rem 0;gap:14px;height:100%;cursor:pointer;user-select:none;}
-/* Staircase: R16 high → QF mid → SF low, symmetrical, 2rem steps */
-.bc[data-bcol="1"] .bc-strip,.bc[data-bcol="7"] .bc-strip{padding-top:3.5rem;}
-.bc[data-bcol="2"] .bc-strip,.bc[data-bcol="6"] .bc-strip{padding-top:5.5rem;}
-.bc[data-bcol="3"] .bc-strip,.bc[data-bcol="5"] .bc-strip{padding-top:7.5rem;}
+/* Staircase: R16 high → QF mid → SF low, symmetrical, 1.5rem steps */
+.bc[data-bcol="1"] .bc-strip,.bc[data-bcol="7"] .bc-strip{padding-top:1.5rem;}
+.bc[data-bcol="2"] .bc-strip,.bc[data-bcol="6"] .bc-strip{padding-top:3rem;}
+.bc[data-bcol="3"] .bc-strip,.bc[data-bcol="5"] .bc-strip{padding-top:4.5rem;}
 .bc[data-collapsed] .bc-strip{display:flex;}
 .bc-strip-arrow{width:30px;height:30px;border-radius:50%;background:var(--md-primary-container);color:var(--md-on-primary-container);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;transition:background .15s,color .15s;flex-shrink:0;}
 .bc-strip:hover .bc-strip-arrow{background:var(--md-primary);color:#fff;}
