@@ -1854,7 +1854,8 @@ function buildRecCard(r, globalRank, catRank, catTotal, catColor) {
   const rankNum=document.createElement('div');rankNum.className='rec-rank-num';rankNum.textContent=globalRank;
   const rankLbl=document.createElement('div');rankLbl.className='rec-rank-overall';rankLbl.textContent='overall';
   if(r.status==='alive'||isChamp) rankNum.style.color=catHex;
-  if(r.status!=='pending'){rankCol.appendChild(rankNum);rankCol.appendChild(rankLbl);}
+  if(r.status==='pending'){rankNum.textContent='?';rankLbl.textContent='rank';}
+  rankCol.appendChild(rankNum);rankCol.appendChild(rankLbl);
   card.appendChild(rankCol);
 
   // Body (info + round markers)
