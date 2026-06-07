@@ -341,10 +341,13 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .rec-card.compact-card{opacity:.5;padding:.65rem 1rem;}
 .rec-card.compact-card:hover{opacity:.78;transform:translateY(-1px);box-shadow:none;}
 .rec-card.pending{opacity:.45;border-style:dashed;}
+/* Card layout — rank col spans full card height */
+.rec-card{display:flex;align-items:center;gap:.75rem;}
+.rec-card-body{flex:1;min-width:0;}
 /* Card top row */
-.rec-card-top{display:flex;align-items:flex-start;gap:.75rem;}
-/* Rank column — fixed width so all names align */
-.rec-rank-col{width:80px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;align-self:center;}
+.rec-card-top{display:flex;align-items:flex-start;gap:.5rem;}
+/* Rank column — fixed width, centered across full card */
+.rec-rank-col{width:80px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
 .rec-rank-num{font-size:2.8rem;font-weight:700;line-height:1;color:var(--md-on-surface-variant);}
 .rec-rank-overall{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-on-surface-variant);opacity:.5;}
 .rec-card.champion .rec-rank-num{font-size:3.2rem;color:#B45309;}
@@ -369,7 +372,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 /* Round markers */
 .rec-card{position:relative;overflow:hidden;}
 .rec-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:120px;background:linear-gradient(to right,var(--cc,transparent),transparent);opacity:.1;pointer-events:none;}
-.rec-round-markers{display:flex;align-items:flex-start;gap:0;padding:.55rem 0 .2rem 92px;}
+.rec-round-markers{display:flex;align-items:flex-start;gap:0;padding:.55rem 0 .2rem 0;}
 .rec-rm-item{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:40px;}
 .rec-rm-con{flex:1;height:1px;background:var(--md-outline-variant);margin-top:11px;min-width:8px;}
 .rec-rm-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
@@ -1770,12 +1773,12 @@ function renderLeaderboard() {
     hdr.innerHTML=`<div class="rec-cat-dot" style="background:${CAT_COLORS[ci]}"></div><span class="rec-cat-title">${esc(cat.name)}</span><div class="rec-cat-line"></div>`;
     el.appendChild(hdr);
     catSorted.forEach(r=>{
-      el.appendChild(buildRecCard(r, globalRankMap.get(r.idx), catRankMap.get(r.idx), cat.seeds.length, ci));
+      el.appendChild(buildRecCard(r, globalRankMap.get(r.idx), catRankMap.get(r.idx), cat.seeds.length, CAT_COLORS[ci]));
     });
   });
 }
 
-function buildRecCard(r, globalRank, catRank, catTotal, catIdx) {
+function buildRecCard(r, globalRank, catRank, catTotal, catColor) {
   const isChamp=r.status==='champion';
   const isDeep=r.roundsWon>=1;
   const isCompact=!isChamp&&!isDeep;
@@ -1784,7 +1787,7 @@ function buildRecCard(r, globalRank, catRank, catTotal, catIdx) {
   card.className='rec-card '+statusClass+(isCompact?' compact-card':'');
 
   // Category color
-  const catHex=['#1565C0','#6A1B9A','#2E7D32','#C62828'][catIdx]||'#555';
+  const catHex=catColor||'#555';
   card.style.setProperty('--cc',catHex);
   card.style.borderLeft='3px solid '+catHex;
 
@@ -1799,27 +1802,28 @@ function buildRecCard(r, globalRank, catRank, catTotal, catIdx) {
   const catSuffix=` · ${catOrdinal} in category`;
   const subtitle=isChamp?`Won all matches · Undefeated${catSuffix}`:r.status==='alive'?`Still in the tournament${catSuffix}`:r.status==='pending'?'Waiting for their match':lostLabel+catSuffix;
 
-  // Top row
-  const top=document.createElement('div');top.className='rec-card-top';
-
-  // Rank column
+  // Rank column (direct child of card — spans full card height for centering)
   const rankCol=document.createElement('div');rankCol.className='rec-rank-col';
   const rankNum=document.createElement('div');rankNum.className='rec-rank-num';rankNum.textContent=globalRank;
   const rankLbl=document.createElement('div');rankLbl.className='rec-rank-overall';rankLbl.textContent='overall';
   if(r.status==='alive'||isChamp) rankNum.style.color=catHex;
   rankCol.appendChild(rankNum);rankCol.appendChild(rankLbl);
+  card.appendChild(rankCol);
 
-  // Info
+  // Body (info + round markers)
+  const body=document.createElement('div');body.className='rec-card-body';
+
+  // Top row (info + placement)
+  const top=document.createElement('div');top.className='rec-card-top';
   const info=document.createElement('div');info.className='rec-info';
   const name=document.createElement('div');name.className='rec-name';name.textContent=r.name;
   const sub=document.createElement('div');sub.className='rec-subtitle';sub.textContent=subtitle;
   info.appendChild(name);info.appendChild(sub);
-
-  top.appendChild(rankCol);top.appendChild(info);
+  top.appendChild(info);
   if(placementLabel){const pl=document.createElement('span');pl.className='rec-placement '+placementClass;pl.textContent=placementLabel;top.appendChild(pl);}
-  card.appendChild(top);
+  body.appendChild(top);
 
-  // Round markers (all cards)
+  // Round markers
   const ALL_ROUNDS=['R16','QF','SF','F'];
   const dotData=ALL_ROUNDS.map((label,i)=>{
     const played=r.rounds.find(rd=>rd.label===label);
@@ -1842,7 +1846,8 @@ function buildRecCard(r, globalRank, catRank, catTotal, catIdx) {
     if(d.pct!==null){const pctEl=document.createElement('div');pctEl.className='rec-rm-pct';pctEl.textContent=d.pct+'%';item.appendChild(pctEl);}
     markers.appendChild(item);
   });
-  card.appendChild(markers);
+  body.appendChild(markers);
+  card.appendChild(body);
   return card;
 }
 
