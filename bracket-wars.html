@@ -1952,12 +1952,14 @@ function buildMatchCard(pA,pB,md,isLatest){
   const pctW=isC&&tv>0?Math.round(wv/tv*100):0;
   const isUpset=isC&&winner&&loser&&(winner.seed>loser.seed)&&Math.abs(winner.seed-loser.seed)>=2;
   const highPct=Math.max(pctW,100-pctW);
-  const tagClass=!isC?'none':(isUpset?'upset':highPct<=55?'close':highPct>=75?'dom':highPct>55?'solid':'none');
-  const tagLabel=tagClass==='upset'?'UPSET':tagClass==='close'?'CLOSE CALL':tagClass==='dom'?'DOMINANT':tagClass==='solid'?'SOLID WIN':'·';
-  if(tagClass!=='none'||isLatest){
+  const marginClass=!isC?null:(highPct<=55?'close':highPct>=75?'dom':null);
+  const marginLabel=marginClass==='close'?'CLOSE CALL':marginClass==='dom'?'DOMINANT':null;
+  if(isUpset||marginClass||isLatest){
     const top=document.createElement('div');top.className='lmc-top';
-    if(tagClass!=='none'){const tag=document.createElement('span');tag.className='lmc-tag '+tagClass;tag.textContent=tagLabel;top.appendChild(tag);}
-    else{top.appendChild(document.createElement('span'));}
+    const left=document.createElement('div');left.style.cssText='display:flex;gap:5px;';
+    if(isUpset){const t=document.createElement('span');t.className='lmc-tag upset';t.textContent='UNDERDOG WIN';left.appendChild(t);}
+    if(marginClass){const t=document.createElement('span');t.className='lmc-tag '+marginClass;t.textContent=marginLabel;left.appendChild(t);}
+    top.appendChild(left);
     if(isLatest){const lt=document.createElement('span');lt.className='lmc-latest';lt.textContent='LATEST';top.appendChild(lt);}
     card.appendChild(top);
   }
