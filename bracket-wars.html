@@ -166,6 +166,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .col-header-inner{display:inline-flex;align-items:center;gap:8px;}
 .col-header-text{text-align:center;}
 .col-header-title{display:block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.crown-col-header .col-header-title{font-size:1.05rem;font-weight:800;letter-spacing:.05em;color:var(--md-on-surface);}
 .col-header-sub{display:block;font-size:.65rem;font-weight:400;text-transform:none;color:var(--md-outline);margin-top:.1rem;}
 .col-hide-btn{width:30px;height:30px;border-radius:50%;background:var(--md-primary-container);color:var(--md-on-primary-container);border:none;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background .15s,color .15s;line-height:1;}
 .col-hide-btn:hover{background:var(--md-primary);color:#fff;}
@@ -175,7 +176,11 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 /* ── Bracket collapse ── */
 .bc[data-collapsed]{overflow:hidden;}
 .bc[data-collapsed]>*:not(.bc-strip){display:none!important;}
-.bc-strip{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;padding:.75rem 0;gap:14px;height:100%;cursor:pointer;user-select:none;}
+.bc-strip{display:none;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;padding:.75rem 0;gap:14px;height:100%;cursor:pointer;user-select:none;}
+/* Staircase positioning: R16 high, QF mid, SF low */
+.bc[data-bcol="1"] .bc-strip,.bc[data-bcol="7"] .bc-strip{padding-top:2.5rem;}
+.bc[data-bcol="2"] .bc-strip,.bc[data-bcol="6"] .bc-strip{padding-top:6rem;}
+.bc[data-bcol="3"] .bc-strip,.bc[data-bcol="5"] .bc-strip{padding-top:9.5rem;}
 .bc[data-collapsed] .bc-strip{display:flex;}
 .bc-strip-arrow{width:30px;height:30px;border-radius:50%;background:var(--md-primary-container);color:var(--md-on-primary-container);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;transition:background .15s,color .15s;flex-shrink:0;}
 .bc-strip:hover .bc-strip-arrow{background:var(--md-primary);color:#fff;}
@@ -2164,7 +2169,7 @@ function renderBracket(){
   const roundDone={1:isR16Complete(),2:isQFComplete(),3:isSFComplete(),5:isSFComplete(),6:isQFComplete(),7:isR16Complete()};
   ['Round of 16','Quarterfinals','Semifinals','The Crown','Semifinals','Quarterfinals','Round of 16'].forEach((h,i)=>{
     const colNum=i+1;
-    const hd=document.createElement('div');hd.className='col-header';hd.style.cssText=`grid-column:${colNum};grid-row:1;`;
+    const hd=document.createElement('div');hd.className='col-header'+(colNum===4?' crown-col-header':'');hd.style.cssText=`grid-column:${colNum};grid-row:1;`;
     hd.setAttribute('data-bhdr',String(colNum));
     // Text block: title + subtitle stacked and centered
     const textBlock=document.createElement('div');textBlock.className='col-header-text';
