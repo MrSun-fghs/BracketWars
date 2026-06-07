@@ -175,6 +175,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .bc.right{align-items:flex-end;}
 /* ── Bracket collapse ── */
 .bc[data-collapsed]{overflow:hidden;}
+.bc[data-collapsed]{padding-top:0!important;}
 .bc[data-collapsed]>*:not(.bc-strip){display:none!important;}
 .bc-strip{display:none;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;padding:.75rem 0;gap:14px;height:100%;cursor:pointer;user-select:none;}
 /* Staircase: R16 high → QF mid → SF low, symmetrical, 1.5rem steps */
