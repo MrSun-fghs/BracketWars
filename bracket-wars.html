@@ -281,7 +281,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .final-match-wrap .matchup{border:1.5px solid rgba(245,158,11,.4);box-shadow:0 0 0 3px rgba(245,158,11,.08),var(--elev-2);}
 .final-match-wrap .winner-slot{background:linear-gradient(135deg,var(--md-primary-container),rgba(245,158,11,.1))!important;}
 /* LIST VIEW */
-.list-view{padding:1.25rem;max-width:860px;margin:0 auto;}
+.list-view{padding:1.25rem;max-width:620px;margin:0 auto;}
 .list-champion{border-radius:var(--shape-xl);background:linear-gradient(135deg,var(--md-primary),var(--md-secondary));padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:var(--elev-3);position:relative;overflow:hidden;}
 .list-champion.crowned{animation:champGlow 2.5s ease-in-out infinite alternate;}
 .list-champion.crowned::after{content:'';position:absolute;top:0;left:-70%;bottom:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:bannerShimmer 3s ease-in-out infinite;pointer-events:none;}
@@ -291,31 +291,35 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .list-champ-label{font-size:.65rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:.2rem;}
 .list-champ-name{font-size:1.35rem;font-weight:700;color:#FFF;line-height:1.2;}
 .list-champ-name.empty{font-size:.9rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.6);}
-.list-section-card{border-radius:var(--shape-xl);background:var(--md-surface-container-lowest);box-shadow:var(--elev-1);margin-bottom:1rem;overflow:hidden;border:1px solid var(--md-outline-variant);}
-.list-section-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid var(--md-outline-variant);background:var(--md-surface-container-low);}
-.list-section-title{font-size:.8rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--md-on-surface);}
-.list-region-card{border-radius:var(--shape-xl);background:var(--md-surface-container-lowest);box-shadow:var(--elev-1);margin-bottom:1rem;overflow:hidden;border:1px solid var(--md-outline-variant);}
-.list-region-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.2);}
-.list-region-title{font-size:.8rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#FFF;}
-.list-region-winner{font-size:.75rem;font-style:italic;color:rgba(255,255,255,.88);}
-.list-round-label{font-size:.65rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);padding:.45rem 1.25rem .3rem;background:var(--md-surface-container);border-bottom:1px solid var(--md-outline-variant);}
-.list-matchup{display:flex;align-items:stretch;border-bottom:1px solid var(--md-outline-variant);background:var(--md-surface-container-lowest);}
-.list-matchup:last-child{border-bottom:none;}
-.list-poem{flex:1;padding:.6rem 1.25rem;display:flex;align-items:center;gap:.55rem;transition:background .2s;}
-.list-poem.winner{background:var(--md-primary-container);}
-.list-poem.loser{opacity:.42;background:var(--md-surface-container);}
-.list-poem.loser .list-name{text-decoration:line-through;}
-.list-poem.pending{background:var(--md-surface-container);}
-.list-seed{font-family:monospace;font-size:.6rem;font-weight:500;color:var(--md-on-surface-variant);background:var(--md-surface-container-high);padding:.1rem .3rem;border-radius:var(--shape-xs);flex-shrink:0;}
-.list-poem.winner .list-seed{background:var(--md-primary);color:var(--md-on-primary);}
-.list-name{flex:1;font-size:.88rem;font-weight:500;line-height:1.2;color:var(--md-on-surface);}
-.list-poem.winner .list-name{color:var(--md-on-primary-container);font-weight:700;}
-.list-poem.pending .list-name{color:var(--md-on-surface-variant);font-style:italic;}
-.list-vote-info{font-family:monospace;font-size:.65rem;color:var(--md-on-surface-variant);white-space:nowrap;text-align:right;}
-.list-poem.winner .list-vote-info{color:var(--md-primary);font-weight:500;}
-.list-vs{display:flex;align-items:center;justify-content:center;padding:0 .6rem;font-size:.72rem;font-weight:700;color:var(--md-on-surface-variant);border-left:1px solid var(--md-outline-variant);border-right:1px solid var(--md-outline-variant);background:var(--md-surface-container);min-width:2.4rem;}
-.list-bar-row{height:4px;background:var(--md-surface-container-high);display:flex;}
-.list-bar-fill{background:linear-gradient(90deg,var(--md-primary),var(--md-secondary));transition:width .8s var(--motion-decel);}
+.lm-section{margin-bottom:1.25rem;}
+.lm-section-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;}
+.lm-section-title{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);white-space:nowrap;}
+.lm-section-line{flex:1;height:1px;background:var(--md-outline-variant);}
+.lmc{background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);border-radius:var(--shape-lg);padding:12px 14px;margin-bottom:8px;transition:transform .15s ease,box-shadow .15s ease;cursor:default;}
+.lmc:hover{transform:translateY(-2px);box-shadow:var(--elev-3);}
+.lmc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.lmc-tag{font-size:.58rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 8px;border-radius:var(--shape-full);}
+.lmc-tag.close{background:#FEF3C7;color:#92400E;}
+.lmc-tag.dom{background:#DCFCE7;color:#166534;}
+.lmc-tag.upset{background:#FEE2E2;color:#991B1B;}
+.lmc-tag.none{visibility:hidden;}
+.lmc-round{font-size:.7rem;color:var(--md-on-surface-variant);}
+.lmc-poems{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.lmc-winner{font-size:.88rem;font-weight:600;color:var(--md-on-surface);flex:1;line-height:1.3;}
+.lmc-loser{font-size:.88rem;font-weight:400;color:var(--md-on-surface-variant);text-align:right;flex:1;line-height:1.3;}
+.lmc-bar-wrap{position:relative;padding:5px 0;margin-bottom:5px;}
+.lmc-bar-track{height:10px;border-radius:var(--shape-full);background:var(--md-surface-container-high);overflow:visible;display:flex;}
+@keyframes lmcGlow{0%,100%{box-shadow:0 0 5px 1px rgba(74,58,255,.25);}50%{box-shadow:0 0 12px 4px rgba(74,58,255,.5);}}
+.lmc-bar-winner{height:100%;background:var(--md-primary);border-radius:var(--shape-full) 0 0 var(--shape-full);animation:lmcGlow 2s ease-in-out infinite;}
+.lmc-bar-loser{height:100%;background:var(--md-outline-variant);border-radius:0 var(--shape-full) var(--shape-full) 0;}
+.lmc-bolt{position:absolute;top:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:var(--md-surface-container-lowest);border:1.5px solid var(--md-primary);display:flex;align-items:center;justify-content:center;z-index:2;font-size:10px;pointer-events:none;}
+.lmc-labels{display:flex;justify-content:space-between;}
+.lmc-lbl-w{font-size:.72rem;font-weight:500;color:var(--md-primary);}
+.lmc-lbl-l{font-size:.72rem;color:var(--md-on-surface-variant);}
+.lmc-pending-row{display:flex;align-items:center;gap:8px;padding:4px 0;}
+.lmc-pending-name{font-size:.88rem;color:var(--md-on-surface-variant);font-style:italic;flex:1;}
+.lmc-pending-name.right{text-align:right;}
+.lmc-pending-vs{font-size:.72rem;font-weight:700;color:var(--md-on-surface-variant);flex-shrink:0;}
 /* RECORDS TAB */
 .leaderboard-view{padding:1.25rem;max-width:700px;margin:0 auto;}
 .rec-waiting{text-align:center;padding:3rem 1rem;font-size:1rem;font-weight:500;color:var(--md-on-surface-variant);}
@@ -798,7 +802,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
     <div class="seg-btn-track" id="viewToggle" style="display:none">
       <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
       <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
-      <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">☰</span> List</button>
+      <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">⚡</span> Drama</button>
       <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">⌗</span> Records</button>
     </div>
   </div>
@@ -1916,40 +1920,64 @@ function renderList() {
   const cc=document.createElement('div');cc.className='list-champion'+(champ?' crowned':'');
   cc.innerHTML=`<div class="list-champ-trophy">👑</div><div><div class="list-champ-label">Poetry Champion</div><div class="list-champ-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div></div>`;
   el.appendChild(cc);
-  const fs=mkSection('Championship Final');fs.appendChild(buildListMatchup(finalPoem(0),finalPoem(1),bkt().final));el.appendChild(fs);
-  const ss=mkSection('Semifinals');for(let si=0;si<2;si++)ss.appendChild(buildListMatchup(semiPoem(si,0),semiPoem(si,1),bkt().semis[si]));el.appendChild(ss);
-  CATEGORIES.forEach((cat,ri)=>{
-    const card=document.createElement('div');card.className='list-region-card';
-    const rw=regionWinner(ri);
-    const hdr=document.createElement('div');hdr.className='list-region-header';hdr.style.background=cat.bg;
-    hdr.innerHTML=`<span class="list-region-title">${esc(cat.name)}</span>${rw?`<span class="list-region-winner">▶ ${esc(rw.name)}</span>`:''}`;
-    card.appendChild(hdr);
-    const qfR=document.createElement('div');const qfl=document.createElement('div');qfl.className='list-round-label';qfl.textContent='Quarterfinal';qfR.appendChild(qfl);qfR.appendChild(buildListMatchup(qfPoem(ri,0),qfPoem(ri,1),bkt().regionRounds[ri][2]));card.appendChild(qfR);
-    const r1R=document.createElement('div');const r1l=document.createElement('div');r1l.className='list-round-label';r1l.textContent='Round of 16';r1R.appendChild(r1l);for(let mi=0;mi<2;mi++)r1R.appendChild(buildListMatchup(r1Poem(ri,mi,0),r1Poem(ri,mi,1),bkt().regionRounds[ri][mi]));card.appendChild(r1R);el.appendChild(card);
+  const rounds=[
+    {label:'Final',matchups:[[finalPoem(0),finalPoem(1),bkt().final]]},
+    {label:'Semifinals',matchups:[[semiPoem(0,0),semiPoem(0,1),bkt().semis[0]],[semiPoem(1,0),semiPoem(1,1),bkt().semis[1]]]},
+    {label:'Quarterfinals',matchups:CATEGORIES.map((cat,ri)=>[qfPoem(ri,0),qfPoem(ri,1),bkt().regionRounds[ri][2]])},
+    {label:'Round of 16',matchups:CATEGORIES.flatMap((cat,ri)=>[[r1Poem(ri,0,0),r1Poem(ri,0,1),bkt().regionRounds[ri][0]],[r1Poem(ri,1,0),r1Poem(ri,1,1),bkt().regionRounds[ri][1]]])},
+  ];
+  rounds.forEach(({label,matchups})=>{
+    const section=document.createElement('div');section.className='lm-section';
+    const hdr=document.createElement('div');hdr.className='lm-section-hdr';
+    const tt=document.createElement('span');tt.className='lm-section-title';tt.textContent=label;
+    const ln=document.createElement('span');ln.className='lm-section-line';
+    hdr.appendChild(tt);hdr.appendChild(ln);section.appendChild(hdr);
+    matchups.forEach(([pA,pB,md])=>section.appendChild(buildMatchCard(pA,pB,md,label)));
+    el.appendChild(section);
   });
 }
-function mkSection(t){const sc=document.createElement('div');sc.className='list-section-card';const hdr=document.createElement('div');hdr.className='list-section-header';const tt=document.createElement('div');tt.className='list-section-title';tt.textContent=t;hdr.appendChild(tt);sc.appendChild(hdr);return sc;}
-function buildListMatchup(pA,pB,md){
-  const wrap=document.createElement('div');const isC=md.winnerIdx!==null;const tv=(md.votes[0]||0)+(md.votes[1]||0);
-  const row=document.createElement('div');row.className='list-matchup';
-  [[pA,0],[pB,1]].forEach(([poem,s],i)=>{
-    if(i===1){const vs=document.createElement('div');vs.className='list-vs';vs.textContent='vs';row.appendChild(vs);}
-    const iW=isC&&md.winnerIdx===s,iL=isC&&md.winnerIdx!==s,iP=!poem;
-    const pd=document.createElement('div');pd.className='list-poem'+(iP?' pending':iW?' winner':iL?' loser':'');
-    // Category color accent
-    if (poem && poem.seedIdx !== undefined) {
-      const cat=CATEGORIES.find(c=>c.seeds.includes(poem.seedIdx));
-      if (cat) { const dot=document.createElement('div');dot.className='list-cat-dot';dot.style.background=cat.bg;pd.appendChild(dot); }
-    }
-    const se=document.createElement('span');se.className='list-seed';se.textContent=poem?poem.seed:'?';
-    const ne=document.createElement('span');ne.className='list-name';ne.textContent=poem?poem.name:'TBD';
-    pd.appendChild(se);pd.appendChild(ne);
-    if(isC){const v=md.votes[s];const pct=tv>0?Math.round(((v||0)/tv)*100):0;const ve=document.createElement('span');ve.className='list-vote-info';ve.textContent=v!==null?`${v} · ${pct}%`:'';pd.appendChild(ve);}
-    row.appendChild(pd);
-  });
-  wrap.appendChild(row);
-  if(isC&&tv>0){const br=document.createElement('div');br.className='list-bar-row';const bf=document.createElement('div');bf.className='list-bar-fill';bf.style.width=Math.round(((md.votes[0]||0)/tv)*100)+'%';br.appendChild(bf);wrap.appendChild(br);}
-  return wrap;
+function buildMatchCard(pA,pB,md,roundLabel){
+  const card=document.createElement('div');card.className='lmc';
+  const isC=md&&md.winnerIdx!==null;
+  const tv=isC?(md.votes[0]||0)+(md.votes[1]||0):0;
+  const winner=isC?(md.winnerIdx===0?pA:pB):null;
+  const loser=isC?(md.winnerIdx===0?pB:pA):null;
+  const wv=isC?(md.votes[md.winnerIdx]||0):0;
+  const pctW=isC&&tv>0?Math.round(wv/tv*100):0;
+  const isUpset=isC&&winner&&loser&&(winner.seed>loser.seed)&&Math.abs(winner.seed-loser.seed)>=2;
+  const tagClass=!isC?'none':(isUpset?'upset':pctW<=55?'close':pctW>=75?'dom':'none');
+  const tagLabel=tagClass==='upset'?'UPSET':tagClass==='close'?'CLOSE CALL':tagClass==='dom'?'DOMINANT':'·';
+  const top=document.createElement('div');top.className='lmc-top';
+  const tag=document.createElement('span');tag.className='lmc-tag '+tagClass;tag.textContent=tagLabel;
+  const rnd=document.createElement('span');rnd.className='lmc-round';rnd.textContent=roundLabel||'';
+  top.appendChild(tag);top.appendChild(rnd);card.appendChild(top);
+  if(!isC){
+    const pr=document.createElement('div');pr.className='lmc-pending-row';
+    const na=document.createElement('span');na.className='lmc-pending-name';na.textContent=pA?pA.name:'TBD';
+    const vs=document.createElement('span');vs.className='lmc-pending-vs';vs.textContent='vs';
+    const nb=document.createElement('span');nb.className='lmc-pending-name right';nb.textContent=pB?pB.name:'TBD';
+    pr.appendChild(na);pr.appendChild(vs);pr.appendChild(nb);card.appendChild(pr);
+    return card;
+  }
+  const poems=document.createElement('div');poems.className='lmc-poems';
+  const wn=document.createElement('span');wn.className='lmc-winner';wn.textContent=winner?winner.name:'TBD';
+  const ln=document.createElement('span');ln.className='lmc-loser';ln.textContent=loser?loser.name:'TBD';
+  poems.appendChild(wn);poems.appendChild(ln);card.appendChild(poems);
+  if(tv>0){
+    const bw=document.createElement('div');bw.className='lmc-bar-wrap';
+    const bt=document.createElement('div');bt.className='lmc-bar-track';
+    const bwin=document.createElement('div');bwin.className='lmc-bar-winner';bwin.style.width=pctW+'%';
+    const blos=document.createElement('div');blos.className='lmc-bar-loser';blos.style.width=(100-pctW)+'%';
+    const bolt=document.createElement('div');bolt.className='lmc-bolt';bolt.textContent='⚡';bolt.style.left=pctW+'%';
+    bt.appendChild(bwin);bt.appendChild(blos);bw.appendChild(bt);bw.appendChild(bolt);
+    const lbls=document.createElement('div');lbls.className='lmc-labels';
+    const lw=document.createElement('span');lw.className='lmc-lbl-w';lw.textContent=`${wv} votes · ${pctW}%`;
+    const lv=md.votes[1-md.winnerIdx]||0;
+    const ll=document.createElement('span');ll.className='lmc-lbl-l';ll.textContent=`${lv} votes · ${100-pctW}%`;
+    lbls.appendChild(lw);lbls.appendChild(ll);
+    card.appendChild(bw);card.appendChild(lbls);
+  }
+  return card;
 }
 
 // ── Engagement helpers ──
