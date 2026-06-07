@@ -489,11 +489,10 @@ body.projection .fullscreen-btn{display:none;}
 @keyframes pollsHeadlineIn{0%{transform:translateY(20px);opacity:0;}100%{transform:translateY(0);opacity:1;}}
 @keyframes pollsSubPulse{0%,100%{opacity:.5;}50%{opacity:.9;}}
 @keyframes pollsFlash{0%{background:rgba(186,26,26,.35);}100%{background:rgba(6,0,28,.96);}}
-.polls-closed-lock{font-size:3.5rem;animation:pollsLockPop .6s cubic-bezier(.17,.67,.35,1.4) .1s both;}
-.polls-closed-bang{font-size:9rem;font-weight:900;color:#fff;line-height:1;animation:pollsBangSlam .5s cubic-bezier(.22,.61,.36,1) .3s both;}
-.polls-closed-bang.shake{animation:pollsBangSlam .5s cubic-bezier(.22,.61,.36,1) .3s both, pollsBangShake .4s ease-in-out .85s both, pollsBangGlow 1.8s ease-in-out 1.2s infinite;}
-.polls-closed-headline{font-size:1.5rem;font-weight:900;color:#fff;letter-spacing:.06em;text-transform:uppercase;margin:.75rem 0 0;animation:pollsHeadlineIn .5s ease-out .7s both;line-height:1.2;}
-.polls-closed-sub{font-size:.9rem;color:rgba(255,255,255,.55);margin-top:.65rem;font-weight:500;animation:pollsSubPulse 2s ease-in-out 1.2s infinite;}
+.polls-closed-bang{font-size:16rem;font-weight:900;color:#fff;line-height:1;animation:pollsBangSlam .5s cubic-bezier(.22,.61,.36,1) .1s both;}
+.polls-closed-bang.shake{animation:pollsBangSlam .5s cubic-bezier(.22,.61,.36,1) .1s both, pollsBangShake .4s ease-in-out .65s both, pollsBangGlow 1.8s ease-in-out 1s infinite;}
+.polls-closed-headline{font-size:2.6rem;font-weight:900;color:#fff;letter-spacing:.06em;text-transform:uppercase;margin:.5rem 0 0;animation:pollsHeadlineIn .5s ease-out .5s both;line-height:1.2;}
+.polls-closed-sub{font-size:1.15rem;color:rgba(255,255,255,.55);margin-top:.65rem;font-weight:500;animation:pollsSubPulse 2s ease-in-out 1s infinite;}
 /* Vote button live glow */
 @keyframes voteGlow{0%,100%{box-shadow:0 0 0 0 rgba(0,104,116,.6);}50%{box-shadow:0 0 0 7px rgba(0,104,116,0);}}
 .seg-btn.vote-live{background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);animation:voteGlow 1.8s ease-in-out infinite;}
@@ -502,9 +501,9 @@ body.projection .fullscreen-btn{display:none;}
 .tallying-overlay{position:fixed;inset:0;background:rgba(6,0,28,.96);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .5s;}
 .tallying-overlay.visible{opacity:1;pointer-events:all;}
 @keyframes tallyFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
-.tallying-icon{font-size:5rem;animation:tallyFloat 2.2s ease-in-out infinite;}
-.tallying-title{font-size:1.75rem;font-weight:800;color:#fff;margin:1rem 0 .5rem;letter-spacing:-.01em;}
-.tallying-sub{font-size:.95rem;color:rgba(255,255,255,.55);max-width:300px;line-height:1.7;}
+.tallying-icon{font-size:8rem;animation:tallyFloat 2.2s ease-in-out infinite;}
+.tallying-title{font-size:2.6rem;font-weight:900;color:#fff;margin:1rem 0 .5rem;letter-spacing:-.01em;}
+.tallying-sub{font-size:1.15rem;color:rgba(255,255,255,.55);max-width:400px;line-height:1.7;}
 .tallying-bars{display:flex;gap:.5rem;margin-top:2rem;align-items:flex-end;}
 .tallying-bar{width:10px;height:40px;background:rgba(255,255,255,.15);border-radius:5px;animation:tallyBar 1.2s ease-in-out infinite;}
 .tallying-bar:nth-child(1){animation-delay:0s;}
@@ -907,8 +906,7 @@ body.projection .fullscreen-btn{display:none;}
 <div id="resultsView" style="display:none"><div class="results-view" id="resultsContent"></div></div>
 
 <!-- POLLS CLOSED OVERLAY -->
-<div id="studentCountdownOverlay" class="tallying-overlay" style="z-index:550" id="pollsClosedOverlay">
-  <div class="polls-closed-lock">🔒</div>
+<div id="studentCountdownOverlay" class="tallying-overlay" style="z-index:550">
   <div class="polls-closed-bang" id="pollsBang">!</div>
   <div class="polls-closed-headline">The Polls Are<br>Now Closed</div>
   <div class="polls-closed-sub">Stand by for results…</div>
@@ -2432,6 +2430,24 @@ function playSound(type) {
         g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.28,t+.04); g.gain.exponentialRampToValueAtTime(.001,t+.3);
         o.start(t); o.stop(t+.3);
       });
+    } else if (type === 'victory') {
+      // Bass thud
+      const bd=ctx.createOscillator(),bg=ctx.createGain(); bd.type='sine'; bd.frequency.setValueAtTime(120,now); bd.frequency.exponentialRampToValueAtTime(40,now+.25);
+      bg.gain.setValueAtTime(.7,now); bg.gain.exponentialRampToValueAtTime(.001,now+.3);
+      bd.connect(bg); bg.connect(ctx.destination); bd.start(now); bd.stop(now+.3);
+      // Triumphant ascending fanfare — sawtooth for brightness
+      [392,523,659,784,1047,1319].forEach((freq,i)=>{
+        const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+        o.type='sawtooth'; o.frequency.value=freq;
+        const t=now+.1+i*.11; const dur=i===5?.9:.22;
+        g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.22,t+.03); g.gain.exponentialRampToValueAtTime(.001,t+dur);
+        o.start(t); o.stop(t+dur);
+        // Harmonics layer
+        const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.connect(g2); g2.connect(ctx.destination);
+        o2.type='sine'; o2.frequency.value=freq*2;
+        g2.gain.setValueAtTime(0,t); g2.gain.linearRampToValueAtTime(.08,t+.03); g2.gain.exponentialRampToValueAtTime(.001,t+dur);
+        o2.start(t); o2.stop(t+dur);
+      });
     }
   } catch(e) {}
 }
@@ -2617,7 +2633,7 @@ function showVoteResultCelebration(r) {
     <div class="vr-stat-card"><div class="vr-stat-num">${r.winVotes>=r.loseVotes?'+':''}${r.winVotes-r.loseVotes}</div><div class="vr-stat-label">margin</div></div>`;
   document.getElementById('vrLoser').innerHTML = `⚔️ Defeated: <strong style="color:rgba(255,255,255,.8)">${esc(r.loserName)}</strong> &nbsp;·&nbsp; ${r.loseVotes} votes`;
   document.getElementById('voteResultDialog').classList.add('open');
-  playSound('fanfare');
+  playSound('victory');
   setTimeout(launchConfetti, 200);
 }
 function closeOpenVotingDialog() { document.getElementById('openVotingDialog').classList.remove('open'); pendingVotingKey=null; }
