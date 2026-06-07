@@ -130,7 +130,8 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   border-bottom:1px solid var(--md-outline-variant);
 }
 .seg-btn-track{
-  display:flex;align-items:center;gap:.3rem;
+  display:flex;align-items:center;gap:.5rem;
+  width:100%;max-width:380px;
 }
 .seg-btn{
   display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;
@@ -140,10 +141,10 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   border:none;cursor:pointer;
   background:transparent;
   color:var(--md-on-surface-variant);
-  transition:background .2s var(--motion-std),color .2s,box-shadow .2s,transform .15s var(--motion-std);
+  transition:background .2s var(--motion-std),color .2s,box-shadow .2s;
   letter-spacing:.01em;
   white-space:nowrap;
-  min-width:64px;
+  flex:1;
   position:relative;
 }
 .seg-btn:hover{background:rgba(74,58,255,.08);color:var(--md-primary);}
@@ -152,11 +153,16 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   color:var(--md-on-primary);
   box-shadow:var(--elev-2);
   font-weight:700;
-  transform:scale(1.04);
 }
 .seg-btn.active:hover{filter:brightness(1.08);}
-.seg-btn .nav-icon{font-size:1.25rem;line-height:1;transition:transform .2s var(--motion-std);}
-.seg-btn.active .nav-icon{transform:scale(1.15);}
+.seg-btn .nav-icon{font-size:1.25rem;line-height:1;display:inline-block;}
+/* Icon hover animations — each button gets its own */
+@keyframes navSpin{0%{transform:rotate(0)}50%{transform:rotate(40deg)}100%{transform:rotate(0)}}
+@keyframes navZap{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-3px) rotate(-20deg)}50%{transform:translateX(3px) rotate(20deg)}80%{transform:translateX(-1px) rotate(-8deg)}}
+@keyframes navBounce{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-6px) scale(1.15)}65%{transform:translateY(-2px) scale(1.05)}}
+.seg-btn#btnBracket:hover .nav-icon{animation:navSpin .5s var(--motion-std);}
+.seg-btn#btnList:hover .nav-icon{animation:navZap .45s ease;}
+.seg-btn#btnLeaderboard:hover .nav-icon{animation:navBounce .4s ease;}
 /* BRACKET */
 .bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;display:flex;}
 .bracket-scroll>.mm-bracket{margin:0 auto;flex-shrink:0;}
@@ -765,7 +771,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
   .leaderboard-view{padding:.75rem .5rem;}
   .list-view{padding:.75rem .5rem;}
   .results-view{padding:.75rem .5rem;}
-  .seg-btn{min-width:44px;padding:.35rem .5rem;font-size:.6rem;}
+  .seg-btn{padding:.35rem .5rem;font-size:.6rem;}
   .seg-btn .nav-icon{font-size:1.1rem;}
   .combined-bar-inner{flex-wrap:wrap;gap:.4rem;padding:.5rem .75rem;}
   .seg-btn-track{flex-wrap:wrap;justify-content:center;gap:.2rem;}
