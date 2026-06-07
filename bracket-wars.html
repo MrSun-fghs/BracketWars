@@ -3130,7 +3130,7 @@ function renderVoteView() {
     card.innerHTML=`
       <div class="v2-card-top">
         <span class="v2-cat-badge" style="background:${catColor}">${esc(catName)}</span>
-        <span class="v2-leading-badge${isLeading&&total>0?' show':''}" id="v2Lead${i}">🏆 Leading</span>
+        <span class="v2-leading-badge" id="v2Lead${i}" style="display:none"></span>
       </div>
       <div class="v2-poem-title">${esc(poem.name)}</div>
       <div class="v2-count" id="v2Cnt${i}">${cnt}</div>
