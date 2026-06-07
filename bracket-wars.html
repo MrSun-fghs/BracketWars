@@ -1851,8 +1851,8 @@ function buildRecCard(r, globalRank, catRank, catTotal, catColor) {
 
   // Rank column (direct child of card — spans full card height for centering)
   const rankCol=document.createElement('div');rankCol.className='rec-rank-col';
-  const rankNum=document.createElement('div');rankNum.className='rec-rank-num';rankNum.textContent=globalRank;
-  const rankLbl=document.createElement('div');rankLbl.className='rec-rank-overall';rankLbl.textContent='overall';
+  const rankNum=document.createElement('div');rankNum.className='rec-rank-num';rankNum.textContent=r.status==='pending'?r.idx+1:globalRank;
+  const rankLbl=document.createElement('div');rankLbl.className='rec-rank-overall';rankLbl.textContent=r.status==='pending'?'seed':'overall';
   if(r.status==='alive'||isChamp) rankNum.style.color=catHex;
   rankCol.appendChild(rankNum);rankCol.appendChild(rankLbl);
   card.appendChild(rankCol);
