@@ -496,12 +496,12 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .v2-splitbar-wrap{background:var(--md-surface-container-lowest);border-radius:var(--shape-full);border:1px solid var(--md-outline-variant);padding:.5rem .85rem;display:flex;align-items:center;gap:8px;margin-top:2px;}
 .v2-splitbar-pct{font-size:10px;font-weight:700;min-width:26px;}
 .v2-splitbar{flex:1;height:22px;border-radius:var(--shape-full);display:flex;position:relative;overflow:visible;}
-.v2-splitbar-a{height:100%;background:var(--md-primary);border-radius:9999px 0 0 9999px;transition:width .6s var(--motion-decel);}
+.v2-splitbar-a{height:100%;background:#60A5FA;border-radius:9999px 0 0 9999px;transition:width .6s var(--motion-decel);}
 .v2-splitbar-b{height:100%;background:var(--md-secondary);border-radius:0 9999px 9999px 0;transition:width .6s var(--motion-decel);}
 .v2-bolt{position:absolute;top:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:var(--md-surface-container-lowest);border:2px solid var(--md-outline-variant);display:flex;align-items:center;justify-content:center;z-index:4;transition:left .6s cubic-bezier(0,0,0,1);font-size:18px;}
 @keyframes barPulseA{0%{filter:brightness(1) saturate(1);transform:scaleY(1);}20%{filter:brightness(2.0) saturate(2.5);transform:scaleY(1.5);}50%{filter:brightness(1.45) saturate(1.6);transform:scaleY(1.12);}75%{transform:scaleY(0.95);}100%{filter:brightness(1) saturate(1);transform:scaleY(1);}}
 @keyframes barPulseB{0%{filter:brightness(1) saturate(1);transform:scaleY(1);}20%{filter:brightness(2.0) saturate(2.5);transform:scaleY(1.5);}50%{filter:brightness(1.45) saturate(1.6);transform:scaleY(1.12);}75%{transform:scaleY(0.95);}100%{filter:brightness(1) saturate(1);transform:scaleY(1);}}
-@keyframes splitGlowA{0%{box-shadow:none;}15%{box-shadow:0 0 22px 9px rgba(74,58,255,.75),0 0 42px 18px rgba(74,58,255,.3);}70%{box-shadow:0 0 10px 3px rgba(74,58,255,.3);}100%{box-shadow:none;}}
+@keyframes splitGlowA{0%{box-shadow:none;}15%{box-shadow:0 0 24px 10px rgba(96,165,250,.85),0 0 48px 20px rgba(96,165,250,.35);}70%{box-shadow:0 0 10px 3px rgba(96,165,250,.3);}100%{box-shadow:none;}}
 @keyframes splitGlowB{0%{box-shadow:none;}15%{box-shadow:0 0 22px 9px rgba(124,92,191,.75),0 0 42px 18px rgba(124,92,191,.3);}70%{box-shadow:0 0 10px 3px rgba(124,92,191,.3);}100%{box-shadow:none;}}
 .v2-splitbar.split-glow-a{animation:splitGlowA .8s cubic-bezier(.22,.61,.36,1);}
 .v2-splitbar.split-glow-b{animation:splitGlowB .8s cubic-bezier(.22,.61,.36,1);}
@@ -3149,7 +3149,7 @@ function renderVoteView() {
   const pctB=100-pctA;
   const splitWrap=document.createElement('div'); splitWrap.className='v2-splitbar-wrap';
   splitWrap.innerHTML=`
-    <span class="v2-splitbar-pct" id="v2SPctA" style="color:var(--md-primary);text-align:right">${pctA}%</span>
+    <span class="v2-splitbar-pct" id="v2SPctA" style="color:#60A5FA;text-align:right">${pctA}%</span>
     <div class="v2-splitbar" id="v2Splitbar">
       <div class="v2-splitbar-a" id="v2SplitA" style="width:${pctA}%"></div>
       <div class="v2-splitbar-b" id="v2SplitB" style="width:${pctB}%"></div>
