@@ -802,7 +802,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
     <div class="seg-btn-track" id="viewToggle" style="display:none">
       <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
       <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
-      <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">⚡</span> Drama</button>
+      <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">↯</span> Drama</button>
       <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">⌗</span> Records</button>
     </div>
   </div>
@@ -1950,10 +1950,11 @@ function buildMatchCard(pA,pB,md,roundLabel){
   const highPct=Math.max(pctW,100-pctW);
   const tagClass=!isC?'none':(isUpset?'upset':highPct<=55?'close':highPct>=75?'dom':'none');
   const tagLabel=tagClass==='upset'?'UPSET':tagClass==='close'?'CLOSE CALL':tagClass==='dom'?'DOMINANT':'·';
-  const top=document.createElement('div');top.className='lmc-top';
-  const tag=document.createElement('span');tag.className='lmc-tag '+tagClass;tag.textContent=tagLabel;
-  const rnd=document.createElement('span');rnd.className='lmc-round';rnd.textContent=roundLabel||'';
-  top.appendChild(tag);top.appendChild(rnd);card.appendChild(top);
+  if(tagClass!=='none'){
+    const top=document.createElement('div');top.className='lmc-top';
+    const tag=document.createElement('span');tag.className='lmc-tag '+tagClass;tag.textContent=tagLabel;
+    top.appendChild(tag);card.appendChild(top);
+  }
   if(!isC){
     const pr=document.createElement('div');pr.className='lmc-pending-row';
     const na=document.createElement('span');na.className='lmc-pending-name';na.textContent=pA?pA.name:'TBD';
