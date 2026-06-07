@@ -342,15 +342,15 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .rec-card.compact-card:hover{opacity:.78;transform:translateY(-1px);box-shadow:none;}
 .rec-card.pending{opacity:.45;border-style:dashed;}
 /* Card top row */
-.rec-card-top{display:flex;align-items:center;gap:0;}
+.rec-card-top{display:flex;align-items:center;gap:.75rem;}
 /* Rank column — fixed width so all names align */
-.rec-rank-col{width:68px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
-.rec-rank-num{font-size:2rem;font-weight:600;line-height:1;color:var(--md-on-surface-variant);}
-.rec-rank-overall{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-on-surface-variant);opacity:.5;}
-.rec-card.champion .rec-rank-num{font-size:2.4rem;color:#B45309;}
+.rec-rank-col{width:80px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-right:1.5px solid var(--md-outline-variant);padding-right:.75rem;}
+.rec-rank-num{font-size:2.8rem;font-weight:700;line-height:1;color:var(--md-on-surface-variant);}
+.rec-rank-overall{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--md-on-surface-variant);opacity:.5;}
+.rec-card.champion .rec-rank-num{font-size:3.2rem;color:#B45309;}
 .rec-card.champion .rec-rank-overall{color:#B45309;opacity:.7;}
 .rec-card.alive .rec-rank-num{color:var(--md-primary);}
-.rec-card.compact-card .rec-rank-num{font-size:1.4rem;}
+.rec-card.compact-card .rec-rank-num{font-size:1.8rem;}
 /* Info */
 .rec-info{flex:1;min-width:0;}
 .rec-name{font-size:1rem;font-weight:600;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
