@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bracket Wars · Poetry Madness</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234A3AFF'/><line x1='5' y1='9' x2='12' y2='9' stroke='white' stroke-width='2.5' stroke-linecap='round'/><line x1='5' y1='23' x2='12' y2='23' stroke='white' stroke-width='2.5' stroke-linecap='round'/><line x1='12' y1='9' x2='12' y2='23' stroke='white' stroke-width='2.5' stroke-linecap='round'/><line x1='12' y1='16' x2='18' y2='16' stroke='white' stroke-width='2.5' stroke-linecap='round'/><circle cx='23' cy='16' r='5' fill='%23F59E0B'/></svg>">
 <style>
 :root {
@@ -816,6 +817,61 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
   .seg-btn-container{padding:.45rem .65rem;}
   .app-bar-actions{flex-wrap:wrap;justify-content:flex-end;gap:.25rem;}
 }
+
+/* ── ROSTER VIEW ─────────────────────────────────────────── */
+#rosterView{background:#0d0d1a;min-height:calc(100vh - 120px);padding:28px 16px 60px;}
+.roster-grid{display:grid;grid-template-columns:repeat(4,210px);gap:16px;justify-content:center;width:100%;max-width:920px;margin:0 auto;}
+.roster-row-label{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:6px 4px 4px;margin-top:4px;}
+.roster-row-letter{font-family:'Fredoka One',sans-serif;font-size:22px;color:#fff;background:#1e1e3a;border:1px solid #2e2e50;border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.roster-row-name{font-size:12px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#3a3a5c;}
+.roster-card{background:#14142a;border-radius:20px;padding:16px 14px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;border:2px solid #252542;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;user-select:none;position:relative;}
+.roster-card-num{position:absolute;top:8px;left:10px;font-size:9px;font-weight:800;color:#2a2a42;letter-spacing:1px;}
+.roster-card:hover{transform:translateY(-10px) scale(1.04);}
+.roster-card.selected{box-shadow:0 0 36px rgba(128,128,128,.3);}
+.roster-avatar-wrap{width:100%;height:190px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;}
+.roster-avatar-wrap img{height:100%;width:auto;object-fit:contain;object-position:bottom center;display:block;}
+.roster-poem-title{font-size:9px;font-weight:700;letter-spacing:1px;color:#4b4b72;margin-top:7px;line-height:1.3;text-transform:uppercase;}
+.roster-author-name{font-family:'Fredoka One',sans-serif;font-size:16px;color:#f97316;margin-top:10px;letter-spacing:1px;line-height:1.15;}
+.roster-row-expansion{grid-column:1/-1;max-height:0;overflow:hidden;transition:max-height .4s ease-out;}
+.roster-row-expansion.open{max-height:2000px;transition:max-height .5s ease-out;}
+.roster-row-expansion.open .roster-expansion-inner{animation:rosterPanelFadeIn .25s ease both;}
+@keyframes rosterPanelFadeIn{from{opacity:0}to{opacity:1}}
+.roster-expansion-inner{background:#10101e;border-radius:16px;overflow:hidden;margin-bottom:4px;}
+.roster-stats-inner{display:grid;grid-template-columns:160px 1fr;border-radius:16px;overflow:hidden;}
+.roster-stats-left{background:#14142a;padding:24px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;border-right:1px solid #1e1e3a;}
+.roster-portrait-circle{width:110px;height:110px;border-radius:50%;overflow:hidden;border:3px solid var(--r-accent,#f97316);box-shadow:0 0 24px color-mix(in srgb,var(--r-accent,#f97316) 40%,transparent);flex-shrink:0;}
+.roster-portrait-circle img{width:100%;height:100%;object-fit:cover;}
+.roster-stats-poem{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;text-align:center;line-height:1.6;}
+.roster-stats-col2{display:flex;flex-direction:column;}
+.roster-stats-right{padding:24px;position:relative;}
+.roster-stats-close{position:absolute;top:14px;right:16px;background:none;border:none;color:#3a3a5c;font-size:18px;cursor:pointer;transition:color .15s;}
+.roster-stats-close:hover{color:#fff;}
+.roster-stats-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:4px;}
+.roster-stats-name{font-family:'Fredoka One',sans-serif;font-size:28px;color:#fff;margin-bottom:4px;line-height:1.1;}
+.roster-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+.roster-chip{background:#1a1a32;border:1px solid #252542;border-radius:6px;padding:4px 10px;display:flex;flex-direction:column;}
+.roster-chip-label{font-size:7px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#4b4b72;margin-bottom:1px;}
+.roster-chip-value{font-size:11px;font-weight:700;color:#c4c4e0;}
+.roster-known-for{font-size:11px;color:#4b4b72;font-style:italic;margin-bottom:14px;}
+.roster-superpower-badge{display:block;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--r-accent,#f97316);background:color-mix(in srgb,var(--r-accent,#f97316) 12%,transparent);border:1px solid color-mix(in srgb,var(--r-accent,#f97316) 30%,transparent);border-radius:20px;padding:7px 14px;margin-top:6px;margin-bottom:14px;text-align:center;}
+.roster-stat-section{display:flex;flex-direction:column;justify-content:center;flex:1;gap:10px;padding-top:17px;}
+.roster-stat-row{display:flex;align-items:center;gap:8px;}
+.roster-stat-label{font-size:8px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#4b4b72;width:110px;flex-shrink:0;}
+.roster-stat-bars{display:flex;gap:4px;flex:1;}
+.roster-stat-bar{flex:1;height:8px;border-radius:3px;}
+.roster-stat-bar.filled{background:var(--r-accent,#f97316);}
+.roster-stat-bar.empty{background:#1e1e3a;}
+.roster-reading-lens{background:#12122a;border-left:3px solid var(--r-accent,#f97316);padding:8px 12px;margin-bottom:12px;font-size:12px;font-style:italic;color:#8b8baa;line-height:1.6;}
+.roster-scout-label{font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#4b4b72;margin-bottom:4px;}
+.roster-scout-text{font-size:12px;color:#c4c4e0;line-height:1.6;margin-bottom:14px;}
+.roster-scout-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;border-top:1px solid #1e1e3a;padding-top:14px;margin-top:4px;}
+.roster-scout-col-right{border-left:1px solid #1e1e3a;padding-left:20px;}
+.roster-why-matters{border-top:1px solid #1e1e3a;margin:0 24px;padding:14px 0 20px;}
+.roster-why-matters-text{font-size:13px;line-height:1.75;color:#6b7280;margin-top:4px;}
+@keyframes rosterCardSettle{0%{transform:translateY(16px) scale(.97)}50%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+.roster-card.bounce{animation:rosterCardSettle .7s cubic-bezier(.34,1.56,.64,1) var(--bounce-delay,.1s) both;}
+@media(max-width:960px){.roster-grid{grid-template-columns:repeat(4,1fr);max-width:100%;gap:10px;}.roster-stats-inner{grid-template-columns:130px 1fr;}.roster-stats-name{font-size:22px;}}
+@media(max-width:700px){.roster-stats-inner{grid-template-columns:1fr;}.roster-stats-left{border-right:none;border-bottom:1px solid #1e1e3a;flex-direction:row;justify-content:flex-start;padding:16px;gap:20px;}.roster-scout-cols{grid-template-columns:1fr;}.roster-scout-col-right{border-left:none;padding-left:0;border-top:1px solid #1e1e3a;padding-top:14px;}}
 </style>
 </head>
 <body>
@@ -851,6 +907,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
       <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">↯</span> Drama</button>
       <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">⌗</span> Records</button>
+      <button class="seg-btn" id="btnRoster" onclick="setView('roster')"><span class="nav-icon">⚔</span> Roster</button>
     </div>
   </div>
 </div>
@@ -859,6 +916,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 <div id="leaderboardView" style="display:none"><div class="leaderboard-view" id="lbContent"></div></div>
 <div id="listView" style="display:none"><div class="list-view" id="listContent"></div></div>
 <div id="bracketView" style="display:none"><div id="bracketColToolbar"><button class="bracket-expand-btn" onclick="expandAllBracketCols()">↔ Show All Rounds</button></div><div class="bracket-scroll"><div class="mm-bracket" id="bracket"></div></div></div>
+<div id="rosterView" style="display:none"><div class="roster-grid" id="rosterGrid"></div></div>
 <div id="engagementView" style="display:none;background:#fff;"><div class="home-view" id="engagementContent"></div></div>
 </div>
 
@@ -1167,7 +1225,7 @@ function setMode(m) {
   }
   document.getElementById('secondaryToolbar').style.display = MODE==='student' ? 'block' : 'block';
   if (MODE === 'student') {
-    ['home','leaderboard','list','bracket'].forEach(x=>{
+    ['home','leaderboard','list','bracket','roster'].forEach(x=>{
       const el=document.getElementById('btn'+x.charAt(0).toUpperCase()+x.slice(1));
       if(el) el.classList.toggle('active', currentView===x);
     });
@@ -1199,7 +1257,7 @@ function setTeacherView(v) {
 function setView(v) {
   currentView = v;
   saveStudentPrefs();
-  ['home','leaderboard','list','bracket'].forEach(x => {
+  ['home','leaderboard','list','bracket','roster'].forEach(x => {
     const el = document.getElementById('btn'+x.charAt(0).toUpperCase()+x.slice(1));
     if (el) el.classList.toggle('active', v===x);
   });
@@ -1209,7 +1267,7 @@ function setView(v) {
 function showCurrentView() {
   if (MODE === 'teacher') return;
   document.getElementById('engagementView').style.display = 'none';
-  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView', results:'resultsView'};
+  const views = {home:'homeView', leaderboard:'leaderboardView', list:'listView', bracket:'bracketView', vote:'voteView', results:'resultsView', roster:'rosterView'};
   Object.entries(views).forEach(([key, id]) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1238,6 +1296,7 @@ function showCurrentView() {
   if (currentView==='leaderboard') renderLeaderboard();
   if (currentView==='vote') renderVoteView();
   if (currentView==='results') renderResults();
+  if (currentView==='roster') renderRoster();
 }
 
 // ── Tournament round progress helper ──
@@ -2597,7 +2656,7 @@ function saveStudentPrefs() {
 function restoreStudentPrefs() {
   try {
     const p = JSON.parse(localStorage.getItem('bw-prefs')||'{}');
-    if (p.view && ['home','leaderboard','list','bracket','vote'].includes(p.view)) currentView = p.view;
+    if (p.view && ['home','leaderboard','list','bracket','vote','roster'].includes(p.view)) currentView = p.view;
     if (p.activeId && app.classes.find(c=>c.id===p.activeId)) app.activeId = p.activeId;
   } catch(e) {}
 }
@@ -3349,6 +3408,162 @@ async function boot() {
   }
 }
 boot();
+
+// ── ROSTER ──────────────────────────────────────────────────
+const ROSTER_POEMS = [
+  {num:1,title:"Oranges",author:"Gary Soto",svg:"Gary Soto.svg?v=2",color:"orange",accentColor:"#30b21f",cropZoom:2.1,cropX:51,cropY:25,born:"1952",birthplace:"Fresno, CA",nationality:"American",genre:"Chicano Poetry",knownFor:"Turning everyday experiences into memorable stories",superpower:"Making ordinary moments unforgettable",readingLens:"How does Soto make an ordinary moment feel important?",scoutingReport:"Dangerous opening-round matchup. Strong imagery and high relatability make this poem easy for first-time readers to connect with.",whyMatters:"Gary Soto grew up in California's Central Valley in a Mexican-American working-class family. His poems focus on moments many people recognize—first crushes, family, embarrassment, money, and growing up.",stats:{accessibility:5,emotionalImpact:4,imageryPower:5,literaryDevicePower:2,themeStrength:4,relatability:5}},
+  {num:2,title:"Hanging Fire",author:"Audre Lorde",svg:"Hanging Fire v3.svg?v=2",color:"magenta",accentColor:"#fddd57",cropZoom:1.9,cropX:44,cropY:25,born:"1934",birthplace:"New York City, NY",nationality:"American",genre:"Black Feminist Poetry",knownFor:"Writing about identity and justice",superpower:"Giving powerful voice to difficult emotions",readingLens:"How does the speaker respond to being misunderstood or overlooked?",scoutingReport:"High-impact contender. The voice is personal, intense, and layered with questions about identity, belonging, and power.",whyMatters:"Born to Caribbean immigrant parents, Audre Lorde wrote about race, gender, sexuality, and power. She believed poetry could help people understand themselves and challenge injustice.",stats:{accessibility:2,emotionalImpact:4,imageryPower:3,literaryDevicePower:4,themeStrength:5,relatability:5}},
+  {num:3,title:"Nothing Gold Can Stay",author:"Robert Frost",svg:"Robert Frost.svg?v=2",color:"gold",accentColor:"#aee0f9",cropZoom:1.8,cropX:41,cropY:37,born:"1874",birthplace:"San Francisco, CA",nationality:"American",genre:"New England Poetry",knownFor:"Finding big ideas in simple moments",superpower:"Hiding deep ideas inside simple language",readingLens:"What bigger truth might be hiding inside a simple observation?",scoutingReport:"Classic sleeper pick. The language looks simple, but the meaning gets deeper the longer students sit with it.",whyMatters:"Robert Frost became famous for poems about everyday life in rural New England. His writing often sounds simple at first, but underneath are questions about choices, change, and what it means to be human.",stats:{accessibility:4,emotionalImpact:3,imageryPower:4,literaryDevicePower:3,themeStrength:4,relatability:3}},
+  {num:4,title:"Hope Is the Thing with Feathers",author:"Emily Dickinson",svg:"Emily Dickinson.svg?v=3",color:"pearl",accentColor:"#e2e8f0",cropZoom:1.95,cropX:50,cropY:30,born:"1830",birthplace:"Amherst, MA",nationality:"American",genre:"Lyric Poetry",knownFor:"Exploring big ideas through small details",superpower:"Packing big ideas into very few words",readingLens:"How does Dickinson use simple images to express a deeper idea?",scoutingReport:"Short poem, big ideas. Dickinson may look easy at first, but she becomes stronger with every reread.",whyMatters:"Emily Dickinson wrote nearly 1,800 poems, though most were not published during her lifetime. Her poems often focus on hope, nature, death, and eternity using compressed language and unexpected comparisons.",stats:{accessibility:3,emotionalImpact:3,imageryPower:4,literaryDevicePower:5,themeStrength:5,relatability:4}},
+  {num:5,title:"Still I Rise",author:"Maya Angelou",svg:"Maya Angelou.svg?v=3",color:"rose",accentColor:"#038f68",cropZoom:2.2,cropX:54,cropY:21,born:"1928",birthplace:"St. Louis, MO",nationality:"American",genre:"Autobiographical Poetry",knownFor:"Writing about resilience and self-worth",superpower:"Turning pain into confidence",readingLens:"How does the speaker show strength in the face of challenges?",scoutingReport:"Fan favorite. Direct, confident, and emotionally powerful, this poem is built to make a strong first impression.",whyMatters:"Maya Angelou was a poet, memoirist, performer, and civil rights activist. She transformed painful experiences into powerful writing about dignity, courage, and hope.",stats:{accessibility:5,emotionalImpact:5,imageryPower:4,literaryDevicePower:3,themeStrength:5,relatability:5}},
+  {num:6,title:"The Rose That Grew from Concrete",author:"Tupac Shakur",svg:"Tupac Shakur.svg?v=2",color:"pink",accentColor:"#fb7185",cropZoom:1.6,cropX:60,cropY:30,born:"1971",birthplace:"East Harlem, NY",nationality:"American",genre:"Hip-Hop / Spoken Word",knownFor:"Writing about struggle and survival",superpower:"Making resilience feel personal",readingLens:"What helps the speaker succeed despite obstacles?",scoutingReport:"Relatable powerhouse. Clear language and a memorable central image make this poem a serious bracket threat.",whyMatters:"Before becoming a music icon, Tupac Shakur was writing poetry. His poems explore hardship, injustice, love, and perseverance.",stats:{accessibility:5,emotionalImpact:5,imageryPower:3,literaryDevicePower:2,themeStrength:5,relatability:5}},
+  {num:7,title:"I, Too",author:"Langston Hughes",svg:"Langston Hughes.svg?v=2",color:"blue",accentColor:"#0476e4",cropZoom:2.2,cropX:69,cropY:18,born:"1902",birthplace:"Joplin, MO",nationality:"American",genre:"Harlem Renaissance",knownFor:"Giving voice to Black America",superpower:"Making powerful statements with simple language",readingLens:"Whose voice is being heard, and why does it matter?",scoutingReport:"Classic contender. Hughes uses simple language to deliver a message that is direct, powerful, and hard to ignore.",whyMatters:"Langston Hughes was one of the leading writers of the Harlem Renaissance. His poems celebrate Black culture while challenging racism and exclusion.",stats:{accessibility:4,emotionalImpact:4,imageryPower:3,literaryDevicePower:3,themeStrength:5,relatability:4}},
+  {num:8,title:"Women",author:"Alice Walker",svg:"Alice Walker.svg?v=3",color:"purple",accentColor:"#c873d7",cropZoom:2.05,cropX:33,cropY:12,born:"1944",birthplace:"Eatonton, GA",nationality:"American",genre:"Black Feminist Poetry",knownFor:"Honoring women's strength and perseverance",superpower:"Honoring overlooked courage",readingLens:"What sacrifices made the speaker's life possible?",scoutingReport:"Emotional heavyweight. This poem may seem quiet at first, but its message about sacrifice lands with real force.",whyMatters:"Alice Walker is a novelist, poet, and activist best known for The Color Purple. Her writing explores race, gender, family, and history.",stats:{accessibility:4,emotionalImpact:5,imageryPower:3,literaryDevicePower:3,themeStrength:5,relatability:3}},
+  {num:9,title:"Famous",author:"Naomi Shihab Nye",svg:"Naomi Shihab Nye.svg?v=2",color:"cream",accentColor:"#ff7a00",cropZoom:1.95,cropX:52,cropY:0,born:"1952",birthplace:"St. Louis, MO",nationality:"Palestinian-American",genre:"Humanist Poetry",knownFor:"Finding connection in everyday life",superpower:"Finding meaning in small moments",readingLens:"What small details help reveal a larger idea?",scoutingReport:"Quiet contender. Small details and everyday language make this poem stronger the closer students read.",whyMatters:"Born to a Palestinian father and an American mother, Naomi Shihab Nye writes about neighbors, families, food, kindness, and belonging.",stats:{accessibility:5,emotionalImpact:4,imageryPower:4,literaryDevicePower:2,themeStrength:4,relatability:4}},
+  {num:10,title:"Wind, Water, Stone",author:"Octavio Paz",svg:"Octavio Paz.svg?v=2",color:"turquoise",accentColor:"#976e35",cropZoom:1.9,cropX:37,cropY:43,born:"1914",birthplace:"Mexico City, Mexico",nationality:"Mexican",genre:"Surrealist / Political Poetry",knownFor:"Exploring identity, history, and time",superpower:"Connecting big ideas through vivid images",readingLens:"How are different forces connected to one another?",scoutingReport:"High-ceiling challenge. This poem brings elite imagery and literary device power, but students will need to slow down to unlock it.",whyMatters:"Octavio Paz was a Mexican poet, diplomat, and essayist who won the Nobel Prize in Literature. His work explores culture, history, relationships, and identity.",stats:{accessibility:2,emotionalImpact:3,imageryPower:5,literaryDevicePower:5,themeStrength:5,relatability:2}},
+  {num:11,title:"Wild Geese",author:"Mary Oliver",svg:"Mary Oliver.svg?v=2",color:"mint",accentColor:"#d4d44e",cropZoom:1.8,cropX:60,cropY:18,born:"1935",birthplace:"Maple Heights, OH",nationality:"American",genre:"Nature Poetry",knownFor:"Finding wonder in nature",superpower:"Helping readers feel connected to the world",readingLens:"How does nature help the speaker understand life?",scoutingReport:"Imagery powerhouse. Oliver's poem is accessible, vivid, and likely to connect with students who respond to nature and reflection.",whyMatters:"Mary Oliver spent much of her life observing nature and turning those observations into poetry. She encourages readers to slow down and pay attention.",stats:{accessibility:4,emotionalImpact:5,imageryPower:5,literaryDevicePower:3,themeStrength:5,relatability:5}},
+  {num:12,title:"The Peace of Wild Things",author:"Wendell Berry",svg:"Wendell Berry.svg?v=2",color:"harvest",accentColor:"#949138",cropZoom:2,cropX:45,cropY:36,born:"1934",birthplace:"Henry County, KY",nationality:"American",genre:"Agrarian / Eco-Poetry",knownFor:"Finding peace in the natural world",superpower:"Turning nature into wisdom",readingLens:"What does the speaker learn from nature?",scoutingReport:"Steady veteran. Calm imagery and a strong theme make this poem more powerful by the end than it may seem at the start.",whyMatters:"Wendell Berry is a farmer, poet, novelist, and environmental activist whose writing focuses on land, community, and belonging.",stats:{accessibility:4,emotionalImpact:5,imageryPower:4,literaryDevicePower:3,themeStrength:5,relatability:4}},
+  {num:13,title:"Touchscreen",author:"Marshall Davis Jones",svg:"Marshall Davis Jones.svg?v=2",color:"cyan",accentColor:"#65bde6",cropZoom:2.1,cropX:47,cropY:23,born:"1980s",birthplace:"United States",nationality:"American",genre:"Spoken Word / Slam Poetry",knownFor:"Questioning technology and modern life",superpower:"Turning modern problems into memorable messages",readingLens:"What is gained—and what might be lost—as technology becomes part of everyday life?",scoutingReport:"Modern upset pick. Fast language, repetition, and a familiar topic give students plenty to debate.",whyMatters:"Marshall Davis Jones is a spoken word artist whose poem 'Touchscreen' became widely known after a TEDx performance. His work explores technology, communication, and human connection.",stats:{accessibility:5,emotionalImpact:4,imageryPower:3,literaryDevicePower:4,themeStrength:5,relatability:5}},
+  {num:14,title:"The Dictator",author:"Pablo Neruda",svg:"Pablo Neruda.svg?v=2",color:"crimson",accentColor:"#f82020",cropZoom:2.2,cropX:45,cropY:18,born:"1904",birthplace:"Parral, Chile",nationality:"Chilean",genre:"Political / Love Poetry",knownFor:"Writing about power, politics, and humanity",superpower:"Making abstract ideas feel physical and real",readingLens:"What is the poet criticizing or challenging?",scoutingReport:"Heavyweight matchup. Powerful imagery and political force make this poem challenging, but dangerous in later rounds.",whyMatters:"Pablo Neruda was one of the most influential poets of the twentieth century. His work ranges from love poems to political poems and reflections on everyday life.",stats:{accessibility:3,emotionalImpact:4,imageryPower:5,literaryDevicePower:5,themeStrength:5,relatability:2}},
+  {num:15,title:"Knock Knock",author:"Daniel Beaty",svg:"Daniel Beaty.svg?v=2",color:"amber",accentColor:"#ffffff",cropZoom:2.3,cropX:32,cropY:26,born:"1976",birthplace:"United States",nationality:"American",genre:"Spoken Word / Theater",knownFor:"Giving voice to family struggles and resilience",superpower:"Turning personal loss into hope",readingLens:"How does the speaker respond to loss or absence?",scoutingReport:"Emotional powerhouse. This poem hits quickly and can become one of the most memorable pieces in the tournament.",whyMatters:"Daniel Beaty is a spoken word artist, actor, and playwright. His poem 'Knock Knock' draws from his experience growing up without his father after incarceration.",stats:{accessibility:5,emotionalImpact:5,imageryPower:3,literaryDevicePower:3,themeStrength:5,relatability:5}},
+  {num:16,title:"A Poison Tree",author:"William Blake",svg:"William Blake.svg?v=2",color:"cloud",accentColor:"#94a3b8",cropZoom:2.1,cropX:46,cropY:58,born:"1757",birthplace:"London, England",nationality:"British",genre:"Romantic / Visionary Poetry",knownFor:"Challenging human behavior and society",superpower:"Teaching life lessons through symbols and stories",readingLens:"What lesson is the poet trying to teach?",scoutingReport:"Dangerous sleeper. The poem looks simple on the surface, but its symbols and lesson get sharper with rereading.",whyMatters:"William Blake was a poet, artist, and printmaker whose work explored innocence, experience, imagination, and morality.",stats:{accessibility:3,emotionalImpact:4,imageryPower:4,literaryDevicePower:5,themeStrength:5,relatability:4}},
+];
+
+const ROSTER_ROWS = [
+  {letter:'A',label:'Growing Up'},
+  {letter:'B',label:'Identity & Resilience'},
+  {letter:'C',label:'Seeing the World Differently'},
+  {letter:'D',label:'Power & Society'},
+];
+
+let _rosterBuilt = false;
+let _rosterActiveRow = null;
+let _rosterActiveCard = null;
+const _rosterRowCards = [[],[],[],[]];
+const _rosterExpPanels = [];
+
+function _rosterBuildStatsHTML(p) {
+  const chips = [
+    {label:'Born',value:p.born},
+    {label:'Birthplace',value:p.birthplace},
+    {label:'Nationality',value:p.nationality},
+    {label:'Genre',value:p.genre},
+  ].map(c=>`<div class="roster-chip"><span class="roster-chip-label">${c.label}</span><span class="roster-chip-value" style="color:${c.label==='Born'?p.accentColor:'#c4c4e0'}">${c.value}</span></div>`).join('');
+
+  const statRows = [
+    ['Readability',p.stats.accessibility],
+    ['Relatability',p.stats.relatability],
+    ['Emotional Impact',p.stats.emotionalImpact],
+    ['Imagery Power',p.stats.imageryPower],
+    ['Literary Devices',p.stats.literaryDevicePower],
+    ['Theme Strength',p.stats.themeStrength],
+  ].map(([label,val])=>`<div class="roster-stat-row"><span class="roster-stat-label">${label}</span><div class="roster-stat-bars">${[1,2,3,4,5].map(i=>`<div class="roster-stat-bar ${i<=val?'filled':'empty'}"></div>`).join('')}</div></div>`).join('');
+
+  return `<div class="roster-stats-inner" style="--r-accent:${p.accentColor};border:1px solid ${p.accentColor};">
+    <div class="roster-stats-left">
+      <div class="roster-portrait-circle"><img src="${p.svg}" alt="${p.author}" style="transform:scale(${p.cropZoom||1.6});transform-origin:${p.cropX||50}% ${p.cropY||12}%;object-position:${p.cropX||50}% ${p.cropY||12}%;"></div>
+      <div class="roster-stats-poem" style="color:${p.accentColor}">${p.title.toUpperCase()}</div>
+    </div>
+    <div class="roster-stats-col2">
+      <div class="roster-stats-right">
+        <button class="roster-stats-close" data-close="1">✕</button>
+        <div class="roster-stats-header-row">
+          <div><div class="roster-stats-name">${p.author}</div>${p.knownFor?`<div class="roster-known-for">${p.knownFor}</div>`:''}</div>
+          <div class="roster-chips">${chips}</div>
+        </div>
+        <div class="roster-scout-cols">
+          <div class="scout-col-left">
+            <div class="roster-superpower-badge">⚡ ${p.superpower}</div>
+            <div class="roster-stat-section">${statRows}</div>
+          </div>
+          <div class="roster-scout-col-right">
+            <div class="roster-scout-label">Reading Lens</div>
+            <div class="roster-reading-lens">${p.readingLens}</div>
+            <div class="roster-scout-label">Scouting Report</div>
+            <div class="roster-scout-text">${p.scoutingReport}</div>
+          </div>
+        </div>
+      </div>
+      ${p.whyMatters?`<div class="roster-why-matters"><div class="roster-scout-label">Why This Poet Matters</div><div class="roster-why-matters-text">${p.whyMatters}</div></div>`:''}
+    </div>
+  </div>`;
+}
+
+function _rosterBounceRows(fromRow) {
+  for (let r = fromRow+1; r < 4; r++) {
+    _rosterRowCards[r].forEach((card,i) => {
+      card.style.setProperty('--bounce-delay', `${0.08+i*0.05}s`);
+      card.classList.remove('bounce'); void card.offsetWidth; card.classList.add('bounce');
+      card.addEventListener('animationend', ()=>card.classList.remove('bounce'), {once:true});
+    });
+  }
+}
+
+function _rosterOpenRow(rowIdx, poem, cardEl) {
+  const panel = _rosterExpPanels[rowIdx];
+  if (_rosterActiveRow !== null) {
+    _rosterExpPanels[_rosterActiveRow].classList.remove('open');
+    _rosterExpPanels[_rosterActiveRow].querySelector('.roster-expansion-inner').innerHTML = '';
+    if (_rosterActiveCard) { _rosterActiveCard.classList.remove('selected'); _rosterActiveCard = null; }
+  }
+  panel.querySelector('.roster-expansion-inner').innerHTML = _rosterBuildStatsHTML(poem);
+  panel.classList.add('open');
+  panel.querySelector('[data-close]').addEventListener('click', _rosterCloseActive);
+  _rosterActiveRow = rowIdx; _rosterActiveCard = cardEl; cardEl.classList.add('selected');
+  _rosterBounceRows(rowIdx);
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
+}
+
+function _rosterCloseActive() {
+  if (_rosterActiveRow !== null) {
+    const panel = _rosterExpPanels[_rosterActiveRow];
+    panel.classList.remove('open');
+    setTimeout(()=>{ panel.querySelector('.roster-expansion-inner').innerHTML=''; }, 400);
+    _rosterBounceRows(_rosterActiveRow);
+  }
+  if (_rosterActiveCard) { _rosterActiveCard.classList.remove('selected'); _rosterActiveCard = null; }
+  _rosterActiveRow = null;
+}
+
+function renderRoster() {
+  if (_rosterBuilt) return;
+  _rosterBuilt = true;
+  const grid = document.getElementById('rosterGrid');
+  grid.innerHTML = '';
+  _rosterRowCards.forEach(r=>r.length=0); _rosterExpPanels.length=0;
+  _rosterActiveRow=null; _rosterActiveCard=null;
+
+  const sorted = [...ROSTER_POEMS].sort((a,b)=>a.num-b.num);
+
+  for (let row=0; row<4; row++) {
+    const rowPoems = sorted.slice(row*4, row*4+4);
+
+    const rowLabel = document.createElement('div');
+    rowLabel.className = 'roster-row-label';
+    rowLabel.innerHTML = `<span class="roster-row-letter">${ROSTER_ROWS[row].letter}</span><span class="roster-row-name">${ROSTER_ROWS[row].label}</span>`;
+    grid.appendChild(rowLabel);
+
+    rowPoems.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'roster-card';
+      card.dataset.color = p.color;
+      card.style.cssText = `--r-accent:${p.accentColor};`;
+      card.innerHTML = `<div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap"><img src="${p.svg}" alt="${p.author}"></div><div class="roster-author-name" style="color:${p.accentColor}">${p.author}</div><div class="roster-poem-title">${p.title}</div>`;
+      card.addEventListener('click', ()=>{
+        if (_rosterActiveCard===card) { _rosterCloseActive(); return; }
+        _rosterOpenRow(row, p, card);
+      });
+      _rosterRowCards[row].push(card);
+      grid.appendChild(card);
+    });
+
+    const exp = document.createElement('div');
+    exp.className = 'roster-row-expansion';
+    exp.innerHTML = `<div class="roster-expansion-inner"></div>`;
+    _rosterExpPanels.push(exp);
+    grid.appendChild(exp);
+  }
+}
 </script>
 </body>
 </html>
