@@ -250,7 +250,12 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;display:flex;}
 .bracket-scroll>.mm-bracket{margin:0 auto;flex-shrink:0;}
 .mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;align-items:stretch;justify-content:center;column-gap:.5rem;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
-.mm-bracket:not(.all-collapsed){min-width:1080px;}
+.mm-bracket:not(.all-collapsed){min-width:900px;}
+/* Compact TBD matchups so full bracket fits in view */
+.tbd-matchup{opacity:.5;}
+.tbd-matchup .poem-slot{padding:.18rem .45rem;min-height:0;}
+.tbd-matchup .poem-name{font-size:.6rem;}
+.tbd-matchup .seed{font-size:.5rem;padding:.05rem .2rem;}
 .col-header{text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,border-bottom-color .45s;display:flex;align-items:center;justify-content:center;}
 .col-header[data-collapsed]{padding:0;border-bottom-color:transparent;overflow:hidden;}
 .col-header[data-collapsed]>*{display:none;}
@@ -2758,7 +2763,8 @@ function bcard(type,ri,mi,mirrored,isT){
   else if(type==='semi'){pA=semiPoem(ri,0);pB=semiPoem(ri,1);md=bkt().semis[ri];if(md.winnerIdx!==null&&!isSemiDone()){if(md.winnerIdx===0)aA=true;else aB=true;}}
   else{pA=finalPoem(0);pB=finalPoem(1);md=bkt().final;}
   const hasPoems=pA&&pB,isC=md.winnerIdx!==null,tv=(md.votes[0]||0)+(md.votes[1]||0);
-  const card=document.createElement('div');card.className='matchup'+(isT&&hasPoems?' clickable':'');card.dataset.matchupKey=JSON.stringify({type,ri,mi});
+  const isTBD=!pA&&!pB;
+  const card=document.createElement('div');card.className='matchup'+(isT&&hasPoems?' clickable':'')+(isTBD?' tbd-matchup':'');card.dataset.matchupKey=JSON.stringify({type,ri,mi});
   if(pA) card.dataset.poemA=pA.name;
   if(pB) card.dataset.poemB=pB.name;
   // Path-to-victory hover
@@ -3216,7 +3222,7 @@ function applyProjectionScale() {
   if (!bracketEl) return;
   const isProj = document.body.classList.contains('projection');
   const onBracket = currentView === 'bracket';
-  if (!isProj || !onBracket) {
+  if (!onBracket) {
     bracketEl.style.transform = '';
     bracketEl.style.transformOrigin = '';
     bracketEl.style.marginBottom = '';
@@ -3228,15 +3234,19 @@ function applyProjectionScale() {
     const naturalW = bracketEl.offsetWidth;
     const naturalH = bracketEl.offsetHeight;
     if (!naturalW) return;
-    const viewW = window.innerWidth;
-    const viewH = window.innerHeight - 48; // leave room for exit button
+    const scroll = bracketEl.closest('.bracket-scroll');
+    const viewW = scroll ? scroll.clientWidth : window.innerWidth;
+    const viewH = window.innerHeight - (isProj ? 48 : 120);
     const scaleW = viewW / naturalW;
     const scaleH = viewH / naturalH;
-    const scale = Math.min(scaleW, scaleH, 3);
+    // Projection: scale to fill. Normal: scale down to fit only (max 1)
+    const maxScale = isProj ? 3 : 1;
+    const scale = Math.min(scaleW, scaleH, maxScale);
     bracketEl.style.transformOrigin = 'top center';
     bracketEl.style.transform = `scale(${scale.toFixed(3)})`;
-    // Adjust container height so content doesn't overlap below
     bracketEl.style.marginBottom = `${(naturalH * scale - naturalH).toFixed(0)}px`;
+    // Disable scroll container overflow when content fits scaled
+    if (scroll) scroll.style.overflowX = (scale >= 1) ? 'auto' : 'hidden';
   });
 }
 // ── Projection mode ──
