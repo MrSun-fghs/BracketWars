@@ -819,7 +819,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 }
 
 /* ── ROSTER VIEW ─────────────────────────────────────────── */
-#rosterView{background:#0d0d1a;min-height:calc(100vh - 120px);padding:28px 16px 60px;}
+#rosterView{background:#0d0d1a;min-height:calc(100vh - 120px);padding:28px 16px 60px;overflow-y:auto;overflow-x:hidden;}
 .roster-grid{display:grid;grid-template-columns:repeat(4,210px);gap:16px;justify-content:center;width:100%;max-width:920px;margin:0 auto;}
 .roster-row-label{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:6px 4px 4px;margin-top:4px;}
 .roster-row-letter{font-family:'Fredoka One',sans-serif;font-size:22px;color:#fff;background:#1e1e3a;border:1px solid #2e2e50;border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -871,7 +871,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 @keyframes rosterCardSettle{0%{transform:translateY(16px) scale(.97)}50%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
 .roster-card.bounce{animation:rosterCardSettle .7s cubic-bezier(.34,1.56,.64,1) var(--bounce-delay,.1s) both;}
 @media(max-width:960px){.roster-grid{grid-template-columns:repeat(4,1fr);max-width:100%;gap:10px;}.roster-stats-inner{grid-template-columns:130px 1fr;}.roster-stats-name{font-size:22px;}}
-@media(max-width:700px){.roster-stats-inner{grid-template-columns:1fr;}.roster-stats-left{border-right:none;border-bottom:1px solid #1e1e3a;flex-direction:row;justify-content:flex-start;padding:16px;gap:20px;}.roster-scout-cols{grid-template-columns:1fr;}.roster-scout-col-right{border-left:none;padding-left:0;border-top:1px solid #1e1e3a;padding-top:14px;}}
+@media(max-width:700px){.roster-grid{grid-template-columns:repeat(2,1fr);gap:10px;}.roster-avatar-wrap{height:130px;}.roster-stats-inner{grid-template-columns:1fr;}.roster-stats-left{border-right:none;border-bottom:1px solid #1e1e3a;flex-direction:row;justify-content:flex-start;padding:16px;gap:20px;}.roster-scout-cols{grid-template-columns:1fr;}.roster-scout-col-right{border-left:none;padding-left:0;border-top:1px solid #1e1e3a;padding-top:14px;}}
 </style>
 </head>
 <body>
@@ -907,7 +907,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
       <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><span class="nav-icon">⬡</span> Bracket</button>
       <button class="seg-btn" id="btnList" onclick="setView('list')"><span class="nav-icon">↯</span> Drama</button>
       <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><span class="nav-icon">⌗</span> Records</button>
-      <button class="seg-btn" id="btnRoster" onclick="setView('roster')"><span class="nav-icon">⚔</span> Roster</button>
+      <button class="seg-btn" id="btnRoster" onclick="setView('roster')"><span class="nav-icon" style="font-size:1.5rem;filter:drop-shadow(0 0 2px currentColor)">⚔</span> Roster</button>
     </div>
   </div>
 </div>
