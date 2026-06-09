@@ -2210,8 +2210,8 @@ function buildMatchCard(pA,pB,md,isLatest){
     const bwin=document.createElement('div');bwin.className='lmc-bar-winner';bwin.style.width=pctW+'%';
     const bshim=document.createElement('div');bshim.className='lmc-bar-shimmer';bwin.appendChild(bshim);
     const blos=document.createElement('div');blos.className='lmc-bar-loser';blos.style.width=(100-pctW)+'%';
-    const bolt=document.createElement('div');bolt.className='lmc-bolt';bolt.textContent='⚡';bolt.style.left=`clamp(18px,${pctW}%,calc(100% - 18px))`;
-    bt.appendChild(bwin);bt.appendChild(blos);bw.appendChild(bt);bw.appendChild(bolt);
+    bt.appendChild(bwin);bt.appendChild(blos);bw.appendChild(bt);
+    if(pctW>0&&pctW<100){const bolt=document.createElement('div');bolt.className='lmc-bolt';bolt.textContent='⚡';bolt.style.left=`clamp(18px,${pctW}%,calc(100% - 18px))`;bw.appendChild(bolt);}
     const lbls=document.createElement('div');lbls.className='lmc-labels';
     const lw=document.createElement('span');lw.className='lmc-lbl-w';lw.textContent=`${wv} votes · ${pctW}%`;
     const lv=md.votes[1-md.winnerIdx]||0;
