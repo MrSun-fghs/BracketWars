@@ -3402,19 +3402,32 @@ function renderVoteView() {
       btnClass='v2-vote-btn';
     }
 
+    const rp2=ROSTER_POEMS.find(p=>p.num===poem.seed);
+    const voteSrc=rp2?(rp2.aniSvg||rp2.svg):'';
+    const pZoom=rp2?rp2.cropZoom||1.6:1.6;
+    const pCx=rp2&&rp2.cropX!=null?rp2.cropX:50;
+    const pCy=rp2&&rp2.cropY!=null?rp2.cropY:12;
+    const circleColor=i===0?'var(--md-primary)':'var(--md-secondary)';
+    const circleHtml=voteSrc
+      ?`<div style="padding:14px 0 8px;display:flex;justify-content:center;"><div style="width:128px;height:128px;border-radius:50%;overflow:hidden;border:3.5px solid ${circleColor};background:var(--md-surface-container);flex-shrink:0;"><img src="${voteSrc}" alt="" style="width:100%;height:100%;object-fit:cover;transform:scale(${pZoom});transform-origin:${pCx}% ${pCy}%;"></div></div>`
+      :'';
+    card.style.cssText='padding:0;display:flex;flex-direction:column;';
     card.innerHTML=`
-      <div class="v2-card-top">
-        <span class="v2-cat-badge" style="background:${catColor}">${esc(catName)}</span>
-        <span class="v2-leading-badge" id="v2Lead${i}" style="display:none"></span>
-      </div>
-      <div class="v2-poem-title">${esc(poem.name)}</div>
-      <div class="v2-count" id="v2Cnt${i}">${cnt}</div>
-      <div class="v2-count-label" id="v2CntLbl${i}">vote${cnt!==1?'s':''}</div>
-      <div class="v2-bar-track"><div class="v2-bar-fill" id="v2Bar${i}" style="width:${pct}%"></div></div>
-      <div class="v2-bar-pct" id="v2Pct${i}">${pct}%</div>
-      <button class="${btnClass}" id="v2Btn${i}" ${!hasVoted?`onclick="handleVoteBtnClick(${i})"`:''} ${hasVoted?'disabled':''}>
-        ${btnContent}
-      </button>`;
+      ${circleHtml}
+      <div style="padding:0 .75rem .85rem;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;">
+        <div class="v2-card-top" style="justify-content:center;">
+          <span class="v2-cat-badge" style="background:${catColor}">${esc(catName)}</span>
+          <span class="v2-leading-badge" id="v2Lead${i}" style="display:none"></span>
+        </div>
+        <div class="v2-poem-title">${esc(poem.name)}</div>
+        <div class="v2-count" id="v2Cnt${i}">${cnt}</div>
+        <div class="v2-count-label" id="v2CntLbl${i}">vote${cnt!==1?'s':''}</div>
+        <div class="v2-bar-track" style="width:100%;"><div class="v2-bar-fill" id="v2Bar${i}" style="width:${pct}%"></div></div>
+        <div class="v2-bar-pct" id="v2Pct${i}">${pct}%</div>
+        <button class="${btnClass}" id="v2Btn${i}" ${!hasVoted?`onclick="handleVoteBtnClick(${i})"`:''} ${hasVoted?'disabled':''}>
+          ${btnContent}
+        </button>
+      </div>`;
     grid.appendChild(card);
   });
   view.appendChild(grid);
