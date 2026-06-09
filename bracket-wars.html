@@ -2285,7 +2285,8 @@ function buildMatchCard(pA,pB,md,isLatest){
     toggle.classList.toggle('open',open);
     const chev=toggle.querySelector('.lmc-scout-chevron');
     chev.style.animation=open?'none':'';
-    chev.style.transform=open?'rotate(180deg)':'';
+    chev.style.transform='';
+    chev.textContent=open?'▴':'▾';
   });
   card.appendChild(toggle);card.appendChild(panel);
   return card;
