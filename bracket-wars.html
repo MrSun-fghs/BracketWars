@@ -2032,7 +2032,7 @@ function buildRecCard(r, globalRank, catRank, catTotal, catColor) {
 
   const badge=document.createElement('div');
   badge.style.cssText=`position:absolute;bottom:${isCompact?-2:-5}px;right:${isCompact?-2:-5}px;background:${borderColor};color:#fff;border-radius:50%;width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;font-weight:700;display:flex;align-items:center;justify-content:center;border:${borderPx} solid var(--md-background);`;
-  badge.textContent=catRank||'?';
+  badge.textContent=globalRank||'?';
   avWrap.appendChild(badge);
   card.appendChild(avWrap);
 
