@@ -254,12 +254,12 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;align-items:stretch;justify-content:center;column-gap:.5rem;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
 .mm-bracket:not(.all-collapsed){min-width:900px;}
 /* Compact TBD matchups so full bracket fits in view */
-.tbd-matchup{opacity:.38;}
-.tbd-matchup .poem-slot{padding:.08rem .5rem;min-height:0;}
+.tbd-matchup{opacity:.38;width:fit-content;min-width:0;margin:0 auto;}
+.tbd-matchup .poem-slot{padding:.1rem .4rem;min-height:0;white-space:nowrap;}
 .tbd-matchup .poem-slot:not(:last-child){border-bottom:1px solid var(--md-outline-variant);}
-.tbd-matchup .poem-name{font-size:.62rem;line-height:1.1;}
+.tbd-matchup .poem-name{font-size:.6rem;line-height:1.15;}
 .tbd-matchup .poem-author{display:none;}
-.tbd-matchup .seed{font-size:.48rem;padding:.04rem .18rem;}
+.tbd-matchup .seed{font-size:.46rem;padding:.03rem .15rem;}
 .col-header{text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,border-bottom-color .45s;display:flex;align-items:center;justify-content:center;}
 .col-header[data-collapsed]{padding:0;border-bottom-color:transparent;overflow:hidden;}
 .col-header[data-collapsed]>*{display:none;}
@@ -2747,6 +2747,13 @@ function renderBracket(){
   const rR1=mcol('bc right','7','2');rR1.setAttribute('data-bcol','7');
   rR1.appendChild(catBan(CATEGORIES[2]));rR1.appendChild(bcard('rR1',2,0,true,isT));rR1.appendChild(bcard('rR1',2,1,true,isT));rR1.appendChild(catBan(CATEGORIES[3]));rR1.appendChild(bcard('rR1',3,0,true,isT));rR1.appendChild(bcard('rR1',3,1,true,isT));
   rR1.appendChild(mkStrip(7,'Round of 16','‹'));bracket.appendChild(rR1);
+  // Shrink all-TBD columns so they only take content width
+  [1,2,3,5,6,7].forEach(col=>{
+    const colEl = bracket.querySelector(`[data-bcol="${col}"]`);
+    if (!colEl) return;
+    const allTBD = [...colEl.querySelectorAll('.matchup')].every(m=>m.classList.contains('tbd-matchup'));
+    bracket.style.setProperty(`--bcol${col}`, allTBD ? '56px' : '1fr');
+  });
   // Apply collapse state (immediate for page-load; delayed timer handles post-result-save animation)
   if(!bracketFreshResult)applyBracketCollapse();
   if(bracketJustSavedKey){
