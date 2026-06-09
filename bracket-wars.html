@@ -177,12 +177,20 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .seg-btn#btnBracket.active svg line:nth-child(4){animation:hexPairB 2s ease-in-out infinite;animation-delay:1s;}
 .seg-btn#btnBracket.active svg line:nth-child(5){animation:hexPairA 2s ease-in-out infinite;animation-delay:.5s;}
 .seg-btn#btnBracket.active svg line:nth-child(6){animation:hexPairB 2s ease-in-out infinite;animation-delay:.5s;}
-.seg-btn#btnList:not(.active):hover svg{animation:navZap .45s ease;}
-@keyframes navDramaLine{0%,15%{stroke-dashoffset:0;opacity:1}55%,70%{stroke-dashoffset:35;opacity:.06}100%{stroke-dashoffset:0;opacity:1}}
-@keyframes navDramaLine3{0%,15%{stroke-dashoffset:0;opacity:1}55%,70%{stroke-dashoffset:12;opacity:.06}100%{stroke-dashoffset:0;opacity:1}}
-.seg-btn#btnList.active svg line:nth-child(1){animation:navDramaLine 1.8s ease-in-out infinite;}
-.seg-btn#btnList.active svg line:nth-child(2){animation:navDramaLine 1.8s ease-in-out infinite;animation-delay:.12s;}
-.seg-btn#btnList.active svg line:nth-child(3){animation:navDramaLine3 1.8s ease-in-out infinite;animation-delay:.24s;}
+/* Drama icon — talking waveform */
+@keyframes dramaTalk{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.18)}}
+@keyframes dramaHover{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.55)}}
+.seg-btn#btnList svg rect{transform-box:fill-box;transform-origin:center;}
+.seg-btn#btnList.active svg rect:nth-child(1){animation:dramaTalk .80s ease-in-out infinite;animation-delay:0s;}
+.seg-btn#btnList.active svg rect:nth-child(2){animation:dramaTalk .55s ease-in-out infinite;animation-delay:.12s;}
+.seg-btn#btnList.active svg rect:nth-child(3){animation:dramaTalk .70s ease-in-out infinite;animation-delay:.22s;}
+.seg-btn#btnList.active svg rect:nth-child(4){animation:dramaTalk .62s ease-in-out infinite;animation-delay:.06s;}
+.seg-btn#btnList.active svg rect:nth-child(5){animation:dramaTalk .75s ease-in-out infinite;animation-delay:.18s;}
+.seg-btn#btnList:not(.active):hover svg rect:nth-child(1){animation:dramaHover .45s ease both;}
+.seg-btn#btnList:not(.active):hover svg rect:nth-child(2){animation:dramaHover .45s ease .06s both;}
+.seg-btn#btnList:not(.active):hover svg rect:nth-child(3){animation:dramaHover .45s ease .12s both;}
+.seg-btn#btnList:not(.active):hover svg rect:nth-child(4){animation:dramaHover .45s ease .18s both;}
+.seg-btn#btnList:not(.active):hover svg rect:nth-child(5){animation:dramaHover .45s ease .24s both;}
 .seg-btn#btnLeaderboard:not(.active):hover svg{animation:navBounce .4s ease;}
 .seg-btn#btnLeaderboard.active svg line:nth-child(1){animation:navRecordLine 2.4s ease-in-out infinite;}
 .seg-btn#btnLeaderboard.active svg line:nth-child(2){animation:navRecordLine 2.4s ease-in-out infinite;animation-delay:.6s;}
@@ -991,7 +999,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
     <div class="seg-btn-track" id="viewToggle" style="display:none">
       <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
       <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><svg width="15" height="15" viewBox="2 2 44 44" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/></svg> Bracket</button>
-      <button class="seg-btn" id="btnList" onclick="setView('list')"><svg width="13" height="15" viewBox="0 0 38 44" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="30" y1="4" x2="8" y2="22" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="35"/><line x1="8" y1="22" x2="30" y2="38" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="35"/><line x1="30" y1="38" x2="22" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="12"/></svg> Drama</button>
+      <button class="seg-btn" id="btnList" onclick="setView('list')"><svg width="16" height="13" viewBox="0 0 42 32" fill="currentColor" style="display:inline-block;vertical-align:-2px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg> Drama</button>
       <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/></svg> Records</button>
       <button class="seg-btn" id="btnRoster" onclick="setView('roster')"><svg width="15" height="15" viewBox="-4 0 56 52" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg> Roster</button>
     </div>
