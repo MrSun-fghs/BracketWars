@@ -73,9 +73,12 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .hmenu-btn-lines span{display:block;width:18px;height:2px;background:currentColor;border-radius:2px;}
 .hmenu-btn-label{font-size:.78rem;font-weight:700;color:#fff;white-space:nowrap;max-width:0;overflow:hidden;opacity:0;transition:max-width .25s ease,opacity .2s ease;}
 .hmenu-btn-label.visible{max-width:120px;opacity:1;}
-.hamburger-btn span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;}
-.hamburger-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:220px;z-index:200;overflow:hidden;display:none;max-height:80vh;overflow-y:auto;}
-.hamburger-menu.open{display:block;}
+.hamburger-btn span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s ease;}
+.hamburger-btn.open .hmenu-btn-lines span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+.hamburger-btn.open .hmenu-btn-lines span:nth-child(2){opacity:0;transform:scaleX(0);}
+.hamburger-btn.open .hmenu-btn-lines span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+.hamburger-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:220px;z-index:200;overflow:hidden;max-height:80vh;overflow-y:auto;opacity:0;transform:scale(.88) translateY(-10px);transform-origin:top right;pointer-events:none;visibility:hidden;transition:opacity .22s ease,transform .28s cubic-bezier(.34,1.4,.64,1),visibility 0s linear .28s;}
+.hamburger-menu.open{opacity:1;transform:scale(1) translateY(0);pointer-events:auto;visibility:visible;transition:opacity .18s ease,transform .28s cubic-bezier(.34,1.4,.64,1),visibility 0s linear 0s;}
 .hmenu-item{padding:.6rem 1rem;font-size:.85rem;font-weight:500;color:#1c1b1f;cursor:pointer;}
 .hmenu-item:hover{background:#f0edf7;color:var(--md-primary);}
 .hmenu-sep{height:1px;background:#ece8f4;margin:3px 0;}
@@ -3381,11 +3384,14 @@ document.addEventListener('fullscreenchange', () => {
 function toggleHamburger(e) {
   if (e) e.stopPropagation();
   const m = document.getElementById('hamburgerMenu');
+  const btn = document.getElementById('hamburgerBtn');
   if (!m) return;
   const opening = !m.classList.contains('open');
   if (opening) rebuildHamburgerMenu();
   m.classList.toggle('open');
+  if (btn) btn.classList.toggle('open', opening);
 }
+
 let _hmenuExpandedBlock = null; // tracks which block is expanded in accordion
 
 function rebuildHamburgerMenu() {
@@ -3499,7 +3505,9 @@ function rebuildHamburgerMenu() {
 }
 document.addEventListener('click', () => {
   const m = document.getElementById('hamburgerMenu');
+  const btn = document.getElementById('hamburgerBtn');
   if (m) m.classList.remove('open');
+  if (btn) btn.classList.remove('open');
 });
 window.addEventListener('resize', () => { applyProjectionScale(); });
 
