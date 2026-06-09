@@ -451,6 +451,18 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 /* Compact result (bottom 2 per category — R16 losers) */
 .rec-compact-result{padding:.3rem 0 .1rem;}
 .rec-compact-result-pill{font-size:.65rem;font-weight:600;padding:2px 9px;border-radius:var(--shape-full);background:#fee2e2;color:#991b1b;}
+/* Progress bar (A2 redesign) */
+.rec-progress-wrap{margin-top:8px;}
+.rec-progress-track{height:4px;border-radius:99px;background:var(--md-surface-container-high);}
+.rec-progress-fill{height:4px;border-radius:99px;transition:width .4s ease;}
+.rec-progress-labels{display:flex;justify-content:space-between;margin-top:4px;}
+.rec-progress-lbl{font-size:8.5px;color:var(--md-on-surface-variant);}
+.rec-progress-lbl.won,.rec-progress-lbl.next{color:var(--cc,var(--md-primary));font-weight:500;}
+.rec-progress-lbl.lost{color:#dc2626;font-weight:500;}
+/* Compact elim card: tighter padding, strikethrough via .eliminated .rec-name */
+.rec-card.compact-card{padding:.55rem .9rem;}
+.rec-card.compact-card .rec-name{font-size:.85rem;}
+.rec-card.compact-card .rec-subtitle{font-size:.68rem;}
 /* VOTE VIEW */
 .vote-view{padding:1.25rem;max-width:960px;margin:0 auto;}
 .vote-tab-pulse{width:7px;height:7px;border-radius:50%;background:var(--md-tertiary);animation:livePulse 1.8s ease-in-out infinite;display:inline-block;margin-right:.4rem;vertical-align:middle;}
@@ -893,7 +905,8 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .roster-chip-label{font-size:7px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#4b4b72;margin-bottom:1px;}
 .roster-chip-value{font-size:11px;font-weight:700;color:#c4c4e0;}
 .roster-known-for{font-size:11px;color:#4b4b72;font-style:italic;margin-bottom:14px;}
-.roster-superpower-badge{display:block;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--r-accent,#f97316);background:color-mix(in srgb,var(--r-accent,#f97316) 12%,transparent);border:1px solid color-mix(in srgb,var(--r-accent,#f97316) 30%,transparent);border-radius:20px;padding:7px 14px;margin-top:6px;margin-bottom:14px;text-align:center;}
+.roster-superpower-badge{display:block;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--r-accent,#f97316);background:color-mix(in srgb,var(--r-accent,#f97316) 12%,transparent);border:1px solid color-mix(in srgb,var(--r-accent,#f97316) 30%,transparent);border-radius:20px;padding:7px 14px;margin-top:6px;margin-bottom:14px;text-align:center;animation:superpowerPulse 2.4s ease-in-out infinite;}
+@keyframes superpowerPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--r-accent,#f97316) 0%,transparent);}50%{box-shadow:0 0 14px 5px color-mix(in srgb,var(--r-accent,#f97316) 45%,transparent);}}
 .roster-stat-section{display:flex;flex-direction:column;justify-content:center;flex:1;gap:10px;padding-top:17px;}
 .roster-stat-row{display:flex;align-items:center;gap:8px;}
 .roster-stat-label{font-size:8px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#4b4b72;width:110px;flex-shrink:0;}
@@ -1943,87 +1956,102 @@ function renderLeaderboard() {
 function buildRecCard(r, globalRank, catRank, catTotal, catColor) {
   const isChamp=r.status==='champion';
   const isDeep=r.roundsWon>=1;
+  const isElim=r.status==='eliminated';
+  const isAlive=r.status==='alive';
   const isCompact=!isChamp&&!isDeep;
-  const statusClass=isChamp?'champion':r.status==='alive'?'alive':r.status==='eliminated'?'eliminated':'pending';
+  const statusClass=isChamp?'champion':isAlive?'alive':isElim?'eliminated':'pending';
   const card=document.createElement('div');
   card.className='rec-card '+statusClass+(isCompact?' compact-card':'');
 
-  // Category color
   const catHex=catColor||'#555';
   card.style.setProperty('--cc',catHex);
   card.style.borderLeft='3px solid '+catHex;
 
-  // Placement badge
-  const placementLabel=isChamp?'Champion':r.roundsWon===3?'Runner-up':r.roundsWon===2?'Semifinalist':null;
-  const placementClass=isChamp?'champ':r.roundsWon===3?'runner':r.roundsWon===2?'semi':null;
-
-  // Subtitle
-  const lostRound=r.rounds.length>0&&r.status==='eliminated'?r.rounds[r.rounds.length-1].label:null;
+  // Subtitle / lost label
+  const lostRound=r.rounds.length>0&&isElim?r.rounds[r.rounds.length-1].label:null;
   const lostLabel=lostRound?`Lost in ${lostRound==='R16'?'round of 16':lostRound==='QF'?'quarterfinal':lostRound==='SF'?'semifinal':'final'}`:'Yet to play';
   const catOrdinal=catRank===1?'1st':catRank===2?'2nd':catRank===3?'3rd':`${catRank}th`;
   const catSuffix=` · ${catOrdinal} in category`;
-  const subtitle=isChamp?`Won all matches · Undefeated${catSuffix}`:r.status==='alive'?`Still in the tournament${catSuffix}`:r.status==='pending'?'Waiting for their match':lostLabel+catSuffix;
+  const subtitle=isChamp?`Won all matches · Undefeated${catSuffix}`:isAlive?`Still in the tournament${catSuffix}`:r.status==='pending'?'Waiting for their match':lostLabel+catSuffix;
 
-  // Rank column (direct child of card — spans full card height for centering)
-  const rankCol=document.createElement('div');rankCol.className='rec-rank-col';
-  const rankNum=document.createElement('div');rankNum.className='rec-rank-num';rankNum.textContent=globalRank;
-  const rankLbl=document.createElement('div');rankLbl.className='rec-rank-overall';rankLbl.textContent='overall';
-  if(r.status==='alive'||isChamp) rankNum.style.color=catHex;
-  if(r.status==='pending'){rankNum.textContent='?';rankLbl.textContent='rank';}
-  rankCol.appendChild(rankNum);rankCol.appendChild(rankLbl);
-  card.appendChild(rankCol);
+  // Placement badge (full cards only)
+  const placementLabel=isChamp?'Champion':r.roundsWon===3?'Runner-up':r.roundsWon===2?'Semifinalist':null;
+  const placementClass=isChamp?'champ':r.roundsWon===3?'runner':r.roundsWon===2?'semi':null;
 
-  // Body (info + round markers)
+  // ── Avatar ──
+  const rosterPoem=ROSTER_POEMS.find(p=>p.num===r.idx+1);
+  const avatarSrc=rosterPoem?rosterPoem.svg:null;
+  const avSize=isCompact?36:96;
+  const badgeSize=isCompact?14:28;
+  const badgeFontSize=isCompact?8:14;
+  const borderPx=isCompact?'1.5px':'3px';
+  const borderColor=isCompact?'#888':catHex;
+
+  const avWrap=document.createElement('div');
+  avWrap.style.cssText=`position:relative;flex-shrink:0;width:${avSize}px;height:${avSize}px;`;
+
+  const avEl=document.createElement('div');
+  avEl.style.cssText=`width:${avSize}px;height:${avSize}px;border-radius:50%;overflow:hidden;border:${borderPx} solid ${borderColor};${isCompact?'filter:grayscale(1);':''}background:var(--md-surface-container);`;
+  if(avatarSrc){
+    const img=document.createElement('img');
+    img.src=avatarSrc;
+    img.style.cssText=`width:100%;height:100%;object-fit:cover;${isCompact?'opacity:.55;':''}`;
+    img.alt=r.name;
+    avEl.appendChild(img);
+  }
+  avWrap.appendChild(avEl);
+
+  const badge=document.createElement('div');
+  badge.style.cssText=`position:absolute;bottom:${isCompact?-2:-5}px;right:${isCompact?-2:-5}px;background:${borderColor};color:#fff;border-radius:50%;width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;font-weight:700;display:flex;align-items:center;justify-content:center;border:${borderPx} solid var(--md-background);`;
+  badge.textContent=catRank||'?';
+  avWrap.appendChild(badge);
+  card.appendChild(avWrap);
+
+  // ── Body ──
   const body=document.createElement('div');body.className='rec-card-body';
 
-  // Top row (info + placement)
-  const top=document.createElement('div');top.className='rec-card-top';
-  const info=document.createElement('div');info.className='rec-info';
   const name=document.createElement('div');name.className='rec-name';name.textContent=r.name;
-  const auth=document.createElement('div');auth.className='rec-author';auth.textContent='by '+(DEFAULT_AUTHORS[r.idx]||'');
-  const sub=document.createElement('div');sub.className='rec-subtitle';sub.textContent=subtitle;
-  info.appendChild(name);info.appendChild(auth);info.appendChild(sub);
-  top.appendChild(info);
-  if(placementLabel){const pl=document.createElement('span');pl.className='rec-placement '+placementClass;pl.textContent=placementLabel;top.appendChild(pl);}
-  body.appendChild(top);
 
-  // Bottom 2 (compact): single R16 result pill — saves space
   if(isCompact){
-    if(r.rounds.length>0){
-      const rnd=r.rounds[0];
-      const total=rnd.myVotes+rnd.oppVotes;
-      const pct=total>0?Math.round(rnd.myVotes/total*100):0;
-      const cr=document.createElement('div');cr.className='rec-compact-result';
-      const pill=document.createElement('span');pill.className='rec-compact-result-pill';
-      pill.textContent=`R16 · ${rnd.result==='won'?'W':'L'} ${pct}%`;
-      cr.appendChild(pill);body.appendChild(cr);
-    }
+    // Eliminated compact: strikethrough title + single info line
+    const combinedSub=document.createElement('div');
+    combinedSub.className='rec-subtitle';
+    combinedSub.textContent='by '+(DEFAULT_AUTHORS[r.idx]||'')+' · '+subtitle;
+    body.appendChild(name);
+    body.appendChild(combinedSub);
   } else {
-    // Top 2 (deep/champion): full round marker dots
+    // Full card: title, author, subtitle, then progress bar
+    const auth=document.createElement('div');auth.className='rec-author';auth.textContent='by '+(DEFAULT_AUTHORS[r.idx]||'');
+    const sub=document.createElement('div');sub.className='rec-subtitle';sub.textContent=subtitle;
+    const top=document.createElement('div');top.className='rec-card-top';
+    const info=document.createElement('div');info.className='rec-info';
+    info.appendChild(name);info.appendChild(auth);info.appendChild(sub);
+    top.appendChild(info);
+    if(placementLabel){const pl=document.createElement('span');pl.className='rec-placement '+placementClass;pl.textContent=placementLabel;top.appendChild(pl);}
+    body.appendChild(top);
+
+    // Progress bar
     const ALL_ROUNDS=['R16','QF','SF','F'];
-    const dotData=ALL_ROUNDS.map((label,i)=>{
-      const played=r.rounds.find(rd=>rd.label===label);
-      if(played){const total=played.myVotes+played.oppVotes;const pct=total>0?Math.round(played.myVotes/total*100):null;return{label,state:played.result,pct};}
-      if(r.status==='eliminated')return{label,state:'future',pct:null};
-      const nextIdx=r.rounds.length;
-      if(i===nextIdx)return{label,state:'next',pct:null};
-      return{label,state:'future',pct:null};
+    const fillPct=Math.round(r.roundsWon/4*100);
+    const progWrap=document.createElement('div');progWrap.className='rec-progress-wrap';
+    const track=document.createElement('div');track.className='rec-progress-track';
+    const fill=document.createElement('div');fill.className='rec-progress-fill';
+    fill.style.cssText=`width:${fillPct}%;background:${catHex};`;
+    track.appendChild(fill);progWrap.appendChild(track);
+    const lblRow=document.createElement('div');lblRow.className='rec-progress-labels';
+    ALL_ROUNDS.forEach((lbl,i)=>{
+      const played=r.rounds.find(rd=>rd.label===lbl);
+      let state='future';
+      if(played) state=played.result; // 'won' or 'lost'
+      else if(!isElim&&i===r.rounds.length) state='next';
+      const span=document.createElement('span');
+      span.className='rec-progress-lbl '+state;
+      span.textContent=state==='won'?lbl+' ✓':state==='lost'?lbl+' ✗':state==='next'?'▸ '+lbl:lbl;
+      lblRow.appendChild(span);
     });
-    const markers=document.createElement('div');markers.className='rec-round-markers';
-    dotData.forEach((d,i)=>{
-      if(i>0){const con=document.createElement('div');con.className='rec-rm-con';markers.appendChild(con);}
-      const item=document.createElement('div');item.className='rec-rm-item';
-      const dot=document.createElement('div');dot.className='rec-rm-dot '+d.state;
-      if(d.state==='won')dot.textContent='✓';
-      else if(d.state==='lost')dot.textContent='✗';
-      if(d.state==='next')dot.style.borderColor=catHex;
-      const lbl=document.createElement('div');lbl.className='rec-rm-label';lbl.textContent=d.label;
-      item.appendChild(dot);item.appendChild(lbl);
-      if(d.pct!==null){const pctEl=document.createElement('div');pctEl.className='rec-rm-pct';pctEl.textContent=d.pct+'%';item.appendChild(pctEl);}
-      markers.appendChild(item);
-    });
-    body.appendChild(markers);
+    progWrap.appendChild(lblRow);body.appendChild(progWrap);
   }
+
   card.appendChild(body);
   return card;
 }
