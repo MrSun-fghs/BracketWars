@@ -1463,7 +1463,7 @@ function showCurrentView() {
     voteBtn.classList.toggle('vote-live', showVote);
     voteBtn.classList.toggle('active', showVote && currentView === 'vote');
   }
-  const hideBar = currentView === 'home' || currentView === 'vote';
+  const hideBar = currentView === 'home' || currentView === 'vote' || currentView === 'roster';
   const tb = document.getElementById('secondaryToolbar');
   if (tb) tb.style.display = hideBar ? 'none' : 'block';
   if (currentView==='home') renderHome();
