@@ -2046,6 +2046,9 @@ function renderTabs() {
 }
 
 function updateStatus() {
+  const hideViews = ['home','vote','roster'];
+  const tb = document.getElementById('secondaryToolbar');
+  if (tb) tb.style.display = (MODE === 'teacher' || hideViews.includes(currentView)) ? 'none' : 'block';
   let done=0, total=0; const b=bkt();
   b.regionRounds.forEach(reg=>reg.forEach(m=>{total++;if(m.winnerIdx!==null)done++;}));
   b.semis.forEach(m=>{total++;if(m.winnerIdx!==null)done++;}); total++; if(b.final.winnerIdx!==null)done++;
