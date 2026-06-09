@@ -2102,9 +2102,9 @@ function buildSecondaryToolbar() {
 function updateHamburgerLabel() {
   const lbl = document.getElementById('hmenuBtnLabel');
   if (!lbl) return;
-  const onHome = currentView === 'home';
+  const onStudentHome = MODE === 'student' && currentView === 'home';
   const activeCls = app.classes && app.classes.find(c => c.id === app.activeId);
-  if (!onHome && activeCls) {
+  if (!onStudentHome && activeCls) {
     lbl.textContent = activeCls.name;
     lbl.classList.add('visible');
   } else {
