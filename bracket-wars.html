@@ -31,6 +31,10 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .app-bar-subtitle{font-size:.72rem;color:var(--md-on-surface-variant);letter-spacing:.05em;margin-top:.15rem;position:relative;top:3px;}
 .app-bar-actions{display:flex;align-items:center;gap:.5rem;}
 .btn-tonal{display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:500;padding:.5rem 1.25rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:var(--md-secondary-container);color:var(--md-on-secondary-container);transition:filter .15s;white-space:nowrap;}
+.btn-teacher-collapsed{padding:.5rem .75rem;transition:filter .15s,padding .2s ease;}
+.btn-teacher-collapsed .teacher-label{display:inline-block;max-width:0;overflow:hidden;opacity:0;transition:max-width .25s ease,opacity .15s ease;}
+.btn-teacher-collapsed:hover{padding:.5rem 1.25rem;}
+.btn-teacher-collapsed:hover .teacher-label{max-width:6rem;opacity:1;}
 .btn-tonal:hover{filter:brightness(.95);}
 .btn-filled{display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:500;padding:.5rem 1.5rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:var(--md-primary);color:var(--md-on-primary);box-shadow:var(--elev-1);transition:filter .15s;white-space:nowrap;}
 .btn-filled:hover{filter:brightness(1.08);}
@@ -1808,7 +1812,7 @@ function buildAppBar() {
     const chip = document.createElement('div'); chip.className='live-chip'; chip.innerHTML='<div class="live-dot"></div>Live'; el.appendChild(chip);
     const fsBtn = document.createElement('button'); fsBtn.className='fullscreen-btn'; fsBtn.title='Fullscreen'; fsBtn.onclick=toggleStudentFullscreen;
     fsBtn.innerHTML='⛶<span class="fs-label">Fullscreen</span>'; el.appendChild(fsBtn);
-    const b = document.createElement('button'); b.className='btn-tonal'; b.innerHTML='✎ Teacher'; b.onclick=requestTeacherMode; el.appendChild(b);
+    const b = document.createElement('button'); b.className='btn-tonal btn-teacher-collapsed'; b.innerHTML='✎<span class="teacher-label"> Teacher</span>'; b.onclick=requestTeacherMode; el.appendChild(b);
   }
 }
 
