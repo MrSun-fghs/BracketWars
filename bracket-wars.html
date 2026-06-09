@@ -48,6 +48,8 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .hmenu-label{padding:.35rem 1rem .15rem;font-size:.62rem;font-weight:700;letter-spacing:.07em;color:#9ca3af;text-transform:uppercase;}
 .hmenu-subitem{padding:.5rem 1rem .5rem 2rem;font-size:.82rem;border-left:2px solid #ede9f6;margin-left:1rem;}
 .hmenu-subitem:hover{background:#f5f3ff;}
+.hmenu-block-row{display:flex;align-items:center;justify-content:space-between;}
+.hmenu-chevron{font-size:.85rem;opacity:.5;margin-left:.5rem;}
 @media(max-width:680px){
   #sectionNav{display:none!important;}
   .hamburger-wrap{display:block!important;}
@@ -1924,7 +1926,9 @@ function buildBlockPill() {
   const isHome = currentView === 'home' || currentView === 'engagement';
   const btn = document.createElement('button');
   btn.className = 'block-pill'; btn.id = 'blockPillBtn';
-  btn.innerHTML = `<span id="blockPillLabel">Block Navigator</span><span class="block-pill-caret">▾</span>`;
+  const activeCls = app.classes && app.classes.find(c => c.id === app.activeId);
+  const pillLabel = isHome ? 'Classes' : (activeCls ? activeCls.name : 'Classes');
+  btn.innerHTML = `<span id="blockPillLabel">${esc(pillLabel)}</span><span class="block-pill-caret">▾</span>`;
   const dd = document.createElement('div');
   dd.className = 'block-dropdown'; dd.id = 'blockDropdown';
   const ddi = document.createElement('div'); ddi.className = 'block-dropdown-inner';
@@ -3312,54 +3316,89 @@ function toggleHamburger(e) {
   if (opening) rebuildHamburgerMenu();
   m.classList.toggle('open');
 }
+let _hmenuExpandedBlock = null; // tracks which block is expanded in accordion
+
 function rebuildHamburgerMenu() {
   const m = document.getElementById('hamburgerMenu');
   if (!m) return;
   m.innerHTML = '';
 
-  const mk = (label, fn, cls2, extra) => {
-    const d = document.createElement('div');
-    d.className = 'hmenu-item' + (cls2 ? ' ' + cls2 : '');
-    if (extra) Object.assign(d.style, extra);
-    d.innerHTML = label;
-    d.onclick = () => { fn(); m.classList.remove('open'); };
-    m.appendChild(d); return d;
-  };
   const sep = () => { const d=document.createElement('div'); d.className='hmenu-sep'; m.appendChild(d); };
   const lbl = (text) => { const d=document.createElement('div'); d.className='hmenu-label'; d.textContent=text; m.appendChild(d); };
 
   const isHome = currentView === 'home';
-  const inBlock = !isHome && currentView !== 'vote';
 
   // ── HOME ──
-  mk('🏠 Home', () => { setView('home'); renderAll(); }, '', isHome ? {color:'#4338ca',fontWeight:'700'} : {});
+  const homeEl = document.createElement('div');
+  homeEl.className = 'hmenu-item';
+  homeEl.innerHTML = '🏠 Home';
+  if (isHome) homeEl.style.cssText = 'color:#4338ca;font-weight:700;';
+  homeEl.onclick = () => { _hmenuExpandedBlock = null; setView('home'); renderAll(); m.classList.remove('open'); };
+  m.appendChild(homeEl);
+
+  const settingsEl = document.createElement('div');
+  settingsEl.className = 'hmenu-item';
+  settingsEl.style.color = '#6b7280';
+  settingsEl.textContent = '⚙ Settings';
+  settingsEl.onclick = () => { requestTeacherMode(); m.classList.remove('open'); };
+  m.appendChild(settingsEl);
 
   sep();
 
-  // ── BLOCKS (accordion: active block expands sub-views) ──
+  // ── BLOCKS (tap-to-expand accordion) ──
   if (app.classes && app.classes.length > 0) {
     lbl('YOUR BLOCKS');
     ensureVoting(app);
     app.classes.forEach(cls => {
       const isActive = cls.id === app.activeId && !isHome;
-      mk((isActive ? '● ' : '○ ') + cls.name, () => {
-        app.activeId = cls.id; setView('bracket'); renderAll(); showCurrentView();
-      }, '', isActive ? {color:'#4338ca',fontWeight:'700'} : {});
+      const isExpanded = _hmenuExpandedBlock === cls.id;
 
-      // Sub-views accordion — only show for active block
-      if (isActive) {
+      const blockEl = document.createElement('div');
+      blockEl.className = 'hmenu-item hmenu-block-row';
+      blockEl.style.cssText = isActive ? 'color:#4338ca;font-weight:700;' : '';
+      blockEl.innerHTML = `<span>${isActive ? '● ' : '○ '}${esc(cls.name)}</span><span class="hmenu-chevron">${isExpanded ? '▾' : '›'}</span>`;
+      blockEl.onclick = (e) => {
+        e.stopPropagation();
+        if (_hmenuExpandedBlock === cls.id) {
+          _hmenuExpandedBlock = null;
+        } else {
+          _hmenuExpandedBlock = cls.id;
+          // Switch to this block if not already active
+          if (cls.id !== app.activeId || isHome) {
+            app.activeId = cls.id; renderAll(); showCurrentView();
+          }
+        }
+        rebuildHamburgerMenu();
+      };
+      m.appendChild(blockEl);
+
+      // Sub-views — shown when expanded
+      if (isExpanded || isActive) {
         const subViews = [
-          ['⬡ Bracket','bracket'],
-          ['▌ Drama','list'],
-          ['# Records','leaderboard'],
-          ['∧ Roster','roster'],
+          ['🏆 Bracket','bracket'],
+          ['🎭 Drama','list'],
+          ['📊 Records','leaderboard'],
+          ['📋 Roster','roster'],
         ];
         subViews.forEach(([label, v]) => {
-          mk(label, () => setView(v), 'hmenu-subitem', currentView===v ? {color:'#4338ca',fontWeight:'700'} : {});
+          const sub = document.createElement('div');
+          sub.className = 'hmenu-item hmenu-subitem';
+          if (currentView === v && isActive) sub.style.cssText = 'color:#4338ca;font-weight:700;';
+          sub.textContent = label;
+          sub.onclick = () => {
+            app.activeId = cls.id;
+            setView(v); renderAll(); showCurrentView();
+            m.classList.remove('open');
+          };
+          m.appendChild(sub);
         });
-        // Vote if open for this block
         if (app.voting.open && app.voting.classId === cls.id) {
-          mk('🗳 Vote Now', () => setView('vote'), 'hmenu-subitem', {background:'#fef3c7',color:'#92400e',fontWeight:'800'});
+          const vEl = document.createElement('div');
+          vEl.className = 'hmenu-item hmenu-subitem';
+          vEl.style.cssText = 'background:#fef3c7;color:#92400e;font-weight:800;';
+          vEl.textContent = '🗳 Vote Now';
+          vEl.onclick = () => { setView('vote'); m.classList.remove('open'); };
+          m.appendChild(vEl);
         }
       }
     });
@@ -3369,8 +3408,9 @@ function rebuildHamburgerMenu() {
 
   // ── MORE ──
   lbl('MORE');
-  mk('⛶ Fullscreen', () => toggleStudentFullscreen(), '');
-  mk('✎ Teacher View', () => requestTeacherMode(), '', {color:'#6b7280'});
+  const fsEl = document.createElement('div'); fsEl.className = 'hmenu-item';
+  fsEl.textContent = '⛶ Fullscreen'; fsEl.onclick = () => { toggleStudentFullscreen(); m.classList.remove('open'); };
+  m.appendChild(fsEl);
 }
 document.addEventListener('click', () => {
   const m = document.getElementById('hamburgerMenu');
