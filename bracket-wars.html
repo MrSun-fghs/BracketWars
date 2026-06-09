@@ -31,11 +31,41 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .app-bar-left{flex:1;min-width:0;}
 .app-bar-title{font-size:1.25rem;font-weight:700;color:#fff;letter-spacing:-.01em;line-height:1;cursor:pointer;}
 /* Center nav — absolutely centered so left/right widths don't skew it */
-#sectionNav{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;pointer-events:auto;}
+#sectionNav{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;pointer-events:auto;overflow:visible;}
 #sectionNav .seg-btn-track{display:flex;gap:.25rem;}
 #sectionNav .seg-btn{color:rgba(255,255,255,.6);background:transparent;flex-direction:row;gap:.4rem;padding:.38rem .85rem;font-size:.78rem;min-width:auto;}
 #sectionNav .seg-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
 #sectionNav .seg-btn.active{background:#fff;color:var(--md-primary);box-shadow:none;}
+/* Medium screens (Chromebook range): icon-only nav with hover tooltip */
+@media(min-width:681px) and (max-width:1199px){
+  #sectionNav .seg-btn .nav-label{display:none;}
+  #sectionNav .seg-btn{padding:.38rem .55rem;position:relative;overflow:visible;}
+  #sectionNav .seg-btn::after{
+    content:attr(data-label);
+    position:absolute;
+    top:calc(100% + 8px);
+    left:50%;
+    transform:translateX(-50%) translateY(-4px);
+    background:rgba(22,14,54,.93);
+    color:#fff;
+    font-size:.7rem;
+    font-weight:700;
+    letter-spacing:.03em;
+    padding:.25rem .6rem;
+    border-radius:7px;
+    white-space:nowrap;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .15s ease, transform .15s ease;
+    z-index:200;
+  }
+  #sectionNav .seg-btn:hover::after{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+  /* Keep vote pill text visible at medium sizes */
+  #sectionNav .vote-nav-pill{font-size:.72rem;padding:.32rem .6rem;}
+}
 /* Hamburger */
 .hamburger-wrap{display:none;position:relative;}
 .hamburger-btn{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;}
@@ -1057,10 +1087,10 @@ body.projection #sectionNav{display:none!important;}
     <div id="sectionNav" style="display:none">
       <div class="seg-btn-track" id="viewToggle">
         <button id="btnVote" class="vote-nav-pill" onclick="setView('vote')" style="display:none">🗳 Vote Now</button>
-        <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><svg width="15" height="15" viewBox="2 2 44 44" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/></svg> Bracket</button>
-        <button class="seg-btn" id="btnList" onclick="setView('list')"><svg width="16" height="13" viewBox="0 0 42 32" fill="currentColor" style="display:inline-block;vertical-align:-2px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg> Drama</button>
-        <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/></svg> Records</button>
-        <button class="seg-btn" id="btnRoster" onclick="setView('roster')"><svg width="15" height="15" viewBox="-4 0 56 52" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg> Roster</button>
+        <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')" data-label="Bracket"><svg width="15" height="15" viewBox="2 2 44 44" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/></svg><span class="nav-label"> Bracket</span></button>
+        <button class="seg-btn" id="btnList" onclick="setView('list')" data-label="Drama"><svg width="16" height="13" viewBox="0 0 42 32" fill="currentColor" style="display:inline-block;vertical-align:-2px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg><span class="nav-label"> Drama</span></button>
+        <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')" data-label="Records"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/></svg><span class="nav-label"> Records</span></button>
+        <button class="seg-btn" id="btnRoster" onclick="setView('roster')" data-label="Roster"><svg width="15" height="15" viewBox="-4 0 56 52" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg><span class="nav-label"> Roster</span></button>
       </div>
     </div>
     <div class="app-bar-actions" id="appBarActions"></div>
