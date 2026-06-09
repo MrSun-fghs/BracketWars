@@ -42,15 +42,21 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .hamburger-btn span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;}
 .hamburger-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:150px;z-index:200;overflow:hidden;display:none;}
 .hamburger-menu.open{display:block;}
-.hmenu-item{padding:.65rem 1rem;font-size:.85rem;font-weight:500;color:#1c1b1f;cursor:pointer;}
+.hmenu-item{padding:.6rem 1rem;font-size:.85rem;font-weight:500;color:#1c1b1f;cursor:pointer;}
 .hmenu-item:hover{background:#f0edf7;color:var(--md-primary);}
+.hmenu-sep{height:1px;background:#ece8f4;margin:3px 0;}
+.hmenu-label{padding:.35rem 1rem .15rem;font-size:.62rem;font-weight:700;letter-spacing:.07em;color:#9ca3af;text-transform:uppercase;}
 @media(max-width:680px){
   #sectionNav .seg-btn-track{display:none;}
-  .hamburger-wrap{display:block;}
-  /* Hide block pill and live chip on mobile — all in hamburger */
+  .hamburger-wrap{display:block!important;}
+  /* Hide all header actions on mobile — everything moves into hamburger */
   .block-pill-wrap{display:none!important;}
   .vote-nav-pill{display:none!important;}
   .app-bar .live-chip{display:none!important;}
+  .fullscreen-btn{display:none!important;}
+  .teacher-btn{display:none!important;}
+  /* Always show hamburger even on home */
+  #sectionNav{display:flex!important;}
 }
 .app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:.1rem;}
 .vote-nav-pill{display:inline-flex;align-items:center;gap:5px;margin-top:.3rem;padding:.28rem .85rem;border-radius:99px;background:#f59e0b;color:#1c1400;font-size:.75rem;font-weight:800;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 0 0 0 rgba(245,158,11,.6);animation:votePillPulse 1.8s ease-in-out infinite;}
@@ -3315,36 +3321,52 @@ function rebuildHamburgerMenu() {
   const m = document.getElementById('hamburgerMenu');
   if (!m) return;
   m.innerHTML = '';
-  const mk = (label, fn) => {
+
+  const mk = (label, fn, extra) => {
     const d = document.createElement('div'); d.className = 'hmenu-item';
-    d.textContent = label; d.onclick = () => { fn(); m.classList.remove('open'); };
-    m.appendChild(d);
+    if (extra) Object.assign(d.style, extra);
+    d.innerHTML = label;
+    d.onclick = () => { fn(); m.classList.remove('open'); };
+    m.appendChild(d); return d;
   };
-  // Vote (if open)
+  const sep = () => { const d=document.createElement('div'); d.className='hmenu-sep'; m.appendChild(d); };
+  const lbl = (text) => { const d=document.createElement('div'); d.className='hmenu-label'; d.textContent=text; m.appendChild(d); };
+
+  // ── HOME ──
+  mk('🏠 Home', () => setView('home'), currentView==='home'?{color:'#4338ca',fontWeight:'700'}:{});
+
+  sep();
+
+  // ── BLOCKS ──
+  if (app.classes && app.classes.length > 0) {
+    lbl('YOUR BLOCKS');
+    app.classes.forEach(cls => {
+      const active = cls.id === app.activeId;
+      mk((active ? '● ' : '○ ') + cls.name, () => {
+        app.activeId = cls.id; setView('bracket'); renderAll(); showCurrentView();
+      }, active ? {color:'#4338ca',fontWeight:'700'} : {});
+    });
+    sep();
+  }
+
+  // ── VIEWS ──
+  lbl('VIEWS');
+  const views = [['⬡ Bracket','bracket'],['▌ Drama','list'],['# Records','leaderboard'],['∧ Roster','roster']];
+  views.forEach(([label, v]) => mk(label, () => setView(v), currentView===v?{color:'#4338ca',fontWeight:'700'}:{}));
+
+  // ── VOTE (if open) ──
   ensureVoting(app);
   if (app.voting.open) {
-    const vd = document.createElement('div'); vd.className = 'hmenu-item';
-    vd.style.cssText = 'background:#fef3c7;color:#92400e;font-weight:800;';
-    vd.textContent = '🗳 Vote Now'; vd.onclick = () => { setView('vote'); m.classList.remove('open'); };
-    m.appendChild(vd);
-    const sep = document.createElement('div'); sep.style.cssText = 'height:1px;background:#f0edf7;margin:2px 0;'; m.appendChild(sep);
+    sep();
+    mk('🗳 Vote Now', () => setView('vote'), {background:'#fef3c7',color:'#92400e',fontWeight:'800'});
   }
-  // Nav items
-  mk('⬡ Bracket', () => setView('bracket'));
-  mk('▌ Drama', () => setView('list'));
-  mk('# Records', () => setView('leaderboard'));
-  mk('∧ Roster', () => setView('roster'));
-  // Block Navigator
-  if (app.classes && app.classes.length > 0) {
-    const sep = document.createElement('div'); sep.style.cssText = 'height:1px;background:#f0edf7;margin:2px 0;'; m.appendChild(sep);
-    app.classes.forEach(cls => {
-      const d = document.createElement('div'); d.className = 'hmenu-item' + (cls.id === app.activeId ? ' bdd-active' : '');
-      d.style.color = cls.id === app.activeId ? '#4338ca' : '';
-      d.textContent = cls.name;
-      d.onclick = () => { app.activeId = cls.id; setView('bracket'); renderAll(); showCurrentView(); m.classList.remove('open'); };
-      m.appendChild(d);
-    });
-  }
+
+  sep();
+
+  // ── SETTINGS ──
+  lbl('MORE');
+  mk('⛶ Fullscreen', () => toggleStudentFullscreen());
+  mk('✎ Teacher View', () => requestTeacherMode(), {color:'var(--md-on-surface-variant)'});
 }
 document.addEventListener('click', () => {
   const m = document.getElementById('hamburgerMenu');
