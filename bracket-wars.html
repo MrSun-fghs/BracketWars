@@ -991,7 +991,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 @media(max-width:960px){.roster-grid{grid-template-columns:repeat(4,1fr);max-width:100%;gap:10px;}.roster-stats-inner{grid-template-columns:130px 1fr;}.roster-stats-name{font-size:22px;}}
 @media(max-width:700px){.roster-grid{grid-template-columns:repeat(2,1fr);gap:10px;}.roster-avatar-wrap{height:130px;}.roster-stats-inner{grid-template-columns:1fr;}.roster-stats-left{border-right:none;border-bottom:1px solid #1e1e3a;flex-direction:row;justify-content:flex-start;padding:16px;gap:20px;}.roster-scout-cols{grid-template-columns:1fr;}.roster-scout-col-right{border-left:none;padding-left:0;border-top:1px solid #1e1e3a;padding-top:14px;}}
 /* Voting announcement bar */
-#votingAnnouncementBar{display:none;background:linear-gradient(90deg,#f59e0b,#ef4444,#ec4899);color:#fff;text-align:center;padding:.55rem 1rem;font-size:.85rem;font-weight:600;cursor:pointer;letter-spacing:.01em;position:sticky;top:0;z-index:51;animation:annPulse 3s ease-in-out infinite;}
+#votingAnnouncementBar{display:none;background:linear-gradient(90deg,#f59e0b,#ef4444,#ec4899);color:#fff;text-align:center;padding:.75rem 1rem;font-size:.92rem;font-weight:600;cursor:pointer;letter-spacing:.01em;animation:annPulse 3s ease-in-out infinite;}
 #votingAnnouncementBar:hover{filter:brightness(1.08);}
 @keyframes annPulse{0%,100%{opacity:1;}50%{opacity:.88;}}
 body.projection #votingAnnouncementBar{display:none!important;}
@@ -1984,7 +1984,7 @@ function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderbo
 function updateVotingAnnouncementBar() {
   const bar = document.getElementById('votingAnnouncementBar'); if (!bar) return;
   ensureVoting(app);
-  const votingOpen = MODE === 'student' && app.voting.open && app.voting.classId === app.activeId;
+  const votingOpen = MODE === 'student' && app.voting.open && app.voting.classId === app.activeId && currentView !== 'vote';
   if (votingOpen) {
     const cls = app.classes.find(c => c.id === app.voting.classId);
     const name = cls ? cls.name : 'Your Class';
