@@ -132,7 +132,8 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .block-pill.pill-home{background:rgba(165,180,252,.18);border-color:rgba(165,180,252,.4);color:#c4b5fd;}
 .block-pill.pill-home:hover{background:rgba(165,180,252,.28);}
 .block-pill-caret{font-size:.6rem;opacity:.55;}
-.block-dropdown{position:absolute;top:calc(100% + 4px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22),0 1px 4px rgba(0,0,0,.1);min-width:160px;z-index:500;border:0.5px solid rgba(0,0,0,.08);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s ease,transform .15s ease;}
+.block-dropdown{position:absolute;top:100%;right:0;padding-top:6px;background:transparent;min-width:160px;z-index:500;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s ease,transform .15s ease;}
+.block-dropdown-inner{background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22),0 1px 4px rgba(0,0,0,.1);border:0.5px solid rgba(0,0,0,.08);overflow:hidden;}
 .block-pill-wrap:hover .block-dropdown{opacity:1;pointer-events:auto;transform:translateY(0);}
 @keyframes ddFadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
 .block-dd-item{padding:.55rem 1rem;font-size:.82rem;color:#1c1b1f;cursor:pointer;display:flex;align-items:center;gap:.6rem;transition:background .1s;}
@@ -1743,7 +1744,7 @@ function renderHome() {
 
     const card = document.createElement('div');
     card.className = 'home-class-card' + (champPoem ? ' crowned' : '');
-    card.onclick = () => { app.activeId = cls.id; setView('leaderboard'); renderAll(); };
+    card.onclick = () => { app.activeId = cls.id; setView('bracket'); renderAll(); showCurrentView(); };
 
     // Header
     // Header — block name + status chip
@@ -1864,19 +1865,20 @@ function buildBlockPill() {
   btn.innerHTML = `<span id="blockPillLabel">Block Navigator</span><span class="block-pill-caret">▾</span>`;
   const dd = document.createElement('div');
   dd.className = 'block-dropdown'; dd.id = 'blockDropdown';
+  const ddi = document.createElement('div'); ddi.className = 'block-dropdown-inner';
   // Home / Engagement option
   if (MODE === 'student') {
     const hi = document.createElement('div'); hi.className = 'block-dd-item' + (isHome ? ' bdd-active' : '');
     hi.innerHTML = '🏠 Home';
     hi.onclick = () => setView('home');
-    dd.appendChild(hi);
-    const s = document.createElement('div'); s.className = 'block-dd-sep'; dd.appendChild(s);
+    ddi.appendChild(hi);
+    const s = document.createElement('div'); s.className = 'block-dd-sep'; ddi.appendChild(s);
   } else {
     const ei = document.createElement('div'); ei.className = 'block-dd-item' + (currentView === 'engagement' ? ' bdd-active' : '');
     ei.innerHTML = '⚡ Engagement';
     ei.onclick = () => setTeacherView('engagement');
-    dd.appendChild(ei);
-    const s = document.createElement('div'); s.className = 'block-dd-sep'; dd.appendChild(s);
+    ddi.appendChild(ei);
+    const s = document.createElement('div'); s.className = 'block-dd-sep'; ddi.appendChild(s);
   }
   // Class items
   app.classes.forEach(cls => {
@@ -1912,14 +1914,15 @@ function buildBlockPill() {
         setTimeout(() => card.classList.remove('content-entering'), 250);
       }, 150);
     };
-    dd.appendChild(item);
+    ddi.appendChild(item);
   });
   if (MODE === 'teacher') {
-    const s2 = document.createElement('div'); s2.className = 'block-dd-sep'; dd.appendChild(s2);
+    const s2 = document.createElement('div'); s2.className = 'block-dd-sep'; ddi.appendChild(s2);
     const add = document.createElement('div'); add.className = 'block-dd-add'; add.textContent = '+ Add Class';
     add.onclick = () => openAddClass();
-    dd.appendChild(add);
+    ddi.appendChild(add);
   }
+  dd.appendChild(ddi);
   wrap.appendChild(btn); wrap.appendChild(dd);
   return wrap;
 }
