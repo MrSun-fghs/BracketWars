@@ -87,7 +87,10 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .hmenu-subitem{padding:.5rem 1rem .5rem 2rem;font-size:.82rem;border-left:2px solid #ede9f6;margin-left:1rem;}
 .hmenu-subitem:hover{background:#f5f3ff;}
 .hmenu-block-row{display:flex;align-items:center;justify-content:space-between;}
-.hmenu-chevron{font-size:.85rem;opacity:.5;margin-left:.5rem;}
+.hmenu-chevron{font-size:.85rem;opacity:.5;margin-left:.5rem;transition:transform .2s ease;}
+.hmenu-block-group .hmenu-sub-container{max-height:0;overflow:hidden;transition:max-height .22s cubic-bezier(0,0,0.2,1);}
+.hmenu-block-group:hover .hmenu-sub-container,.hmenu-sub-container.hmenu-sub-visible{max-height:260px;}
+.hmenu-block-group:hover .hmenu-chevron{transform:rotate(90deg);opacity:.8;}
 /* Hamburger always aligned right */
 .hamburger-menu{right:0;left:auto;}
 @media(max-width:680px){
@@ -3436,18 +3439,16 @@ function rebuildHamburgerMenu() {
       const isActive = cls.id === app.activeId && !isHome;
       const isExpanded = _hmenuExpandedBlock === cls.id;
 
+      // Wrapper group — sub-items reveal on hover via CSS
+      const groupEl = document.createElement('div');
+      groupEl.className = 'hmenu-block-group';
+
       const blockEl = document.createElement('div');
       blockEl.className = 'hmenu-item hmenu-block-row';
       blockEl.style.cssText = isActive ? 'color:#4338ca;font-weight:700;' : '';
-      blockEl.innerHTML = `<span>${isActive ? '● ' : '○ '}${esc(cls.name)}</span><span class="hmenu-chevron">${isExpanded ? '▾' : '›'}</span>`;
+      blockEl.innerHTML = `<span>${isActive ? '● ' : '○ '}${esc(cls.name)}</span><span class="hmenu-chevron">›</span>`;
       blockEl.onclick = (e) => {
         e.stopPropagation();
-        // Chevron click: toggle accordion only, no navigation
-        if (e.target.classList.contains('hmenu-chevron')) {
-          _hmenuExpandedBlock = (_hmenuExpandedBlock === cls.id) ? null : cls.id;
-          rebuildHamburgerMenu();
-          return;
-        }
         // Block name click: switch to this block + go to Bracket + close menu
         app.activeId = cls.id;
         _hmenuExpandedBlock = cls.id;
@@ -3458,53 +3459,55 @@ function rebuildHamburgerMenu() {
         if (_btn) _btn.classList.remove('open');
         updateHamburgerLabel();
       };
-      m.appendChild(blockEl);
+      groupEl.appendChild(blockEl);
 
-      // Sub-items — shown when expanded or active
-      if (isExpanded || isActive) {
-        if (isTeacher) {
-          // Teacher sub-items: block management actions
-          const teacherActions = [
-            { label: '⬇ Export', fn: () => exportBracket() },
-            { label: '✎ Rename', fn: () => openRenameClass() },
-            { label: '📝 Edit Poems', fn: () => openSetup() },
-            { label: '🔴 Reset', fn: () => openReset(), danger: true },
-          ];
-          teacherActions.forEach(({ label, fn, danger }) => {
-            const sub = document.createElement('div');
-            sub.className = 'hmenu-item hmenu-subitem';
-            if (danger) sub.style.cssText = 'color:var(--md-error);';
-            sub.textContent = label;
-            sub.onclick = () => { app.activeId = cls.id; m.classList.remove('open'); fn(); };
-            m.appendChild(sub);
-          });
-        } else {
-          // Student sub-items: navigation views
-          const subViews = [
-            ['<svg width="13" height="13" viewBox="2 2 44 44" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Bracket','bracket'],
-            ['<svg width="14" height="12" viewBox="0 0 42 32" fill="currentColor" style="vertical-align:-1px;margin-right:6px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg>Drama','list'],
-            ['<svg width="13" height="13" viewBox="0 0 48 48" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Records','leaderboard'],
-            ['<svg width="13" height="13" viewBox="-4 0 56 52" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>Roster','roster'],
-          ];
-          subViews.forEach(([label, v]) => {
-            const sub = document.createElement('div');
-            const isSubActive = currentView === v && isActive;
-            sub.className = 'hmenu-item hmenu-subitem hmenu-sub-' + v + (isSubActive ? ' hmenu-active' : '');
-            if (isSubActive) sub.style.cssText = 'color:#4338ca;font-weight:700;';
-            sub.innerHTML = label;
-            sub.onclick = () => { app.activeId = cls.id; setView(v); renderAll(); showCurrentView(); m.classList.remove('open'); };
-            m.appendChild(sub);
-          });
-          if (app.voting.open && app.voting.classId === cls.id) {
-            const vEl = document.createElement('div');
-            vEl.className = 'hmenu-item hmenu-subitem';
-            vEl.style.cssText = 'background:#fef3c7;color:#92400e;font-weight:800;';
-            vEl.textContent = '🗳 Vote Now';
-            vEl.onclick = () => { setView('vote'); m.classList.remove('open'); };
-            m.appendChild(vEl);
-          }
+      // Sub-items container — always rendered; CSS controls visibility (hover + pinned)
+      const subContainer = document.createElement('div');
+      subContainer.className = 'hmenu-sub-container' + (isExpanded || isActive ? ' hmenu-sub-visible' : '');
+
+      if (isTeacher) {
+        const teacherActions = [
+          { label: '⬇ Export', fn: () => exportBracket() },
+          { label: '✎ Rename', fn: () => openRenameClass() },
+          { label: '📝 Edit Poems', fn: () => openSetup() },
+          { label: '🔴 Reset', fn: () => openReset(), danger: true },
+        ];
+        teacherActions.forEach(({ label, fn, danger }) => {
+          const sub = document.createElement('div');
+          sub.className = 'hmenu-item hmenu-subitem';
+          if (danger) sub.style.cssText = 'color:var(--md-error);';
+          sub.textContent = label;
+          sub.onclick = () => { app.activeId = cls.id; m.classList.remove('open'); fn(); };
+          subContainer.appendChild(sub);
+        });
+      } else {
+        const subViews = [
+          ['<svg width="13" height="13" viewBox="2 2 44 44" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Bracket','bracket'],
+          ['<svg width="14" height="12" viewBox="0 0 42 32" fill="currentColor" style="vertical-align:-1px;margin-right:6px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg>Drama','list'],
+          ['<svg width="13" height="13" viewBox="0 0 48 48" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Records','leaderboard'],
+          ['<svg width="13" height="13" viewBox="-4 0 56 52" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>Roster','roster'],
+        ];
+        subViews.forEach(([label, v]) => {
+          const sub = document.createElement('div');
+          const isSubActive = currentView === v && isActive;
+          sub.className = 'hmenu-item hmenu-subitem hmenu-sub-' + v + (isSubActive ? ' hmenu-active' : '');
+          if (isSubActive) sub.style.cssText = 'color:#4338ca;font-weight:700;';
+          sub.innerHTML = label;
+          sub.onclick = () => { app.activeId = cls.id; setView(v); renderAll(); showCurrentView(); m.classList.remove('open'); };
+          subContainer.appendChild(sub);
+        });
+        if (app.voting.open && app.voting.classId === cls.id) {
+          const vEl = document.createElement('div');
+          vEl.className = 'hmenu-item hmenu-subitem';
+          vEl.style.cssText = 'background:#fef3c7;color:#92400e;font-weight:800;';
+          vEl.textContent = '🗳 Vote Now';
+          vEl.onclick = () => { setView('vote'); m.classList.remove('open'); };
+          subContainer.appendChild(vEl);
         }
       }
+
+      groupEl.appendChild(subContainer);
+      m.appendChild(groupEl);
     });
   }
 }
