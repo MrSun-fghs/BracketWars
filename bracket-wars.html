@@ -1966,6 +1966,7 @@ function buildRecCard(r, globalRank, catRank, catTotal, catColor) {
   const catHex=catColor||'#555';
   card.style.setProperty('--cc',catHex);
   card.style.borderLeft='3px solid '+catHex;
+  card.style.gap='23px';
 
   // Subtitle / lost label
   const lostRound=r.rounds.length>0&&isElim?r.rounds[r.rounds.length-1].label:null;
@@ -1995,7 +1996,10 @@ function buildRecCard(r, globalRank, catRank, catTotal, catColor) {
   if(avatarSrc){
     const img=document.createElement('img');
     img.src=avatarSrc;
-    img.style.cssText=`width:100%;height:100%;object-fit:cover;${isCompact?'opacity:.55;':''}`;
+    const zoom=rosterPoem.cropZoom||1.6;
+    const cx=rosterPoem.cropX!=null?rosterPoem.cropX:50;
+    const cy=rosterPoem.cropY!=null?rosterPoem.cropY:12;
+    img.style.cssText=`width:100%;height:100%;object-fit:cover;transform:scale(${zoom});transform-origin:${cx}% ${cy}%;${isCompact?'opacity:.55;':''}`;
     img.alt=r.name;
     avEl.appendChild(img);
   }
