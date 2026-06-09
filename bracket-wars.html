@@ -25,10 +25,17 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden;}
-.app-bar{background:var(--md-surface-container);position:sticky;top:0;z-index:50;box-shadow:var(--elev-2);}
-.app-bar-inner{display:flex;align-items:center;justify-content:space-between;padding:0 1rem;height:64px;gap:.75rem;}
-.app-bar-title{font-size:1.25rem;font-weight:700;color:var(--md-on-surface);letter-spacing:-.01em;line-height:1;flex:1;}
-.app-bar-subtitle{font-size:.72rem;color:var(--md-on-surface-variant);letter-spacing:.05em;margin-top:.15rem;position:relative;top:3px;}
+.app-bar{background:#1e1a4b;position:sticky;top:0;z-index:50;box-shadow:0 2px 14px rgba(0,0,0,.4);}
+.app-bar::before{content:'';display:block;height:3px;background:linear-gradient(90deg,#4338ca,#818cf8,#c4b5fd,#f0abfc);}
+.app-bar-inner{display:flex;align-items:center;justify-content:space-between;padding:0 1rem;height:58px;gap:.75rem;}
+.app-bar-title{font-size:1.25rem;font-weight:700;color:#fff;letter-spacing:-.01em;line-height:1;flex:1;cursor:pointer;}
+.app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:.15rem;position:relative;top:3px;}
+.app-bar .live-chip{background:rgba(103,232,249,.14);color:#67e8f9;border:1px solid rgba(103,232,249,.28);}
+.app-bar .live-dot{background:#67e8f9;}
+.app-bar .teacher-btn{color:rgba(255,255,255,.55);}
+.app-bar .teacher-btn:hover{background:rgba(255,255,255,.1);color:#fff;}
+.app-bar .fullscreen-btn{color:rgba(255,255,255,.6);}
+.app-bar .fullscreen-btn:hover{background:rgba(255,255,255,.1);color:#fff;}
 .app-bar-actions{display:flex;align-items:center;gap:.5rem;}
 .btn-tonal{display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:500;padding:.5rem 1.25rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:var(--md-secondary-container);color:var(--md-on-secondary-container);transition:filter .15s;white-space:nowrap;}
 .teacher-btn{display:inline-flex;align-items:center;gap:0;font-size:.82rem;font-weight:600;padding:.3rem .55rem;border-radius:var(--shape-full);border:none;cursor:pointer;background:transparent;color:var(--md-on-surface-variant);transition:background .2s,color .2s,gap .2s,padding .2s;}
@@ -338,7 +345,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .presence-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:600;padding:.3rem .75rem;border-radius:var(--shape-full);background:rgba(0,150,80,.12);color:#008040;border:1px solid rgba(0,150,80,.25);}
 .presence-dot{width:7px;height:7px;border-radius:50%;background:#00b050;animation:livePulse 1.8s ease-in-out infinite;}
 /* Print / export */
-@media print{.app-bar,.tabs-surface,#appBarActions,.open-voting-btn,.close-voting-btn,.voting-active-card::after,button{display:none!important;}body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-inside:avoid;}}
+@media print{.app-bar,.app-bar::before,.tabs-surface,#appBarActions,.open-voting-btn,.close-voting-btn,.voting-active-card::after,button{display:none!important;}body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-inside:avoid;}}
 .bc.right .votes{text-align:left;}
 .center-col{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.6rem .25rem 0;height:100%;}
 .champion-card{background:linear-gradient(145deg,var(--md-primary),var(--md-secondary));border-radius:var(--shape-xl);padding:1.25rem .9rem;text-align:center;width:100%;box-shadow:var(--elev-3);position:relative;overflow:hidden;}
@@ -992,7 +999,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 <div class="app-bar">
   <div class="app-bar-inner">
     <div>
-      <div class="app-bar-title" style="cursor:pointer;" onclick="if(typeof setView==='function'&&MODE==='student')setView('home')"><span style="color:var(--md-on-surface)">Bracket Wars</span><span style="color:var(--md-outline-variant);font-weight:300;margin:0 .35rem">·</span><span style="font-weight:400;font-style:italic">Poetry Madness</span></div>
+      <div class="app-bar-title" onclick="if(typeof setView==='function'&&MODE==='student')setView('home')"><span style="color:#fff">Bracket Wars</span><span style="color:rgba(255,255,255,.2);font-weight:300;margin:0 .35rem">·</span><span style="font-weight:400;font-style:italic;color:#a5b4fc">Poetry Madness</span></div>
       <div class="app-bar-subtitle">FGHS · English 1 · Mr. Sun</div>
     </div>
     <div class="app-bar-actions" id="appBarActions"></div>
