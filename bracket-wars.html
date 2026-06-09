@@ -2081,7 +2081,6 @@ function buildAppBar() {
     if (redoSnapshot) {
       const rb=document.createElement('button'); rb.className='btn-tonal'; rb.textContent='↪ Redo'; rb.onclick=redoLastResult; el.appendChild(rb);
     }
-    const b = document.createElement('button'); b.className='btn-tonal'; b.innerHTML='👁 Student View'; b.onclick=()=>setMode('student'); el.appendChild(b);
   } else {
     const fsBtn = document.createElement('button'); fsBtn.className='fullscreen-btn'; fsBtn.title='Fullscreen'; fsBtn.onclick=toggleStudentFullscreen;
     fsBtn.innerHTML='⛶<span class="fs-label">Fullscreen</span>'; el.appendChild(fsBtn);
