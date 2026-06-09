@@ -363,10 +363,12 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .lmc:hover{transform:translateY(-2px);box-shadow:var(--elev-3);}
 .lmc-inner{padding:12px 14px;}
 /* Scout Report toggle + panel */
-.lmc-scout-toggle{display:flex;align-items:center;justify-content:space-between;padding:6px 14px;border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container);cursor:pointer;user-select:none;}
+.lmc-scout-toggle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 14px 7px;border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container);cursor:pointer;user-select:none;}
 .lmc-scout-toggle:hover{background:var(--md-surface-container-high);}
 .lmc-scout-toggle-lbl{font-size:.6rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--md-on-surface-variant);}
-.lmc-scout-chevron{font-size:.75rem;color:var(--md-on-surface-variant);transition:transform .25s ease;}
+@keyframes lmcChevHint{0%,100%{transform:scaleX(1) translateY(0);opacity:.7;}50%{transform:scaleX(1.15) translateY(3px);opacity:1;}}
+.lmc-scout-chevron{font-size:1rem;color:var(--md-primary);display:inline-block;animation:lmcChevHint 1.4s ease-in-out infinite;transform-origin:center top;transition:transform .25s ease;}
+.lmc-scout-panel.open~* .lmc-scout-chevron,.lmc-scout-toggle.open .lmc-scout-chevron{animation:none;transform:rotate(180deg);}
 .lmc-scout-panel{max-height:0;overflow:hidden;transition:max-height .38s ease;display:grid;grid-template-columns:1fr 1fr;border-top:0 solid var(--md-outline-variant);}
 .lmc-scout-panel.open{max-height:700px;border-top-width:1px;}
 .lmc-scout-col{padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:9px;}
@@ -2272,7 +2274,10 @@ function buildMatchCard(pA,pB,md,isLatest){
   panel.appendChild(makeScoutCol(loser,rosterL,false));
   toggle.addEventListener('click',()=>{
     const open=panel.classList.toggle('open');
-    toggle.querySelector('.lmc-scout-chevron').style.transform=open?'rotate(180deg)':'rotate(0deg)';
+    toggle.classList.toggle('open',open);
+    const chev=toggle.querySelector('.lmc-scout-chevron');
+    chev.style.animation=open?'none':'';
+    chev.style.transform=open?'rotate(180deg)':'';
   });
   card.appendChild(toggle);card.appendChild(panel);
   return card;
