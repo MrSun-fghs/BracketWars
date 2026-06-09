@@ -28,7 +28,26 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .app-bar{background:#1e1a4b;position:sticky;top:0;z-index:50;box-shadow:0 2px 14px rgba(0,0,0,.4);}
 .app-bar::before{content:'';display:block;height:3px;background:linear-gradient(90deg,#4338ca,#818cf8,#c4b5fd,#f0abfc);}
 .app-bar-inner{display:flex;align-items:center;justify-content:space-between;padding:0 1rem;height:58px;gap:.75rem;}
-.app-bar-title{font-size:1.25rem;font-weight:700;color:#fff;letter-spacing:-.01em;line-height:1;flex:1;cursor:pointer;}
+.app-bar-left{flex:1;min-width:0;}
+.app-bar-title{font-size:1.25rem;font-weight:700;color:#fff;letter-spacing:-.01em;line-height:1;cursor:pointer;}
+/* Center nav inside header */
+#sectionNav{display:flex;align-items:center;justify-content:center;flex:0 1 auto;}
+#sectionNav .seg-btn-track{display:flex;gap:.25rem;}
+#sectionNav .seg-btn{color:rgba(255,255,255,.6);background:transparent;flex-direction:row;gap:.4rem;padding:.38rem .85rem;font-size:.78rem;min-width:auto;}
+#sectionNav .seg-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
+#sectionNav .seg-btn.active{background:#fff;color:var(--md-primary);box-shadow:none;}
+/* Hamburger */
+.hamburger-wrap{display:none;position:relative;}
+.hamburger-btn{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;}
+.hamburger-btn span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;}
+.hamburger-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:150px;z-index:200;overflow:hidden;display:none;}
+.hamburger-menu.open{display:block;}
+.hmenu-item{padding:.65rem 1rem;font-size:.85rem;font-weight:500;color:#1c1b1f;cursor:pointer;}
+.hmenu-item:hover{background:#f0edf7;color:var(--md-primary);}
+@media(max-width:680px){
+  #sectionNav .seg-btn-track{display:none;}
+  .hamburger-wrap{display:block;}
+}
 .app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:.15rem;position:relative;top:3px;}
 .app-bar .live-chip{background:rgba(103,232,249,.14);color:#67e8f9;border:1px solid rgba(103,232,249,.28);}
 .app-bar .live-dot{background:#67e8f9;}
@@ -158,18 +177,6 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   padding:.65rem 1.25rem;
   background:var(--md-surface-container-low);
   border-bottom:1px solid var(--md-outline-variant);
-}
-#sectionNav{
-  background:#fff;
-  border-bottom:1px solid var(--md-outline-variant);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:.4rem 1rem;
-  position:sticky;
-  top:61px;
-  z-index:45;
-  box-shadow:0 2px 6px rgba(0,0,0,.05);
 }
 .seg-btn-track{
   display:flex;align-items:center;gap:.5rem;
@@ -1017,25 +1024,36 @@ body.projection #sectionNav{display:none!important;}
 <button class="projection-exit" id="projectionExitBtn" style="display:none" onclick="exitProjection()">✕ Exit Full Screen</button>
 <div id="timerEdgeGlow"></div>
 
-<div id="votingAnnouncementBar" onclick="setView('vote')"></div>
+<div id="votingAnnouncementBar"></div>
 <div class="app-bar">
   <div class="app-bar-inner">
-    <div>
+    <div class="app-bar-left">
       <div class="app-bar-title" onclick="if(typeof setView==='function'&&MODE==='student')setView('home')"><span style="color:#fff">Bracket Wars</span><span style="color:rgba(255,255,255,.2);font-weight:300;margin:0 .35rem">·</span><span style="font-weight:400;font-style:italic;color:#a5b4fc">Poetry Madness</span></div>
       <div class="app-bar-subtitle">FGHS · English 1 · Mr. Sun</div>
     </div>
+    <!-- Center nav — hidden on home, collapses to hamburger on small screens -->
+    <div id="sectionNav" style="display:none">
+      <div class="seg-btn-track" id="viewToggle">
+        <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
+        <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><svg width="15" height="15" viewBox="2 2 44 44" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/></svg> Bracket</button>
+        <button class="seg-btn" id="btnList" onclick="setView('list')"><svg width="16" height="13" viewBox="0 0 42 32" fill="currentColor" style="display:inline-block;vertical-align:-2px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg> Drama</button>
+        <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/></svg> Records</button>
+        <button class="seg-btn" id="btnRoster" onclick="setView('roster')"><svg width="15" height="15" viewBox="-4 0 56 52" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg> Roster</button>
+      </div>
+      <!-- Hamburger for small screens -->
+      <div class="hamburger-wrap">
+        <button class="hamburger-btn" onclick="toggleHamburger(event)">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="hamburger-menu" id="hamburgerMenu">
+          <div class="hmenu-item" onclick="setView('bracket');toggleHamburger()">⬡ Bracket</div>
+          <div class="hmenu-item" onclick="setView('list');toggleHamburger()">▌Drama</div>
+          <div class="hmenu-item" onclick="setView('leaderboard');toggleHamburger()"># Records</div>
+          <div class="hmenu-item" onclick="setView('roster');toggleHamburger()">∧ Roster</div>
+        </div>
+      </div>
+    </div>
     <div class="app-bar-actions" id="appBarActions"></div>
-  </div>
-</div>
-
-<!-- Section nav strip — shown only when in a block -->
-<div id="sectionNav" style="display:none">
-  <div class="seg-btn-track" id="viewToggle">
-    <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
-    <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><svg width="15" height="15" viewBox="2 2 44 44" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/></svg> Bracket</button>
-    <button class="seg-btn" id="btnList" onclick="setView('list')"><svg width="16" height="13" viewBox="0 0 42 32" fill="currentColor" style="display:inline-block;vertical-align:-2px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg> Drama</button>
-    <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/></svg> Records</button>
-    <button class="seg-btn" id="btnRoster" onclick="setView('roster')"><svg width="15" height="15" viewBox="-4 0 56 52" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg> Roster</button>
   </div>
 </div>
 
@@ -2005,11 +2023,18 @@ function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderbo
 function updateVotingAnnouncementBar() {
   const bar = document.getElementById('votingAnnouncementBar'); if (!bar) return;
   ensureVoting(app);
-  const votingOpen = MODE === 'student' && app.voting.open && app.voting.classId === app.activeId && currentView !== 'vote';
+  const votingOpen = MODE === 'student' && app.voting.open && currentView !== 'vote';
   if (votingOpen) {
     const cls = app.classes.find(c => c.id === app.voting.classId);
     const name = cls ? cls.name : 'Your Class';
     bar.innerHTML = `🗳 <strong>${esc(name)} Voting is now open!</strong> &nbsp;Click here to cast your vote now! →`;
+    bar.onclick = () => {
+      if (app.voting.classId && app.activeId !== app.voting.classId) {
+        app.activeId = app.voting.classId;
+        saveStudentPrefs();
+      }
+      setView('vote'); renderAll(); showCurrentView();
+    };
     bar.style.display = 'block';
   } else {
     bar.style.display = 'none';
@@ -3229,6 +3254,15 @@ function toggleStudentFullscreen() {
 }
 document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement) exitProjection();
+});
+function toggleHamburger(e) {
+  if (e) e.stopPropagation();
+  const m = document.getElementById('hamburgerMenu');
+  if (m) m.classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  const m = document.getElementById('hamburgerMenu');
+  if (m) m.classList.remove('open');
 });
 window.addEventListener('resize', () => { applyProjectionScale(); });
 
