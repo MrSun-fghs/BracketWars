@@ -68,7 +68,11 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 }
 /* Hamburger */
 .hamburger-wrap{display:flex;align-items:center;position:relative;margin-left:.6rem;}
-.hamburger-btn{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;}
+.hamburger-btn{height:36px;border-radius:8px;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:7px;padding:0 10px;transition:background .2s;}
+.hmenu-btn-lines{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:18px;}
+.hmenu-btn-lines span{display:block;width:18px;height:2px;background:currentColor;border-radius:2px;}
+.hmenu-btn-label{font-size:.78rem;font-weight:700;color:#fff;white-space:nowrap;max-width:0;overflow:hidden;opacity:0;transition:max-width .25s ease,opacity .2s ease;}
+.hmenu-btn-label.visible{max-width:120px;opacity:1;}
 .hamburger-btn span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;}
 .hamburger-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:220px;z-index:200;overflow:hidden;display:none;max-height:80vh;overflow-y:auto;}
 .hamburger-menu.open{display:block;}
@@ -1128,8 +1132,9 @@ body.projection #sectionNav{display:none!important;}
     <div class="app-bar-actions" id="appBarActions"></div>
     <!-- Hamburger — always visible, outside appBarActions so buildAppBar() doesn't wipe it -->
     <div class="hamburger-wrap">
-      <button class="hamburger-btn" onclick="toggleHamburger(event)">
-        <span></span><span></span><span></span>
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleHamburger(event)">
+        <span class="hmenu-btn-label" id="hmenuBtnLabel"></span>
+        <div class="hmenu-btn-lines"><span></span><span></span><span></span></div>
       </button>
       <div class="hamburger-menu" id="hamburgerMenu"></div>
     </div>
@@ -2091,7 +2096,20 @@ function buildSecondaryToolbar() {
   // Teacher controls moved to app bar; no-op
 }
 
-function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); updateVotingAnnouncementBar(); }
+function updateHamburgerLabel() {
+  const lbl = document.getElementById('hmenuBtnLabel');
+  if (!lbl) return;
+  const onHome = currentView === 'home';
+  const activeCls = app.classes && app.classes.find(c => c.id === app.activeId);
+  if (!onHome && activeCls) {
+    lbl.textContent = activeCls.name;
+    lbl.classList.add('visible');
+  } else {
+    lbl.textContent = '';
+    lbl.classList.remove('visible');
+  }
+}
+function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); updateVotingAnnouncementBar(); updateHamburgerLabel(); }
 function updateVotingAnnouncementBar() {
   const bar = document.getElementById('votingAnnouncementBar'); if (!bar) return;
   ensureVoting(app);
