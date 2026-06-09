@@ -868,6 +868,9 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .roster-scout-col-right{border-left:1px solid #1e1e3a;padding-left:20px;}
 .roster-why-matters{border-top:1px solid #1e1e3a;margin:0 24px;padding:14px 0 20px;}
 .roster-why-matters-text{font-size:13px;line-height:1.75;color:#6b7280;margin-top:4px;}
+.roster-card.eliminated{filter:grayscale(1) opacity(.45);pointer-events:auto;}
+.roster-card.eliminated:hover{transform:translateY(-6px) scale(1.02);border-color:#374151;box-shadow:none;}
+.roster-elim-badge{position:absolute;top:8px;right:7px;background:#b91c1c;border-radius:4px;font-size:6.5px;font-weight:800;letter-spacing:1px;color:#fff;text-transform:uppercase;padding:2px 5px;font-family:sans-serif;}
 @keyframes rosterCardSettle{0%{transform:translateY(16px) scale(.97)}50%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
 .roster-card.bounce{animation:rosterCardSettle .7s cubic-bezier(.34,1.56,.64,1) var(--bounce-delay,.1s) both;}
 @media(max-width:960px){.roster-grid{grid-template-columns:repeat(4,1fr);max-width:100%;gap:10px;}.roster-stats-inner{grid-template-columns:130px 1fr;}.roster-stats-name{font-size:22px;}}
@@ -3549,12 +3552,11 @@ function _rosterCloseActive() {
 }
 
 function renderRoster() {
-  if (_rosterBuilt) return;
-  _rosterBuilt = true;
   const grid = document.getElementById('rosterGrid');
   grid.innerHTML = '';
   _rosterRowCards.forEach(r=>r.length=0); _rosterExpPanels.length=0;
   _rosterActiveRow=null; _rosterActiveCard=null;
+  const b = bkt();
 
   const sorted = [...ROSTER_POEMS].sort((a,b)=>a.num-b.num);
 
@@ -3567,11 +3569,13 @@ function renderRoster() {
     grid.appendChild(rowLabel);
 
     rowPoems.forEach(p => {
+      const status = computePoemStatus(p.num - 1, b);
+      const isElim = status.status === 'eliminated';
       const card = document.createElement('div');
-      card.className = 'roster-card';
+      card.className = 'roster-card' + (isElim ? ' eliminated' : '');
       card.dataset.color = p.color;
       card.style.cssText = `--r-accent:${p.accentColor};`;
-      card.innerHTML = `<div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap"><img src="${p.svg}" alt="${p.author}"></div><div class="roster-author-name" style="color:${p.accentColor}">${p.author}</div><div class="roster-poem-title">${p.title}</div>`;
+      card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}<div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap"><img src="${p.svg}" alt="${p.author}"></div><div class="roster-author-name" style="color:${p.accentColor}">${p.author}</div><div class="roster-poem-title">${p.title}</div>`;
       card.addEventListener('click', ()=>{
         if (_rosterActiveCard===card) { _rosterPlayClose(); _rosterCloseActive(); return; }
         _rosterPlayOpen(); _rosterOpenRow(row, p, card);
