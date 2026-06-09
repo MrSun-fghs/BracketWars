@@ -40,23 +40,24 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .hamburger-wrap{display:none;position:relative;}
 .hamburger-btn{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;}
 .hamburger-btn span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;}
-.hamburger-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:150px;z-index:200;overflow:hidden;display:none;}
+.hamburger-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:220px;z-index:200;overflow:hidden;display:none;max-height:80vh;overflow-y:auto;}
 .hamburger-menu.open{display:block;}
 .hmenu-item{padding:.6rem 1rem;font-size:.85rem;font-weight:500;color:#1c1b1f;cursor:pointer;}
 .hmenu-item:hover{background:#f0edf7;color:var(--md-primary);}
 .hmenu-sep{height:1px;background:#ece8f4;margin:3px 0;}
 .hmenu-label{padding:.35rem 1rem .15rem;font-size:.62rem;font-weight:700;letter-spacing:.07em;color:#9ca3af;text-transform:uppercase;}
+.hmenu-subitem{padding:.5rem 1rem .5rem 2rem;font-size:.82rem;border-left:2px solid #ede9f6;margin-left:1rem;}
+.hmenu-subitem:hover{background:#f5f3ff;}
 @media(max-width:680px){
-  #sectionNav .seg-btn-track{display:none;}
+  #sectionNav{display:none!important;}
   .hamburger-wrap{display:block!important;}
-  /* Hide all header actions on mobile — everything moves into hamburger */
+  /* Hide all header action items on mobile — everything moves into hamburger */
   .block-pill-wrap{display:none!important;}
   .vote-nav-pill{display:none!important;}
   .app-bar .live-chip{display:none!important;}
   .fullscreen-btn{display:none!important;}
   .teacher-btn{display:none!important;}
-  /* Always show hamburger even on home */
-  #sectionNav{display:flex!important;}
+  .hamburger-menu{right:0;left:auto;}
 }
 .app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:.1rem;}
 .vote-nav-pill{display:inline-flex;align-items:center;gap:5px;margin-top:0;padding:.38rem .85rem;border-radius:99px;background:#f59e0b;color:#1c1400;font-size:.78rem;font-weight:800;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 0 0 0 rgba(245,158,11,.6);animation:votePillPulse 1.8s ease-in-out infinite;}
@@ -1059,20 +1060,16 @@ body.projection #sectionNav{display:none!important;}
         <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/></svg> Records</button>
         <button class="seg-btn" id="btnRoster" onclick="setView('roster')"><svg width="15" height="15" viewBox="-4 0 56 52" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg> Roster</button>
       </div>
-      <!-- Hamburger for small screens -->
+    </div>
+    <div class="app-bar-actions" id="appBarActions">
+      <!-- Hamburger — right side, mobile only -->
       <div class="hamburger-wrap">
         <button class="hamburger-btn" onclick="toggleHamburger(event)">
           <span></span><span></span><span></span>
         </button>
-        <div class="hamburger-menu" id="hamburgerMenu">
-          <div class="hmenu-item" onclick="setView('bracket');toggleHamburger()">⬡ Bracket</div>
-          <div class="hmenu-item" onclick="setView('list');toggleHamburger()">▌Drama</div>
-          <div class="hmenu-item" onclick="setView('leaderboard');toggleHamburger()"># Records</div>
-          <div class="hmenu-item" onclick="setView('roster');toggleHamburger()">∧ Roster</div>
-        </div>
+        <div class="hamburger-menu" id="hamburgerMenu"></div>
       </div>
     </div>
-    <div class="app-bar-actions" id="appBarActions"></div>
   </div>
 </div>
 
@@ -3322,8 +3319,9 @@ function rebuildHamburgerMenu() {
   if (!m) return;
   m.innerHTML = '';
 
-  const mk = (label, fn, extra) => {
-    const d = document.createElement('div'); d.className = 'hmenu-item';
+  const mk = (label, fn, cls2, extra) => {
+    const d = document.createElement('div');
+    d.className = 'hmenu-item' + (cls2 ? ' ' + cls2 : '');
     if (extra) Object.assign(d.style, extra);
     d.innerHTML = label;
     d.onclick = () => { fn(); m.classList.remove('open'); };
@@ -3332,41 +3330,49 @@ function rebuildHamburgerMenu() {
   const sep = () => { const d=document.createElement('div'); d.className='hmenu-sep'; m.appendChild(d); };
   const lbl = (text) => { const d=document.createElement('div'); d.className='hmenu-label'; d.textContent=text; m.appendChild(d); };
 
+  const isHome = currentView === 'home';
+  const inBlock = !isHome && currentView !== 'vote';
+
   // ── HOME ──
-  mk('🏠 Home', () => setView('home'), currentView==='home'?{color:'#4338ca',fontWeight:'700'}:{});
+  mk('🏠 Home', () => { setView('home'); renderAll(); }, '', isHome ? {color:'#4338ca',fontWeight:'700'} : {});
 
   sep();
 
-  // ── BLOCKS ──
+  // ── BLOCKS (accordion: active block expands sub-views) ──
   if (app.classes && app.classes.length > 0) {
     lbl('YOUR BLOCKS');
+    ensureVoting(app);
     app.classes.forEach(cls => {
-      const active = cls.id === app.activeId;
-      mk((active ? '● ' : '○ ') + cls.name, () => {
+      const isActive = cls.id === app.activeId && !isHome;
+      mk((isActive ? '● ' : '○ ') + cls.name, () => {
         app.activeId = cls.id; setView('bracket'); renderAll(); showCurrentView();
-      }, active ? {color:'#4338ca',fontWeight:'700'} : {});
+      }, '', isActive ? {color:'#4338ca',fontWeight:'700'} : {});
+
+      // Sub-views accordion — only show for active block
+      if (isActive) {
+        const subViews = [
+          ['⬡ Bracket','bracket'],
+          ['▌ Drama','list'],
+          ['# Records','leaderboard'],
+          ['∧ Roster','roster'],
+        ];
+        subViews.forEach(([label, v]) => {
+          mk(label, () => setView(v), 'hmenu-subitem', currentView===v ? {color:'#4338ca',fontWeight:'700'} : {});
+        });
+        // Vote if open for this block
+        if (app.voting.open && app.voting.classId === cls.id) {
+          mk('🗳 Vote Now', () => setView('vote'), 'hmenu-subitem', {background:'#fef3c7',color:'#92400e',fontWeight:'800'});
+        }
+      }
     });
-    sep();
-  }
-
-  // ── VIEWS ──
-  lbl('VIEWS');
-  const views = [['⬡ Bracket','bracket'],['▌ Drama','list'],['# Records','leaderboard'],['∧ Roster','roster']];
-  views.forEach(([label, v]) => mk(label, () => setView(v), currentView===v?{color:'#4338ca',fontWeight:'700'}:{}));
-
-  // ── VOTE (if open) ──
-  ensureVoting(app);
-  if (app.voting.open) {
-    sep();
-    mk('🗳 Vote Now', () => setView('vote'), {background:'#fef3c7',color:'#92400e',fontWeight:'800'});
   }
 
   sep();
 
-  // ── SETTINGS ──
+  // ── MORE ──
   lbl('MORE');
-  mk('⛶ Fullscreen', () => toggleStudentFullscreen());
-  mk('✎ Teacher View', () => requestTeacherMode(), {color:'var(--md-on-surface-variant)'});
+  mk('⛶ Fullscreen', () => toggleStudentFullscreen(), '');
+  mk('✎ Teacher View', () => requestTeacherMode(), '', {color:'#6b7280'});
 }
 document.addEventListener('click', () => {
   const m = document.getElementById('hamburgerMenu');
