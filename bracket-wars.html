@@ -3402,19 +3402,29 @@ function renderVoteView() {
       btnClass='v2-vote-btn';
     }
 
+    const rp2=ROSTER_POEMS.find(p=>p.num===poem.seed);
+    const voteSrc=rp2?(rp2.aniSvg||rp2.svg):'';
+    const pZoom=rp2?rp2.cropZoom||1.6:1.6;
+    const pCx=rp2&&rp2.cropX!=null?rp2.cropX:50;
+    const pCy=rp2&&rp2.cropY!=null?rp2.cropY:12;
+    const portraitHtml=voteSrc?`<div style="width:100%;height:130px;overflow:hidden;flex-shrink:0;background:var(--md-surface-container)"><img src="${voteSrc}" alt="" style="width:100%;height:100%;object-fit:cover;transform:scale(${pZoom});transform-origin:${pCx}% ${pCy}%;"></div>`:'';
+    card.style.cssText='padding:0;display:flex;flex-direction:column;';
     card.innerHTML=`
-      <div class="v2-card-top">
-        <span class="v2-cat-badge" style="background:${catColor}">${esc(catName)}</span>
-        <span class="v2-leading-badge" id="v2Lead${i}" style="display:none"></span>
-      </div>
-      <div class="v2-poem-title">${esc(poem.name)}</div>
-      <div class="v2-count" id="v2Cnt${i}">${cnt}</div>
-      <div class="v2-count-label" id="v2CntLbl${i}">vote${cnt!==1?'s':''}</div>
-      <div class="v2-bar-track"><div class="v2-bar-fill" id="v2Bar${i}" style="width:${pct}%"></div></div>
-      <div class="v2-bar-pct" id="v2Pct${i}">${pct}%</div>
-      <button class="${btnClass}" id="v2Btn${i}" ${!hasVoted?`onclick="handleVoteBtnClick(${i})"`:''} ${hasVoted?'disabled':''}>
-        ${btnContent}
-      </button>`;
+      ${portraitHtml}
+      <div style="padding:.75rem .75rem .85rem;flex:1;display:flex;flex-direction:column;">
+        <div class="v2-card-top">
+          <span class="v2-cat-badge" style="background:${catColor}">${esc(catName)}</span>
+          <span class="v2-leading-badge" id="v2Lead${i}" style="display:none"></span>
+        </div>
+        <div class="v2-poem-title">${esc(poem.name)}</div>
+        <div class="v2-count" id="v2Cnt${i}">${cnt}</div>
+        <div class="v2-count-label" id="v2CntLbl${i}">vote${cnt!==1?'s':''}</div>
+        <div class="v2-bar-track"><div class="v2-bar-fill" id="v2Bar${i}" style="width:${pct}%"></div></div>
+        <div class="v2-bar-pct" id="v2Pct${i}">${pct}%</div>
+        <button class="${btnClass}" id="v2Btn${i}" ${!hasVoted?`onclick="handleVoteBtnClick(${i})"`:''} ${hasVoted?'disabled':''}>
+          ${btnContent}
+        </button>
+      </div>`;
     grid.appendChild(card);
   });
   view.appendChild(grid);
@@ -3608,7 +3618,7 @@ const ROSTER_POEMS = [
   {num:4,title:"Hope Is the Thing with Feathers",author:"Emily Dickinson",svg:"Emily Dickinson.svg?v=3",color:"pearl",accentColor:"#e2e8f0",cropZoom:1.95,cropX:50,cropY:30,born:"1830",birthplace:"Amherst, MA",nationality:"American",genre:"Lyric Poetry",knownFor:"Exploring big ideas through small details",superpower:"Packing big ideas into very few words",readingLens:"How does Dickinson use simple images to express a deeper idea?",scoutingReport:"Short poem, big ideas. Dickinson may look easy at first, but she becomes stronger with every reread.",whyMatters:"Emily Dickinson wrote nearly 1,800 poems, though most were not published during her lifetime. Her poems often focus on hope, nature, death, and eternity using compressed language and unexpected comparisons.",stats:{accessibility:3,emotionalImpact:3,imageryPower:4,literaryDevicePower:5,themeStrength:5,relatability:4}},
   {num:5,title:"Still I Rise",author:"Maya Angelou",svg:"Maya Angelou.svg?v=3",color:"rose",accentColor:"#038f68",cropZoom:2.2,cropX:54,cropY:21,born:"1928",birthplace:"St. Louis, MO",nationality:"American",genre:"Autobiographical Poetry",knownFor:"Writing about resilience and self-worth",superpower:"Turning pain into confidence",readingLens:"How does the speaker show strength in the face of challenges?",scoutingReport:"Fan favorite. Direct, confident, and emotionally powerful, this poem is built to make a strong first impression.",whyMatters:"Maya Angelou was a poet, memoirist, performer, and civil rights activist. She transformed painful experiences into powerful writing about dignity, courage, and hope.",stats:{accessibility:5,emotionalImpact:5,imageryPower:4,literaryDevicePower:3,themeStrength:5,relatability:5}},
   {num:6,title:"The Rose That Grew from Concrete",author:"Tupac Shakur",svg:"Tupac Shakur.svg?v=2",color:"pink",accentColor:"#fb7185",cropZoom:1.6,cropX:60,cropY:30,born:"1971",birthplace:"East Harlem, NY",nationality:"American",genre:"Hip-Hop / Spoken Word",knownFor:"Writing about struggle and survival",superpower:"Making resilience feel personal",readingLens:"What helps the speaker succeed despite obstacles?",scoutingReport:"Relatable powerhouse. Clear language and a memorable central image make this poem a serious bracket threat.",whyMatters:"Before becoming a music icon, Tupac Shakur was writing poetry. His poems explore hardship, injustice, love, and perseverance.",stats:{accessibility:5,emotionalImpact:5,imageryPower:3,literaryDevicePower:2,themeStrength:5,relatability:5}},
-  {num:7,title:"I, Too",author:"Langston Hughes",svg:"Langston Hughes Ani.svg",color:"blue",accentColor:"#0476e4",cropZoom:2.2,cropX:69,cropY:18,born:"1902",birthplace:"Joplin, MO",nationality:"American",genre:"Harlem Renaissance",knownFor:"Giving voice to Black America",superpower:"Making powerful statements with simple language",readingLens:"Whose voice is being heard, and why does it matter?",scoutingReport:"Classic contender. Hughes uses simple language to deliver a message that is direct, powerful, and hard to ignore.",whyMatters:"Langston Hughes was one of the leading writers of the Harlem Renaissance. His poems celebrate Black culture while challenging racism and exclusion.",stats:{accessibility:4,emotionalImpact:4,imageryPower:3,literaryDevicePower:3,themeStrength:5,relatability:4}},
+  {num:7,title:"I, Too",author:"Langston Hughes",svg:"Langston Hughes.svg?v=2",aniSvg:"Langston Hughes Ani.svg",color:"blue",accentColor:"#0476e4",cropZoom:2.2,cropX:69,cropY:18,born:"1902",birthplace:"Joplin, MO",nationality:"American",genre:"Harlem Renaissance",knownFor:"Giving voice to Black America",superpower:"Making powerful statements with simple language",readingLens:"Whose voice is being heard, and why does it matter?",scoutingReport:"Classic contender. Hughes uses simple language to deliver a message that is direct, powerful, and hard to ignore.",whyMatters:"Langston Hughes was one of the leading writers of the Harlem Renaissance. His poems celebrate Black culture while challenging racism and exclusion.",stats:{accessibility:4,emotionalImpact:4,imageryPower:3,literaryDevicePower:3,themeStrength:5,relatability:4}},
   {num:8,title:"Women",author:"Alice Walker",svg:"Alice Walker.svg?v=3",color:"purple",accentColor:"#c873d7",cropZoom:2.05,cropX:33,cropY:12,born:"1944",birthplace:"Eatonton, GA",nationality:"American",genre:"Black Feminist Poetry",knownFor:"Honoring women's strength and perseverance",superpower:"Honoring overlooked courage",readingLens:"What sacrifices made the speaker's life possible?",scoutingReport:"Emotional heavyweight. This poem may seem quiet at first, but its message about sacrifice lands with real force.",whyMatters:"Alice Walker is a novelist, poet, and activist best known for The Color Purple. Her writing explores race, gender, family, and history.",stats:{accessibility:4,emotionalImpact:5,imageryPower:3,literaryDevicePower:3,themeStrength:5,relatability:3}},
   {num:9,title:"Famous",author:"Naomi Shihab Nye",svg:"Naomi Shihab Nye.svg?v=2",color:"cream",accentColor:"#ff7a00",cropZoom:1.95,cropX:52,cropY:0,born:"1952",birthplace:"St. Louis, MO",nationality:"Palestinian-American",genre:"Humanist Poetry",knownFor:"Finding connection in everyday life",superpower:"Finding meaning in small moments",readingLens:"What small details help reveal a larger idea?",scoutingReport:"Quiet contender. Small details and everyday language make this poem stronger the closer students read.",whyMatters:"Born to a Palestinian father and an American mother, Naomi Shihab Nye writes about neighbors, families, food, kindness, and belonging.",stats:{accessibility:5,emotionalImpact:4,imageryPower:4,literaryDevicePower:2,themeStrength:4,relatability:4}},
   {num:10,title:"Wind, Water, Stone",author:"Octavio Paz",svg:"Octavio Paz.svg?v=2",color:"turquoise",accentColor:"#976e35",cropZoom:1.9,cropX:37,cropY:43,born:"1914",birthplace:"Mexico City, Mexico",nationality:"Mexican",genre:"Surrealist / Political Poetry",knownFor:"Exploring identity, history, and time",superpower:"Connecting big ideas through vivid images",readingLens:"How are different forces connected to one another?",scoutingReport:"High-ceiling challenge. This poem brings elite imagery and literary device power, but students will need to slow down to unlock it.",whyMatters:"Octavio Paz was a Mexican poet, diplomat, and essayist who won the Nobel Prize in Literature. His work explores culture, history, relationships, and identity.",stats:{accessibility:2,emotionalImpact:3,imageryPower:5,literaryDevicePower:5,themeStrength:5,relatability:2}},
