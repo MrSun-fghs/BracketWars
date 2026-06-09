@@ -28,9 +28,9 @@
 body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden;}
 .app-bar{background:#1e1a4b;position:sticky;top:0;z-index:50;box-shadow:0 2px 14px rgba(0,0,0,.4);}
 .app-bar::before{content:'';display:block;height:3px;background:linear-gradient(90deg,#4338ca,#818cf8,#c4b5fd,#f0abfc);}
-.app-bar-inner{display:flex;align-items:center;padding:0 1rem;height:58px;position:relative;}
+.app-bar-inner{display:flex;align-items:center;padding:0 1rem;height:64px;position:relative;}
 .app-bar-left{flex:1;min-width:0;}
-.app-bar-title{font-family:'MagicSound',system-ui,sans-serif;font-size:0.38rem;font-weight:400;color:#fff;letter-spacing:.02em;line-height:1;cursor:pointer;}
+.app-bar-title{font-family:'MagicSound',system-ui,sans-serif;font-size:1.063rem;font-weight:400;color:#fff;letter-spacing:.02em;line-height:1;cursor:pointer;position:relative;top:5px;}
 /* Center nav — absolutely centered so left/right widths don't skew it */
 #sectionNav{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;pointer-events:auto;overflow:visible;}
 #sectionNav .seg-btn-track{display:flex;gap:.25rem;}
@@ -103,7 +103,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   .fullscreen-btn{display:none!important;}
   .teacher-btn{display:none!important;}
 }
-.app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:.1rem;}
+.app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:16px;}
 .vote-nav-pill{display:inline-flex;align-items:center;gap:5px;margin-top:0;padding:.38rem .85rem;border-radius:99px;background:#f59e0b;color:#1c1400;font-size:.78rem;font-weight:800;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 0 0 0 rgba(245,158,11,.6);animation:votePillPulse 1.8s ease-in-out infinite;}
 @keyframes votePillPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5);}60%{box-shadow:0 0 0 7px rgba(245,158,11,0);}}
 .app-bar .live-chip{background:rgba(103,232,249,.14);color:#67e8f9;border:1px solid rgba(103,232,249,.28);}
@@ -1020,7 +1020,7 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 /* ── Mobile responsive ── */
 @media(max-width:640px){
   .app-bar-inner{padding:0 .65rem;gap:.35rem;}
-  .app-bar-title{font-size:.38rem;}
+  .app-bar-title{font-size:1.063rem;}
   .app-bar-subtitle{font-size:.6rem;}
   .btn-tonal,.btn-filled{font-size:.72rem;padding:.38rem .7rem;}
   .btn-text{padding:.3rem .45rem;font-size:.72rem;}
