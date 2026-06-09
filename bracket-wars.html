@@ -132,7 +132,8 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .block-pill.pill-home{background:rgba(165,180,252,.18);border-color:rgba(165,180,252,.4);color:#c4b5fd;}
 .block-pill.pill-home:hover{background:rgba(165,180,252,.28);}
 .block-pill-caret{font-size:.6rem;opacity:.55;}
-.block-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22),0 1px 4px rgba(0,0,0,.1);min-width:160px;z-index:500;border:0.5px solid rgba(0,0,0,.08);overflow:hidden;animation:ddFadeIn .12s ease;}
+.block-dropdown{position:absolute;top:calc(100% + 4px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22),0 1px 4px rgba(0,0,0,.1);min-width:160px;z-index:500;border:0.5px solid rgba(0,0,0,.08);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s ease,transform .15s ease;}
+.block-pill-wrap:hover .block-dropdown{opacity:1;pointer-events:auto;transform:translateY(0);}
 @keyframes ddFadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
 .block-dd-item{padding:.55rem 1rem;font-size:.82rem;color:#1c1b1f;cursor:pointer;display:flex;align-items:center;gap:.6rem;transition:background .1s;}
 .block-dd-item:hover{background:#f5f3ff;}
@@ -1861,20 +1862,19 @@ function buildBlockPill() {
   const btn = document.createElement('button');
   btn.className = 'block-pill'; btn.id = 'blockPillBtn';
   btn.innerHTML = `<span id="blockPillLabel">Block Navigator</span><span class="block-pill-caret">▾</span>`;
-  btn.onclick = e => { e.stopPropagation(); toggleBlockDropdown(); };
   const dd = document.createElement('div');
-  dd.className = 'block-dropdown'; dd.id = 'blockDropdown'; dd.style.display = 'none';
+  dd.className = 'block-dropdown'; dd.id = 'blockDropdown';
   // Home / Engagement option
   if (MODE === 'student') {
     const hi = document.createElement('div'); hi.className = 'block-dd-item' + (isHome ? ' bdd-active' : '');
     hi.innerHTML = '🏠 Home';
-    hi.onclick = e => { e.stopPropagation(); closeBlockDropdown(); setView('home'); };
+    hi.onclick = () => setView('home');
     dd.appendChild(hi);
     const s = document.createElement('div'); s.className = 'block-dd-sep'; dd.appendChild(s);
   } else {
     const ei = document.createElement('div'); ei.className = 'block-dd-item' + (currentView === 'engagement' ? ' bdd-active' : '');
     ei.innerHTML = '⚡ Engagement';
-    ei.onclick = e => { e.stopPropagation(); closeBlockDropdown(); setTeacherView('engagement'); };
+    ei.onclick = () => setTeacherView('engagement');
     dd.appendChild(ei);
     const s = document.createElement('div'); s.className = 'block-dd-sep'; dd.appendChild(s);
   }
@@ -1888,12 +1888,11 @@ function buildBlockPill() {
     if (MODE === 'teacher' && app.classes.length > 1) {
       const x = document.createElement('span'); x.textContent = '×';
       x.style.cssText = 'margin-left:auto;opacity:.35;font-size:.95rem;padding:0 2px;';
-      x.onclick = ev => { ev.stopPropagation(); closeBlockDropdown(); confirmDeleteClass(cls.id); };
+      x.onclick = ev => { ev.stopPropagation(); confirmDeleteClass(cls.id); };
       item.appendChild(x);
     }
     item.onclick = e => {
       if (e.target.style.marginLeft === 'auto') return;
-      e.stopPropagation(); closeBlockDropdown();
       if (app.activeId === cls.id && !isHome) return;
       const card = document.getElementById('contentCard');
       card.classList.add('content-switching');
@@ -1918,22 +1917,13 @@ function buildBlockPill() {
   if (MODE === 'teacher') {
     const s2 = document.createElement('div'); s2.className = 'block-dd-sep'; dd.appendChild(s2);
     const add = document.createElement('div'); add.className = 'block-dd-add'; add.textContent = '+ Add Class';
-    add.onclick = e => { e.stopPropagation(); closeBlockDropdown(); openAddClass(); };
+    add.onclick = () => openAddClass();
     dd.appendChild(add);
   }
   wrap.appendChild(btn); wrap.appendChild(dd);
   return wrap;
 }
-function toggleBlockDropdown() {
-  const dd = document.getElementById('blockDropdown'); if (!dd) return;
-  const open = dd.style.display === 'none';
-  dd.style.display = open ? 'block' : 'none';
-  const c = document.querySelector('#blockPillBtn .block-pill-caret'); if (c) c.textContent = open ? '▴' : '▾';
-}
-function closeBlockDropdown() {
-  const dd = document.getElementById('blockDropdown'); if (dd) dd.style.display = 'none';
-  const c = document.querySelector('#blockPillBtn .block-pill-caret'); if (c) c.textContent = '▾';
-}
+
 function buildAppBar() {
   const el = document.getElementById('appBarActions'); el.innerHTML = '';
   el.appendChild(buildBlockPill());
@@ -3197,7 +3187,6 @@ function toggleStudentFullscreen() {
 document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement) exitProjection();
 });
-document.addEventListener('click', () => closeBlockDropdown());
 window.addEventListener('resize', () => { applyProjectionScale(); });
 
 // ── Export ──
