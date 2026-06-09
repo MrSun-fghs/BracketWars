@@ -118,6 +118,19 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   transition:background .15s;
 }
 .add-tab-btn:hover{background:rgba(74,58,255,.08);}
+/* Block selector pill + dropdown */
+.block-pill-wrap{position:relative;display:inline-flex;align-items:center;}
+.block-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:99px;font-size:.78rem;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;line-height:1.4;}
+.block-pill:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.35);}
+.block-pill-caret{font-size:.6rem;opacity:.55;}
+.block-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22),0 1px 4px rgba(0,0,0,.1);min-width:160px;z-index:500;border:0.5px solid rgba(0,0,0,.08);overflow:hidden;animation:ddFadeIn .12s ease;}
+@keyframes ddFadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+.block-dd-item{padding:.55rem 1rem;font-size:.82rem;color:#1c1b1f;cursor:pointer;display:flex;align-items:center;gap:.6rem;transition:background .1s;}
+.block-dd-item:hover{background:#f5f3ff;}
+.block-dd-item.bdd-active{color:#4338ca;font-weight:700;background:#ede9f6;}
+.block-dd-sep{height:1px;background:#f0edf7;margin:2px 0;}
+.block-dd-add{padding:.55rem 1rem;font-size:.78rem;color:#4338ca;font-weight:600;cursor:pointer;transition:background .1s;}
+.block-dd-add:hover{background:#f5f3ff;}
 .combined-bar{background:#ffffff;}
 .combined-bar-inner{display:flex;align-items:center;justify-content:space-between;padding:.65rem 1.25rem;gap:1rem;}
 .toolbar-status-stack{display:flex;flex-direction:column;gap:.3rem;flex:1;min-width:0;}
@@ -985,7 +998,6 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 </div>
 
 <div id="contentCard" style="background:#ffffff;margin:0;">
-<div class="tabs-surface"><div class="tabs-row" id="classTabs"></div></div>
 <div class="combined-bar" id="secondaryToolbar">
   <div class="combined-bar-inner">
     <div class="toolbar-status-stack">
@@ -1833,8 +1845,90 @@ function renderHome() {
 
 }
 
+function buildBlockPill() {
+  const wrap = document.createElement('div');
+  wrap.className = 'block-pill-wrap';
+  const isHome = currentView === 'home' || currentView === 'engagement';
+  const label = isHome ? '🏠 Home' : (activeClass() ? activeClass().name : 'Select Block');
+  const btn = document.createElement('button');
+  btn.className = 'block-pill'; btn.id = 'blockPillBtn';
+  btn.innerHTML = `<span id="blockPillLabel">${esc(label)}</span><span class="block-pill-caret">▾</span>`;
+  btn.onclick = e => { e.stopPropagation(); toggleBlockDropdown(); };
+  const dd = document.createElement('div');
+  dd.className = 'block-dropdown'; dd.id = 'blockDropdown'; dd.style.display = 'none';
+  // Home / Engagement option
+  if (MODE === 'student') {
+    const hi = document.createElement('div'); hi.className = 'block-dd-item' + (isHome ? ' bdd-active' : '');
+    hi.innerHTML = '🏠 Home';
+    hi.onclick = e => { e.stopPropagation(); closeBlockDropdown(); setView('home'); };
+    dd.appendChild(hi);
+    const s = document.createElement('div'); s.className = 'block-dd-sep'; dd.appendChild(s);
+  } else {
+    const ei = document.createElement('div'); ei.className = 'block-dd-item' + (currentView === 'engagement' ? ' bdd-active' : '');
+    ei.innerHTML = '⚡ Engagement';
+    ei.onclick = e => { e.stopPropagation(); closeBlockDropdown(); setTeacherView('engagement'); };
+    dd.appendChild(ei);
+    const s = document.createElement('div'); s.className = 'block-dd-sep'; dd.appendChild(s);
+  }
+  // Class items
+  app.classes.forEach(cls => {
+    const item = document.createElement('div');
+    item.className = 'block-dd-item' + (cls.id === app.activeId && !isHome ? ' bdd-active' : '');
+    const dot = document.createElement('span');
+    dot.style.cssText = `width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;background:${cls.bracket.final.winnerIdx!==null?'var(--gold)':'transparent'};border:${cls.bracket.final.winnerIdx!==null?'none':'1.5px solid #cac4d0'};`;
+    item.appendChild(dot); item.appendChild(document.createTextNode(cls.name));
+    if (MODE === 'teacher' && app.classes.length > 1) {
+      const x = document.createElement('span'); x.textContent = '×';
+      x.style.cssText = 'margin-left:auto;opacity:.35;font-size:.95rem;padding:0 2px;';
+      x.onclick = ev => { ev.stopPropagation(); closeBlockDropdown(); confirmDeleteClass(cls.id); };
+      item.appendChild(x);
+    }
+    item.onclick = e => {
+      if (e.target.style.marginLeft === 'auto') return;
+      e.stopPropagation(); closeBlockDropdown();
+      if (app.activeId === cls.id && !isHome) return;
+      const card = document.getElementById('contentCard');
+      card.classList.add('content-switching');
+      setTimeout(() => {
+        app.activeId = cls.id;
+        if (MODE === 'teacher') {
+          saveTeacherPrefs(); saveApp();
+          document.getElementById('engagementView').style.display = 'none';
+          document.getElementById('bracketView').style.display = 'block';
+          currentView = 'bracket'; renderAll();
+        } else {
+          if (currentView === 'home' || currentView === 'vote') setView('bracket');
+          saveStudentPrefs(); renderAll(); showCurrentView();
+        }
+        card.classList.remove('content-switching');
+        card.classList.add('content-entering');
+        setTimeout(() => card.classList.remove('content-entering'), 250);
+      }, 150);
+    };
+    dd.appendChild(item);
+  });
+  if (MODE === 'teacher') {
+    const s2 = document.createElement('div'); s2.className = 'block-dd-sep'; dd.appendChild(s2);
+    const add = document.createElement('div'); add.className = 'block-dd-add'; add.textContent = '+ Add Class';
+    add.onclick = e => { e.stopPropagation(); closeBlockDropdown(); openAddClass(); };
+    dd.appendChild(add);
+  }
+  wrap.appendChild(btn); wrap.appendChild(dd);
+  return wrap;
+}
+function toggleBlockDropdown() {
+  const dd = document.getElementById('blockDropdown'); if (!dd) return;
+  const open = dd.style.display === 'none';
+  dd.style.display = open ? 'block' : 'none';
+  const c = document.querySelector('#blockPillBtn .block-pill-caret'); if (c) c.textContent = open ? '▴' : '▾';
+}
+function closeBlockDropdown() {
+  const dd = document.getElementById('blockDropdown'); if (dd) dd.style.display = 'none';
+  const c = document.querySelector('#blockPillBtn .block-pill-caret'); if (c) c.textContent = '▾';
+}
 function buildAppBar() {
   const el = document.getElementById('appBarActions'); el.innerHTML = '';
+  el.appendChild(buildBlockPill());
   if (MODE === 'teacher') {
     ensureVoting(app);
     if (app.voting.open) {
@@ -1882,61 +1976,11 @@ function buildSecondaryToolbar() {
 function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); }
 
 function renderTabs() {
-  const bar = document.getElementById('classTabs'); bar.innerHTML = '';
-  if (MODE === 'student') {
-    const homeTab = document.createElement('button');
-    homeTab.id = 'btnHomeTab';
-    homeTab.className = 'm3-tab home-tab' + (currentView === 'home' ? ' active' : '');
-    homeTab.innerHTML = '🏠 Home';
-    homeTab.onclick = () => setView('home');
-    bar.appendChild(homeTab);
-  }
-  if (MODE === 'teacher') {
-    const trendsTab = document.createElement('button');
-    trendsTab.id = 'btnTrendsTab';
-    trendsTab.className = 'm3-tab home-tab' + (currentView === 'engagement' ? ' active' : '');
-    trendsTab.innerHTML = '⚡ Engagement';
-    trendsTab.onclick = () => setTeacherView('engagement');
-    bar.appendChild(trendsTab);
-  }
-  app.classes.forEach((cls, ci) => {
-    const tab = document.createElement('button'); tab.className='m3-tab'+(cls.id===app.activeId&&currentView!=='home'?' active':'');
-    const dot = document.createElement('span'); dot.className='tab-indicator'; if(cls.bracket.final.winnerIdx!==null) dot.classList.add('show');
-    tab.appendChild(dot); tab.appendChild(document.createTextNode(cls.name));
-    tab.onclick = e => {
-      if(e.target.classList.contains('tab-close'))return;
-      if(app.activeId===cls.id&&currentView!=='home'&&currentView!=='engagement')return;
-      const card=document.getElementById('contentCard');
-      card.classList.add('content-switching');
-      setTimeout(()=>{
-        app.activeId=cls.id;
-        if(MODE==='teacher'){
-          saveTeacherPrefs();
-          saveApp();
-          document.getElementById('engagementView').style.display='none';
-          document.getElementById('bracketView').style.display='block';
-          currentView='bracket';
-          renderAll();
-        } else {
-          if(currentView==='home'||currentView==='vote'||currentView==='engagement') setView('bracket');
-          saveStudentPrefs();
-          renderAll();
-          showCurrentView();
-        }
-        card.classList.remove('content-switching');
-        card.classList.add('content-entering');
-        setTimeout(()=>card.classList.remove('content-entering'),250);
-      },150);
-    };
-    if (MODE==='teacher' && app.classes.length>1) {
-      const x = document.createElement('span'); x.textContent='×'; x.style.cssText='margin-left:.3rem;font-size:1rem;opacity:.5;line-height:1;'; x.className='tab-close';
-      x.onclick = ev => { ev.stopPropagation(); confirmDeleteClass(cls.id); }; tab.appendChild(x);
-    }
-    bar.appendChild(tab);
-  });
-  if (MODE==='teacher') {
-    const add = document.createElement('button'); add.className='add-tab-btn'; add.textContent='+ Add Class'; add.onclick=openAddClass; bar.appendChild(add);
-  }
+  // Block pill is now in the header; just update the label
+  const lbl = document.getElementById('blockPillLabel');
+  if (!lbl) return;
+  const isHome = currentView === 'home' || currentView === 'engagement';
+  lbl.textContent = isHome ? '🏠 Home' : (activeClass() ? activeClass().name : 'Select Block');
 }
 
 function updateStatus() {
@@ -3149,6 +3193,7 @@ function toggleStudentFullscreen() {
 document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement) exitProjection();
 });
+document.addEventListener('click', () => closeBlockDropdown());
 window.addEventListener('resize', () => { applyProjectionScale(); });
 
 // ── Export ──
