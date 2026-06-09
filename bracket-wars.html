@@ -1780,7 +1780,7 @@ function renderHome() {
     const alivePoems = results.filter(r => r.status === 'alive' || r.status === 'champion')
       .sort((a,b2) => b2.roundsWon - a.roundsWon || b2.totalVotes - a.totalVotes)
       .slice(0, 5);
-    const aliveCount = results.filter(r => r.status === 'alive' || r.status === 'champion').length;
+    const aliveCount = results.filter(r => r.status !== 'eliminated').length;
     const elimCount = results.filter(r => r.status === 'eliminated').length;
     const anyPlayed = results.some(r => r.status !== 'pending');
     // Runner-up and 3rd place
