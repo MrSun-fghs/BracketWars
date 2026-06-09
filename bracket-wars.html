@@ -3442,17 +3442,21 @@ function rebuildHamburgerMenu() {
       blockEl.innerHTML = `<span>${isActive ? '● ' : '○ '}${esc(cls.name)}</span><span class="hmenu-chevron">${isExpanded ? '▾' : '›'}</span>`;
       blockEl.onclick = (e) => {
         e.stopPropagation();
-        if (_hmenuExpandedBlock === cls.id) {
-          _hmenuExpandedBlock = null;
-        } else {
-          _hmenuExpandedBlock = cls.id;
-          if (cls.id !== app.activeId || isHome) {
-            app.activeId = cls.id;
-            if (isTeacher) { saveTeacherPrefs(); saveApp(); currentView = 'bracket'; }
-            renderAll(); showCurrentView();
-          }
+        // Chevron click: toggle accordion only, no navigation
+        if (e.target.classList.contains('hmenu-chevron')) {
+          _hmenuExpandedBlock = (_hmenuExpandedBlock === cls.id) ? null : cls.id;
+          rebuildHamburgerMenu();
+          return;
         }
-        rebuildHamburgerMenu();
+        // Block name click: switch to this block + go to Bracket + close menu
+        app.activeId = cls.id;
+        _hmenuExpandedBlock = cls.id;
+        if (isTeacher) { saveTeacherPrefs(); saveApp(); currentView = 'bracket'; renderAll(); showCurrentView(); }
+        else { setView('bracket'); renderAll(); }
+        m.classList.remove('open');
+        const _btn = document.getElementById('hamburgerBtn');
+        if (_btn) _btn.classList.remove('open');
+        updateHamburgerLabel();
       };
       m.appendChild(blockEl);
 
