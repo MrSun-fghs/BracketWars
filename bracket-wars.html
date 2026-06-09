@@ -1041,7 +1041,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 }
 
 /* ── ROSTER VIEW ─────────────────────────────────────────── */
-#rosterView{background:#0d0d1a;height:calc(100vh - 180px);overflow-y:auto;overflow-x:hidden;padding:28px 16px 60px;-webkit-overflow-scrolling:touch;}
+#rosterView{background:#0d0d1a;min-height:200px;overflow-y:auto;overflow-x:hidden;padding:28px 16px 60px;-webkit-overflow-scrolling:touch;}
 .roster-title-block{text-align:center;padding:12px 0 24px;}
 .roster-title-sub{font-size:11px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#c2410c;margin-bottom:6px;}
 .roster-title-main{font-family:'Fredoka One',sans-serif;font-size:clamp(2.5rem,8vw,4.5rem);color:#fff;letter-spacing:4px;text-transform:uppercase;line-height:1;}
@@ -3510,7 +3510,7 @@ document.addEventListener('click', () => {
   if (m) m.classList.remove('open');
   if (btn) btn.classList.remove('open');
 });
-window.addEventListener('resize', () => { applyProjectionScale(); });
+window.addEventListener('resize', () => { applyProjectionScale(); if (currentView === 'roster') setRosterHeight(); });
 
 // ── Export ──
 function exportBracket() {
@@ -4135,7 +4135,16 @@ function _rosterCloseActive() {
   _rosterActiveRow = null;
 }
 
+function setRosterHeight() {
+  const rv = document.getElementById('rosterView');
+  if (!rv) return;
+  const appBar = document.querySelector('.app-bar');
+  const top = appBar ? appBar.getBoundingClientRect().bottom : 64;
+  rv.style.height = Math.max(200, window.innerHeight - top) + 'px';
+}
+
 function renderRoster() {
+  setRosterHeight();
   const grid = document.getElementById('rosterGrid');
   grid.innerHTML = '';
   _rosterRowCards.forEach(r=>r.length=0); _rosterExpPanels.length=0;
