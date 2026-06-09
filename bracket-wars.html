@@ -2081,13 +2081,6 @@ function buildAppBar() {
     if (redoSnapshot) {
       const rb=document.createElement('button'); rb.className='btn-tonal'; rb.textContent='↪ Redo'; rb.onclick=redoLastResult; el.appendChild(rb);
     }
-    // Export only (projection moved to student nav)
-    const eb=document.createElement('button'); eb.className='btn-text'; eb.textContent='⬇ Export'; eb.onclick=exportBracket; el.appendChild(eb);
-    [{label:'Rename',fn:'openRenameClass()'},{label:'Edit Poems',fn:'openSetup()'},{label:'Reset',fn:'openReset()',danger:true}].forEach(a => {
-      const b = document.createElement('button'); b.className='btn-text';
-      if(a.danger) b.style.color='var(--md-error)';
-      b.textContent=a.label; b.setAttribute('onclick',a.fn); el.appendChild(b);
-    });
     const b = document.createElement('button'); b.className='btn-tonal'; b.innerHTML='👁 Student View'; b.onclick=()=>setMode('student'); el.appendChild(b);
   } else {
     const fsBtn = document.createElement('button'); fsBtn.className='fullscreen-btn'; fsBtn.title='Fullscreen'; fsBtn.onclick=toggleStudentFullscreen;
@@ -3385,7 +3378,7 @@ function rebuildHamburgerMenu() {
 
   const sep = () => { const d=document.createElement('div'); d.className='hmenu-sep'; m.appendChild(d); };
   const lbl = (text) => { const d=document.createElement('div'); d.className='hmenu-label'; d.textContent=text; m.appendChild(d); };
-
+  const isTeacher = MODE === 'teacher';
   const isHome = currentView === 'home';
 
   // ── HOME ──
@@ -3396,12 +3389,18 @@ function rebuildHamburgerMenu() {
   homeEl.onclick = () => { _hmenuExpandedBlock = null; setView('home'); renderAll(); m.classList.remove('open'); };
   m.appendChild(homeEl);
 
-  const settingsEl = document.createElement('div');
-  settingsEl.className = 'hmenu-item';
-  settingsEl.style.color = '#6b7280';
-  settingsEl.textContent = '⚙ Settings';
-  settingsEl.onclick = () => { requestTeacherMode(); m.classList.remove('open'); };
-  m.appendChild(settingsEl);
+  // Teacher mode: Student View link; Student mode: Settings link
+  const modeEl = document.createElement('div');
+  modeEl.className = 'hmenu-item';
+  if (isTeacher) {
+    modeEl.textContent = '👁 Student View';
+    modeEl.onclick = () => { setMode('student'); m.classList.remove('open'); };
+  } else {
+    modeEl.style.color = '#6b7280';
+    modeEl.textContent = '⚙ Settings';
+    modeEl.onclick = () => { requestTeacherMode(); m.classList.remove('open'); };
+  }
+  m.appendChild(modeEl);
 
   sep();
 
@@ -3423,50 +3422,63 @@ function rebuildHamburgerMenu() {
           _hmenuExpandedBlock = null;
         } else {
           _hmenuExpandedBlock = cls.id;
-          // Switch to this block if not already active
           if (cls.id !== app.activeId || isHome) {
-            app.activeId = cls.id; renderAll(); showCurrentView();
+            app.activeId = cls.id;
+            if (isTeacher) { saveTeacherPrefs(); saveApp(); currentView = 'bracket'; }
+            renderAll(); showCurrentView();
           }
         }
         rebuildHamburgerMenu();
       };
       m.appendChild(blockEl);
 
-      // Sub-views — shown when expanded
+      // Sub-items — shown when expanded or active
       if (isExpanded || isActive) {
-        const subViews = [
-          ['<svg width="13" height="13" viewBox="2 2 44 44" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Bracket','bracket'],
-          ['<svg width="14" height="12" viewBox="0 0 42 32" fill="currentColor" style="vertical-align:-1px;margin-right:6px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg>Drama','list'],
-          ['<svg width="13" height="13" viewBox="0 0 48 48" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Records','leaderboard'],
-          ['<svg width="13" height="13" viewBox="-4 0 56 52" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>Roster','roster'],
-        ];
-        subViews.forEach(([label, v]) => {
-          const sub = document.createElement('div');
-          const isSubActive = currentView === v && isActive;
-          sub.className = 'hmenu-item hmenu-subitem hmenu-sub-' + v + (isSubActive ? ' hmenu-active' : '');
-          if (isSubActive) sub.style.cssText = 'color:#4338ca;font-weight:700;';
-          sub.innerHTML = label;
-          sub.onclick = () => {
-            app.activeId = cls.id;
-            setView(v); renderAll(); showCurrentView();
-            m.classList.remove('open');
-          };
-          m.appendChild(sub);
-        });
-        if (app.voting.open && app.voting.classId === cls.id) {
-          const vEl = document.createElement('div');
-          vEl.className = 'hmenu-item hmenu-subitem';
-          vEl.style.cssText = 'background:#fef3c7;color:#92400e;font-weight:800;';
-          vEl.textContent = '🗳 Vote Now';
-          vEl.onclick = () => { setView('vote'); m.classList.remove('open'); };
-          m.appendChild(vEl);
+        if (isTeacher) {
+          // Teacher sub-items: block management actions
+          const teacherActions = [
+            { label: '⬇ Export', fn: () => exportBracket() },
+            { label: '✎ Rename', fn: () => openRenameClass() },
+            { label: '📝 Edit Poems', fn: () => openSetup() },
+            { label: '🔴 Reset', fn: () => openReset(), danger: true },
+          ];
+          teacherActions.forEach(({ label, fn, danger }) => {
+            const sub = document.createElement('div');
+            sub.className = 'hmenu-item hmenu-subitem';
+            if (danger) sub.style.cssText = 'color:var(--md-error);';
+            sub.textContent = label;
+            sub.onclick = () => { app.activeId = cls.id; m.classList.remove('open'); fn(); };
+            m.appendChild(sub);
+          });
+        } else {
+          // Student sub-items: navigation views
+          const subViews = [
+            ['<svg width="13" height="13" viewBox="2 2 44 44" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Bracket','bracket'],
+            ['<svg width="14" height="12" viewBox="0 0 42 32" fill="currentColor" style="vertical-align:-1px;margin-right:6px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg>Drama','list'],
+            ['<svg width="13" height="13" viewBox="0 0 48 48" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Records','leaderboard'],
+            ['<svg width="13" height="13" viewBox="-4 0 56 52" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>Roster','roster'],
+          ];
+          subViews.forEach(([label, v]) => {
+            const sub = document.createElement('div');
+            const isSubActive = currentView === v && isActive;
+            sub.className = 'hmenu-item hmenu-subitem hmenu-sub-' + v + (isSubActive ? ' hmenu-active' : '');
+            if (isSubActive) sub.style.cssText = 'color:#4338ca;font-weight:700;';
+            sub.innerHTML = label;
+            sub.onclick = () => { app.activeId = cls.id; setView(v); renderAll(); showCurrentView(); m.classList.remove('open'); };
+            m.appendChild(sub);
+          });
+          if (app.voting.open && app.voting.classId === cls.id) {
+            const vEl = document.createElement('div');
+            vEl.className = 'hmenu-item hmenu-subitem';
+            vEl.style.cssText = 'background:#fef3c7;color:#92400e;font-weight:800;';
+            vEl.textContent = '🗳 Vote Now';
+            vEl.onclick = () => { setView('vote'); m.classList.remove('open'); };
+            m.appendChild(vEl);
+          }
         }
       }
     });
   }
-
-  sep();
-
 }
 document.addEventListener('click', () => {
   const m = document.getElementById('hamburgerMenu');
