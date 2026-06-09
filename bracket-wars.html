@@ -67,7 +67,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   #sectionNav .vote-nav-pill{font-size:.72rem;padding:.32rem .6rem;}
 }
 /* Hamburger */
-.hamburger-wrap{display:none;position:relative;}
+.hamburger-wrap{display:flex;align-items:center;position:relative;}
 .hamburger-btn{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;}
 .hamburger-btn span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;}
 .hamburger-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:220px;z-index:200;overflow:hidden;display:none;max-height:80vh;overflow-y:auto;}
@@ -80,16 +80,16 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .hmenu-subitem:hover{background:#f5f3ff;}
 .hmenu-block-row{display:flex;align-items:center;justify-content:space-between;}
 .hmenu-chevron{font-size:.85rem;opacity:.5;margin-left:.5rem;}
+/* Hamburger always aligned right */
+.hamburger-menu{right:0;left:auto;}
 @media(max-width:680px){
   #sectionNav{display:none!important;}
-  .hamburger-wrap{display:block!important;}
   /* Hide all header action items on mobile — everything moves into hamburger */
   .block-pill-wrap{display:none!important;}
   .vote-nav-pill{display:none!important;}
   .app-bar .live-chip{display:none!important;}
   .fullscreen-btn{display:none!important;}
   .teacher-btn{display:none!important;}
-  .hamburger-menu{right:0;left:auto;}
 }
 .app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:.1rem;}
 .vote-nav-pill{display:inline-flex;align-items:center;gap:5px;margin-top:0;padding:.38rem .85rem;border-radius:99px;background:#f59e0b;color:#1c1400;font-size:.78rem;font-weight:800;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 0 0 0 rgba(245,158,11,.6);animation:votePillPulse 1.8s ease-in-out infinite;}
@@ -1094,7 +1094,7 @@ body.projection #sectionNav{display:none!important;}
       </div>
     </div>
     <div class="app-bar-actions" id="appBarActions"></div>
-    <!-- Hamburger — right side, mobile only, outside appBarActions so buildAppBar() doesn't wipe it -->
+    <!-- Hamburger — always visible, outside appBarActions so buildAppBar() doesn't wipe it -->
     <div class="hamburger-wrap">
       <button class="hamburger-btn" onclick="toggleHamburger(event)">
         <span></span><span></span><span></span>
@@ -2025,7 +2025,6 @@ function buildBlockPill() {
 
 function buildAppBar() {
   const el = document.getElementById('appBarActions'); el.innerHTML = '';
-  el.appendChild(buildBlockPill());
   if (MODE === 'teacher') {
     ensureVoting(app);
     if (app.voting.open) {
@@ -2061,7 +2060,6 @@ function buildAppBar() {
   } else {
     const fsBtn = document.createElement('button'); fsBtn.className='fullscreen-btn'; fsBtn.title='Fullscreen'; fsBtn.onclick=toggleStudentFullscreen;
     fsBtn.innerHTML='⛶<span class="fs-label">Fullscreen</span>'; el.appendChild(fsBtn);
-    const b = document.createElement('button'); b.className='teacher-btn'; b.innerHTML='✎<span class="teacher-label">Teacher</span>'; b.onclick=requestTeacherMode; el.appendChild(b);
   }
 }
 
