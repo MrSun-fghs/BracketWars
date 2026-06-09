@@ -1858,10 +1858,9 @@ function buildBlockPill() {
   const wrap = document.createElement('div');
   wrap.className = 'block-pill-wrap';
   const isHome = currentView === 'home' || currentView === 'engagement';
-  const label = isHome ? '🏠 Home' : (activeClass() ? activeClass().name : 'Select Block');
   const btn = document.createElement('button');
-  btn.className = 'block-pill' + (isHome ? ' pill-home' : ''); btn.id = 'blockPillBtn';
-  btn.innerHTML = `<span id="blockPillLabel">${esc(label)}</span><span class="block-pill-caret">▾</span>`;
+  btn.className = 'block-pill'; btn.id = 'blockPillBtn';
+  btn.innerHTML = `<span id="blockPillLabel">Block Navigator</span><span class="block-pill-caret">▾</span>`;
   btn.onclick = e => { e.stopPropagation(); toggleBlockDropdown(); };
   const dd = document.createElement('div');
   dd.className = 'block-dropdown'; dd.id = 'blockDropdown'; dd.style.display = 'none';
@@ -1985,13 +1984,7 @@ function buildSecondaryToolbar() {
 function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); }
 
 function renderTabs() {
-  // Block pill is now in the header; update label + color state
-  const lbl = document.getElementById('blockPillLabel');
-  if (!lbl) return;
-  const isHome = currentView === 'home' || currentView === 'engagement';
-  lbl.textContent = isHome ? '🏠 Home' : (activeClass() ? activeClass().name : 'Select Block');
-  const btn = document.getElementById('blockPillBtn');
-  if (btn) btn.classList.toggle('pill-home', isHome);
+  // Block pill label is static ("Block Navigator"); no updates needed here
 }
 
 function updateStatus() {
