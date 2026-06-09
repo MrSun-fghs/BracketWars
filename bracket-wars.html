@@ -3403,7 +3403,7 @@ function renderVoteView() {
     }
 
     const rp2=ROSTER_POEMS.find(p=>p.num===poem.seed);
-    const voteSrc=rp2?rp2.svg:'';
+    const voteSrc=rp2?(rp2.aniSvg||rp2.svg):'';
     const pZoom=rp2?rp2.cropZoom||1.6:1.6;
     const pCx=rp2&&rp2.cropX!=null?rp2.cropX:50;
     const pCy=rp2&&rp2.cropY!=null?rp2.cropY:12;
