@@ -71,8 +71,8 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .hamburger-btn{height:36px;border-radius:8px;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:7px;padding:0 10px;transition:background .2s;}
 .hmenu-btn-lines{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:18px;}
 .hmenu-btn-lines span{display:block;width:18px;height:2px;background:currentColor;border-radius:2px;}
-.hmenu-btn-label{font-size:.78rem;font-weight:700;color:#fff;white-space:nowrap;max-width:0;overflow:hidden;opacity:0;transition:max-width .25s ease,opacity .2s ease;}
-.hmenu-btn-label.visible{max-width:120px;opacity:1;}
+.hmenu-btn-label{font-size:.78rem;font-weight:700;color:#fff;white-space:nowrap;display:none;letter-spacing:.02em;}
+.hmenu-btn-label.visible{display:inline;}
 .hamburger-btn span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s ease;}
 .hamburger-btn.open .hmenu-btn-lines span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
 .hamburger-btn.open .hmenu-btn-lines span:nth-child(2){opacity:0;transform:scaleX(0);}
@@ -2101,9 +2101,9 @@ function buildSecondaryToolbar() {
 
 function updateHamburgerLabel() {
   const lbl = document.getElementById('hmenuBtnLabel');
-  if (!lbl) return;
+  if (!lbl || !app || !app.classes) return;
   const onStudentHome = MODE === 'student' && currentView === 'home';
-  const activeCls = app.classes && app.classes.find(c => c.id === app.activeId);
+  const activeCls = activeClass();
   if (!onStudentHome && activeCls) {
     lbl.textContent = activeCls.name;
     lbl.classList.add('visible');
