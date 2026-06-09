@@ -3607,6 +3607,12 @@ function rebuildHamburgerMenu() {
     svEl.textContent = '👁 Student View';
     svEl.onclick = () => { setMode('student'); m.classList.remove('open'); };
     m.appendChild(svEl);
+    // Engagement / analytics
+    const engEl = document.createElement('div');
+    engEl.className = 'hmenu-item' + (currentView==='engagement'?' hmenu-item-active':'');
+    engEl.textContent = '⚡ Insights';
+    engEl.onclick = () => { setTeacherView('engagement'); m.classList.remove('open'); };
+    m.appendChild(engEl);
   } else {
     const homeEl = document.createElement('div');
     homeEl.className = 'hmenu-item';
