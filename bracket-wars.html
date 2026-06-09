@@ -251,7 +251,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 /* BRACKET */
 .bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;display:flex;}
 .bracket-scroll>.mm-bracket{margin:0 auto;flex-shrink:0;}
-.mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;align-items:stretch;justify-content:center;column-gap:.5rem;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
+.mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) var(--bcol4,190px) var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;align-items:stretch;justify-content:center;column-gap:.5rem;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
 .mm-bracket:not(.all-collapsed){min-width:900px;}
 /* Compact TBD matchups so full bracket fits in view */
 .tbd-matchup{opacity:.38;width:fit-content;min-width:0;margin:0 auto;}
@@ -2688,6 +2688,25 @@ function manualCollapseCol(col){
   setColCollapsed(col,true);
   updateExpandAllBtn();
 }
+function toggleCrownCol(){
+  const bracket=document.getElementById('bracket');
+  const center=bracket&&bracket.querySelector('.center-col');
+  const hdr=bracket&&bracket.querySelector('[data-bhdr="4"]');
+  if(!center)return;
+  const collapsed=center.dataset.collapsed==='1';
+  if(collapsed){
+    center.removeAttribute('data-collapsed');
+    center.style.overflow='';
+    if(hdr)hdr.removeAttribute('data-collapsed');
+    bracket.style.setProperty('--bcol4','190px');
+  } else {
+    center.dataset.collapsed='1';
+    center.style.overflow='hidden';
+    center.style.width='0';
+    if(hdr)hdr.setAttribute('data-collapsed','');
+    bracket.style.setProperty('--bcol4','0px');
+  }
+}
 
 function renderBracket(){
   const bracket=document.getElementById('bracket');bracket.innerHTML='';if(!activeClass())return;
@@ -2705,7 +2724,14 @@ function renderBracket(){
     if(subs[i]){const sub=document.createElement('span');sub.className='col-header-sub';sub.textContent=subs[i];textBlock.appendChild(sub);}
     // Inner wrapper: button on outer edge, text block centered
     const inner=document.createElement('div');inner.className='col-header-inner';
-    if(colNum!==4 && roundDone[colNum]){
+    if(colNum===4){
+      // Crown col: add collapse buttons on both sides
+      const hbtnL=document.createElement('button');hbtnL.className='col-hide-btn';hbtnL.textContent='‹';hbtnL.title='Collapse center';
+      hbtnL.onclick=(e)=>{e.stopPropagation();toggleCrownCol();};
+      const hbtnR=document.createElement('button');hbtnR.className='col-hide-btn';hbtnR.textContent='›';hbtnR.title='Collapse center';
+      hbtnR.onclick=(e)=>{e.stopPropagation();toggleCrownCol();};
+      inner.appendChild(hbtnL);inner.appendChild(textBlock);inner.appendChild(hbtnR);
+    } else if(roundDone[colNum]){
       const hbtn=document.createElement('button');hbtn.className='col-hide-btn';
       const isRight=colNum>=5;
       hbtn.textContent=isRight?'›':'‹';hbtn.title='Collapse this round';
@@ -2777,7 +2803,7 @@ function bcard(type,ri,mi,mirrored,isT){
   else if(type==='semi'){pA=semiPoem(ri,0);pB=semiPoem(ri,1);md=bkt().semis[ri];if(md.winnerIdx!==null&&!isSemiDone()){if(md.winnerIdx===0)aA=true;else aB=true;}}
   else{pA=finalPoem(0);pB=finalPoem(1);md=bkt().final;}
   const hasPoems=pA&&pB,isC=md.winnerIdx!==null,tv=(md.votes[0]||0)+(md.votes[1]||0);
-  const isTBD=!pA&&!pB;
+  const isTBD=!pA&&!pB&&type!=='final';
   const card=document.createElement('div');card.className='matchup'+(isT&&hasPoems?' clickable':'')+(isTBD?' tbd-matchup':'');card.dataset.matchupKey=JSON.stringify({type,ri,mi});
   if(pA) card.dataset.poemA=pA.name;
   if(pB) card.dataset.poemB=pB.name;
