@@ -3436,6 +3436,29 @@ const ROSTER_ROWS = [
   {letter:'D',label:'Power & Society'},
 ];
 
+const _rosterAC = new (window.AudioContext || window.webkitAudioContext)();
+function _rosterPlayOpen() {
+  if (_rosterAC.state === 'suspended') _rosterAC.resume();
+  [[440,0,0.08],[660,0.09,0.18]].forEach(([freq,start,end]) => {
+    const osc=_rosterAC.createOscillator(), gain=_rosterAC.createGain();
+    osc.connect(gain); gain.connect(_rosterAC.destination); osc.type='sine';
+    osc.frequency.setValueAtTime(freq,_rosterAC.currentTime+start);
+    gain.gain.setValueAtTime(0,_rosterAC.currentTime+start);
+    gain.gain.linearRampToValueAtTime(0.25,_rosterAC.currentTime+start+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001,_rosterAC.currentTime+end);
+    osc.start(_rosterAC.currentTime+start); osc.stop(_rosterAC.currentTime+end+0.05);
+  });
+}
+function _rosterPlayClose() {
+  if (_rosterAC.state === 'suspended') _rosterAC.resume();
+  const osc=_rosterAC.createOscillator(), gain=_rosterAC.createGain();
+  osc.connect(gain); gain.connect(_rosterAC.destination); osc.type='sine';
+  osc.frequency.setValueAtTime(520,_rosterAC.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(260,_rosterAC.currentTime+0.12);
+  gain.gain.setValueAtTime(0.22,_rosterAC.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,_rosterAC.currentTime+0.14);
+  osc.start(_rosterAC.currentTime); osc.stop(_rosterAC.currentTime+0.15);
+}
 let _rosterBuilt = false;
 let _rosterActiveRow = null;
 let _rosterActiveCard = null;
@@ -3508,7 +3531,7 @@ function _rosterOpenRow(rowIdx, poem, cardEl) {
   }
   panel.querySelector('.roster-expansion-inner').innerHTML = _rosterBuildStatsHTML(poem);
   panel.classList.add('open');
-  panel.querySelector('[data-close]').addEventListener('click', _rosterCloseActive);
+  panel.querySelector('[data-close]').addEventListener('click', ()=>{ _rosterPlayClose(); _rosterCloseActive(); });
   _rosterActiveRow = rowIdx; _rosterActiveCard = cardEl; cardEl.classList.add('selected');
   _rosterBounceRows(rowIdx);
   setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
@@ -3550,8 +3573,8 @@ function renderRoster() {
       card.style.cssText = `--r-accent:${p.accentColor};`;
       card.innerHTML = `<div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap"><img src="${p.svg}" alt="${p.author}"></div><div class="roster-author-name" style="color:${p.accentColor}">${p.author}</div><div class="roster-poem-title">${p.title}</div>`;
       card.addEventListener('click', ()=>{
-        if (_rosterActiveCard===card) { _rosterCloseActive(); return; }
-        _rosterOpenRow(row, p, card);
+        if (_rosterActiveCard===card) { _rosterPlayClose(); _rosterCloseActive(); return; }
+        _rosterPlayOpen(); _rosterOpenRow(row, p, card);
       });
       _rosterRowCards[row].push(card);
       grid.appendChild(card);
