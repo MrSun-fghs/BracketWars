@@ -161,12 +161,17 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 @keyframes navZap{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-3px) rotate(-20deg)}50%{transform:translateX(3px) rotate(20deg)}80%{transform:translateX(-1px) rotate(-8deg)}}
 @keyframes navBounce{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-6px) scale(1.15)}65%{transform:translateY(-2px) scale(1.05)}}
 @keyframes navClash{0%{transform:rotate(0) scale(1)}20%{transform:rotate(-14deg) scale(1.15)}50%{transform:rotate(10deg) scale(1.1)}75%{transform:rotate(-5deg) scale(1.05)}100%{transform:rotate(0) scale(1)}}
-@keyframes navQuiver{0%,100%{transform:rotate(0)}20%{transform:rotate(-3deg)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(1deg)}}
+@keyframes navEraseTop{0%,20%{stroke-dashoffset:0;opacity:1}65%{stroke-dashoffset:-120;opacity:.15}100%{stroke-dashoffset:0;opacity:1}}
+@keyframes navEraseBot{0%,20%{stroke-dashoffset:0;opacity:1}65%{stroke-dashoffset:120;opacity:.15}100%{stroke-dashoffset:0;opacity:1}}
 .seg-btn#btnBracket:hover .nav-icon{animation:navSpin .5s var(--motion-std);}
 .seg-btn#btnList:hover .nav-icon{animation:navZap .45s ease;}
 .seg-btn#btnLeaderboard:hover .nav-icon{animation:navBounce .4s ease;}
 .seg-btn#btnRoster:hover svg{animation:navClash .5s ease;}
-.seg-btn#btnRoster.active svg{animation:navQuiver 2.4s ease-in-out infinite;}
+.seg-btn#btnRoster.active svg line{stroke-dasharray:120;}
+.seg-btn#btnRoster.active svg line:nth-child(1){animation:navEraseTop 1.8s ease-in-out infinite;}
+.seg-btn#btnRoster.active svg line:nth-child(2){animation:navEraseTop 1.8s ease-in-out infinite;animation-delay:.12s;}
+.seg-btn#btnRoster.active svg line:nth-child(3){animation:navEraseBot 1.8s ease-in-out infinite;animation-delay:.24s;}
+.seg-btn#btnRoster.active svg line:nth-child(4){animation:navEraseBot 1.8s ease-in-out infinite;animation-delay:.32s;}
 /* BRACKET */
 .bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;display:flex;}
 .bracket-scroll>.mm-bracket{margin:0 auto;flex-shrink:0;}
