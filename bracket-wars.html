@@ -419,6 +419,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .rec-info{flex:1;min-width:0;}
 .rec-name{font-size:1rem;font-weight:600;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .rec-card.eliminated .rec-name{text-decoration:line-through;color:var(--md-on-surface-variant);}
+.rec-author{font-size:.65rem;font-weight:400;color:var(--md-on-surface-variant);opacity:.7;margin-top:1px;}
 .rec-card.champion .rec-name{color:#92400E;font-size:1.15rem;}
 .rec-card.compact-card .rec-name{font-size:.85rem;}
 .rec-subtitle{font-size:.72rem;color:var(--md-on-surface-variant);margin-top:2px;}
@@ -1966,8 +1967,9 @@ function buildRecCard(r, globalRank, catRank, catTotal, catColor) {
   const top=document.createElement('div');top.className='rec-card-top';
   const info=document.createElement('div');info.className='rec-info';
   const name=document.createElement('div');name.className='rec-name';name.textContent=r.name;
+  const auth=document.createElement('div');auth.className='rec-author';auth.textContent='by '+(DEFAULT_AUTHORS[r.idx]||'');
   const sub=document.createElement('div');sub.className='rec-subtitle';sub.textContent=subtitle;
-  info.appendChild(name);info.appendChild(sub);
+  info.appendChild(name);info.appendChild(auth);info.appendChild(sub);
   top.appendChild(info);
   if(placementLabel){const pl=document.createElement('span');pl.className='rec-placement '+placementClass;pl.textContent=placementLabel;top.appendChild(pl);}
   body.appendChild(top);
