@@ -401,10 +401,12 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .lmc-author{display:block;font-size:.62rem;font-weight:400;color:var(--md-on-surface-variant);opacity:.7;margin-top:1px;}
 .lmc-bar-wrap{position:relative;padding:5px 0;margin-bottom:5px;}
 .lmc-bar-track{height:10px;border-radius:var(--shape-full);background:var(--md-surface-container-high);overflow:visible;display:flex;}
-@keyframes lmcGlow{0%,100%{box-shadow:0 0 5px 1px rgba(74,58,255,.25);}50%{box-shadow:0 0 12px 4px rgba(74,58,255,.5);}}
-.lmc-bar-winner{height:100%;background:var(--md-primary);border-radius:var(--shape-full) 0 0 var(--shape-full);animation:lmcGlow 2s ease-in-out infinite;}
+@keyframes lmcShimmer{0%{left:-60%}100%{left:120%}}
+@keyframes lmcBoltPulse{0%,100%{box-shadow:0 0 6px 2px rgba(74,58,255,.3);}50%{box-shadow:0 0 16px 6px rgba(74,58,255,.6);}}
+.lmc-bar-winner{height:100%;background:linear-gradient(90deg,#4338ca,#818cf8);border-radius:var(--shape-full) 0 0 var(--shape-full);position:relative;overflow:hidden;}
+.lmc-bar-shimmer{position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);animation:lmcShimmer 1.9s ease-in-out infinite;pointer-events:none;}
 .lmc-bar-loser{height:100%;background:var(--md-outline-variant);border-radius:0 var(--shape-full) var(--shape-full) 0;}
-.lmc-bolt{position:absolute;top:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:var(--md-surface-container-lowest);border:1.5px solid var(--md-primary);display:flex;align-items:center;justify-content:center;z-index:2;font-size:10px;pointer-events:none;}
+.lmc-bolt{position:absolute;top:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;background:var(--md-surface-container-lowest);border:2px solid var(--md-primary);display:flex;align-items:center;justify-content:center;z-index:2;font-size:17px;pointer-events:none;animation:lmcBoltPulse 2s ease-in-out infinite;}
 .lmc-labels{display:flex;justify-content:space-between;}
 .lmc-lbl-w{font-size:.72rem;font-weight:500;color:var(--md-primary);}
 .lmc-lbl-l{font-size:.72rem;color:var(--md-on-surface-variant);}
@@ -2204,6 +2206,7 @@ function buildMatchCard(pA,pB,md,isLatest){
     const bw=document.createElement('div');bw.className='lmc-bar-wrap';
     const bt=document.createElement('div');bt.className='lmc-bar-track';
     const bwin=document.createElement('div');bwin.className='lmc-bar-winner';bwin.style.width=pctW+'%';
+    const bshim=document.createElement('div');bshim.className='lmc-bar-shimmer';bwin.appendChild(bshim);
     const blos=document.createElement('div');blos.className='lmc-bar-loser';blos.style.width=(100-pctW)+'%';
     const bolt=document.createElement('div');bolt.className='lmc-bolt';bolt.textContent='⚡';bolt.style.left=pctW+'%';
     bt.appendChild(bwin);bt.appendChild(blos);bw.appendChild(bt);bw.appendChild(bolt);
