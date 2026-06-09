@@ -2025,7 +2025,6 @@ function buildAppBar() {
     });
     const b = document.createElement('button'); b.className='btn-tonal'; b.innerHTML='👁 Student View'; b.onclick=()=>setMode('student'); el.appendChild(b);
   } else {
-    const chip = document.createElement('div'); chip.className='live-chip'; chip.innerHTML='<div class="live-dot"></div>Live'; el.appendChild(chip);
     const fsBtn = document.createElement('button'); fsBtn.className='fullscreen-btn'; fsBtn.title='Fullscreen'; fsBtn.onclick=toggleStudentFullscreen;
     fsBtn.innerHTML='⛶<span class="fs-label">Fullscreen</span>'; el.appendChild(fsBtn);
     const b = document.createElement('button'); b.className='teacher-btn'; b.innerHTML='✎<span class="teacher-label">Teacher</span>'; b.onclick=requestTeacherMode; el.appendChild(b);
