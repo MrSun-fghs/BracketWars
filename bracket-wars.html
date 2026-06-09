@@ -2047,8 +2047,11 @@ function renderTabs() {
 
 function updateStatus() {
   const hideViews = ['home','vote','roster'];
+  const shouldHide = MODE === 'teacher' || hideViews.includes(currentView);
   const tb = document.getElementById('secondaryToolbar');
-  if (tb) tb.style.display = (MODE === 'teacher' || hideViews.includes(currentView)) ? 'none' : 'block';
+  if (tb) tb.style.display = shouldHide ? 'none' : 'block';
+  const cc = document.getElementById('contentCard');
+  if (cc) cc.style.paddingBottom = shouldHide ? '0' : '64px';
   let done=0, total=0; const b=bkt();
   b.regionRounds.forEach(reg=>reg.forEach(m=>{total++;if(m.winnerIdx!==null)done++;}));
   b.semis.forEach(m=>{total++;if(m.winnerIdx!==null)done++;}); total++; if(b.final.winnerIdx!==null)done++;
