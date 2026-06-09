@@ -48,7 +48,9 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   #sectionNav .seg-btn-track{display:none;}
   .hamburger-wrap{display:block;}
 }
-.app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:.15rem;position:relative;top:3px;}
+.app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:.1rem;}
+.vote-nav-pill{display:inline-flex;align-items:center;gap:5px;margin-top:.3rem;padding:.28rem .85rem;border-radius:99px;background:#f59e0b;color:#1c1400;font-size:.75rem;font-weight:800;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 0 0 0 rgba(245,158,11,.6);animation:votePillPulse 1.8s ease-in-out infinite;}
+@keyframes votePillPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5);}60%{box-shadow:0 0 0 7px rgba(245,158,11,0);}}
 .app-bar .live-chip{background:rgba(103,232,249,.14);color:#67e8f9;border:1px solid rgba(103,232,249,.28);}
 .app-bar .live-dot{background:#67e8f9;}
 .app-bar .teacher-btn{color:rgba(255,255,255,.55);}
@@ -252,10 +254,12 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .mm-bracket{display:grid;grid-template-columns:var(--bcol1,1fr) var(--bcol2,1fr) var(--bcol3,1fr) 190px var(--bcol5,1fr) var(--bcol6,1fr) var(--bcol7,1fr);grid-template-rows:auto 1fr;align-items:stretch;justify-content:center;column-gap:.5rem;transition:grid-template-columns .45s cubic-bezier(0,0,0,1);}
 .mm-bracket:not(.all-collapsed){min-width:900px;}
 /* Compact TBD matchups so full bracket fits in view */
-.tbd-matchup{opacity:.5;}
-.tbd-matchup .poem-slot{padding:.18rem .45rem;min-height:0;}
-.tbd-matchup .poem-name{font-size:.6rem;}
-.tbd-matchup .seed{font-size:.5rem;padding:.05rem .2rem;}
+.tbd-matchup{opacity:.38;}
+.tbd-matchup .poem-slot{padding:.08rem .5rem;min-height:0;}
+.tbd-matchup .poem-slot:not(:last-child){border-bottom:1px solid var(--md-outline-variant);}
+.tbd-matchup .poem-name{font-size:.62rem;line-height:1.1;}
+.tbd-matchup .poem-author{display:none;}
+.tbd-matchup .seed{font-size:.48rem;padding:.04rem .18rem;}
 .col-header{text-align:center;padding:0 .5rem .65rem;border-bottom:2px solid var(--md-outline-variant);align-self:start;transition:padding .45s,border-bottom-color .45s;display:flex;align-items:center;justify-content:center;}
 .col-header[data-collapsed]{padding:0;border-bottom-color:transparent;overflow:hidden;}
 .col-header[data-collapsed]>*{display:none;}
@@ -302,8 +306,8 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .poem-slot.winner-slot .seed{background:var(--md-primary);color:var(--md-on-primary);}
 .seed.seed-won{background:#F59E0B!important;color:#fff!important;display:inline-flex!important;align-items:center;justify-content:center;text-align:center;font-size:.8rem;padding:.15rem .3rem;min-width:1.3rem;}
 .poem-name-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
-.poem-name{font-size:.72rem;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--md-on-surface);}
-.poem-author{font-size:.58rem;font-weight:400;color:var(--md-on-surface-variant);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.75;}
+.poem-name{font-size:.82rem;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--md-on-surface);}
+.poem-author{font-size:.66rem;font-weight:400;color:var(--md-on-surface-variant);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.75;}
 .poem-slot.winner-slot .poem-name{color:var(--md-on-primary-container);font-weight:700;}
 .poem-slot.winner-slot .poem-author{color:var(--md-on-primary-container);opacity:.65;}
 .poem-slot.pending .poem-name{color:var(--md-on-surface-variant);font-style:italic;font-weight:400;}
@@ -1035,11 +1039,11 @@ body.projection #sectionNav{display:none!important;}
     <div class="app-bar-left">
       <div class="app-bar-title" onclick="if(typeof setView==='function'&&MODE==='student')setView('home')"><span style="color:#fff">Bracket Wars</span><span style="color:rgba(255,255,255,.2);font-weight:300;margin:0 .35rem">·</span><span style="font-weight:400;font-style:italic;color:#a5b4fc">Poetry Madness</span></div>
       <div class="app-bar-subtitle">FGHS · English 1 · Mr. Sun</div>
+      <button id="btnVote" class="vote-nav-pill" onclick="setView('vote')" style="display:none">🗳 Vote Now</button>
     </div>
     <!-- Center nav — hidden on home, collapses to hamburger on small screens -->
     <div id="sectionNav" style="display:none">
       <div class="seg-btn-track" id="viewToggle">
-        <button class="seg-btn" id="btnVote" onclick="setView('vote')" style="display:none"><span class="nav-icon">🗳</span> Vote</button>
         <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')"><svg width="15" height="15" viewBox="2 2 44 44" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/></svg> Bracket</button>
         <button class="seg-btn" id="btnList" onclick="setView('list')"><svg width="16" height="13" viewBox="0 0 42 32" fill="currentColor" style="display:inline-block;vertical-align:-2px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg> Drama</button>
         <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/></svg> Records</button>
@@ -3222,31 +3226,23 @@ function applyProjectionScale() {
   if (!bracketEl) return;
   const isProj = document.body.classList.contains('projection');
   const onBracket = currentView === 'bracket';
-  if (!onBracket) {
+  if (!isProj || !onBracket) {
     bracketEl.style.transform = '';
     bracketEl.style.transformOrigin = '';
     bracketEl.style.marginBottom = '';
     return;
   }
-  // Reset scale to measure natural size
   bracketEl.style.transform = 'scale(1)';
   requestAnimationFrame(() => {
     const naturalW = bracketEl.offsetWidth;
     const naturalH = bracketEl.offsetHeight;
     if (!naturalW) return;
-    const scroll = bracketEl.closest('.bracket-scroll');
-    const viewW = scroll ? scroll.clientWidth : window.innerWidth;
-    const viewH = window.innerHeight - (isProj ? 48 : 120);
-    const scaleW = viewW / naturalW;
-    const scaleH = viewH / naturalH;
-    // Projection: scale to fill. Normal: scale down to fit only (max 1)
-    const maxScale = isProj ? 3 : 1;
-    const scale = Math.min(scaleW, scaleH, maxScale);
+    const viewW = window.innerWidth;
+    const viewH = window.innerHeight - 48;
+    const scale = Math.min(viewW / naturalW, viewH / naturalH, 3);
     bracketEl.style.transformOrigin = 'top center';
     bracketEl.style.transform = `scale(${scale.toFixed(3)})`;
     bracketEl.style.marginBottom = `${(naturalH * scale - naturalH).toFixed(0)}px`;
-    // Disable scroll container overflow when content fits scaled
-    if (scroll) scroll.style.overflowX = (scale >= 1) ? 'auto' : 'hidden';
   });
 }
 // ── Projection mode ──
