@@ -857,6 +857,9 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 
 /* ── ROSTER VIEW ─────────────────────────────────────────── */
 #rosterView{background:#0d0d1a;height:calc(100vh - 180px);overflow-y:auto;overflow-x:hidden;padding:28px 16px 60px;-webkit-overflow-scrolling:touch;}
+.roster-title-block{text-align:center;padding:12px 0 24px;}
+.roster-title-sub{font-size:11px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:#c2410c;margin-bottom:6px;}
+.roster-title-main{font-family:'Fredoka One',sans-serif;font-size:clamp(2.5rem,8vw,4.5rem);color:#fff;letter-spacing:4px;text-transform:uppercase;line-height:1;}
 .roster-grid{display:grid;grid-template-columns:repeat(4,210px);gap:16px;justify-content:center;width:100%;max-width:920px;margin:0 auto;}
 .roster-row-label{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:6px 4px 4px;margin-top:4px;}
 .roster-row-letter{font-family:'Fredoka One',sans-serif;font-size:22px;color:#fff;background:#1e1e3a;border:1px solid #2e2e50;border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -957,7 +960,13 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 <div id="leaderboardView" style="display:none"><div class="leaderboard-view" id="lbContent"></div></div>
 <div id="listView" style="display:none"><div class="list-view" id="listContent"></div></div>
 <div id="bracketView" style="display:none"><div id="bracketColToolbar"><button class="bracket-expand-btn" onclick="expandAllBracketCols()">↔ Show All Rounds</button></div><div class="bracket-scroll"><div class="mm-bracket" id="bracket"></div></div></div>
-<div id="rosterView" style="display:none"><div class="roster-grid" id="rosterGrid"></div></div>
+<div id="rosterView" style="display:none">
+  <div class="roster-title-block">
+    <div class="roster-title-sub">× Bracket Wars ×</div>
+    <div class="roster-title-main">Roster</div>
+  </div>
+  <div class="roster-grid" id="rosterGrid"></div>
+</div>
 <div id="engagementView" style="display:none;background:#fff;"><div class="home-view" id="engagementContent"></div></div>
 </div>
 
