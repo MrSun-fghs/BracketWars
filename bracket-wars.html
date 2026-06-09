@@ -3114,6 +3114,7 @@ function launchReaction(emoji, btn) {
 
 function spawnReactionFloat(emoji, x, y) {
   if (MODE === 'teacher') return;
+  if (currentView !== 'vote') return;
   const absX = x <= 1 ? x * window.innerWidth : x;
   const absY = y <= 1 ? y * window.innerHeight : y;
   const count = 1;
