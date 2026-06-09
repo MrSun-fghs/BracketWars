@@ -1368,6 +1368,7 @@ function setMode(m) {
     showCurrentView();
   } else {
     document.getElementById('viewToggle').style.display = 'none';
+    document.getElementById('secondaryToolbar').style.display = 'none';
     document.getElementById('homeView').style.display = 'none';
     document.getElementById('leaderboardView').style.display = 'none';
     document.getElementById('listView').style.display = 'none';
@@ -1426,8 +1427,9 @@ function showCurrentView() {
     voteBtn.classList.toggle('vote-live', showVote);
     voteBtn.classList.toggle('active', showVote && currentView === 'vote');
   }
-  const ss = document.querySelector('.toolbar-status-stack');
-  if (ss) ss.style.display = currentView === 'home' ? 'none' : 'flex';
+  const hideBar = currentView === 'home' || currentView === 'vote';
+  const tb = document.getElementById('secondaryToolbar');
+  if (tb) tb.style.display = hideBar ? 'none' : 'block';
   if (currentView==='home') renderHome();
   if (currentView==='leaderboard') renderLeaderboard();
   if (currentView==='vote') renderVoteView();
