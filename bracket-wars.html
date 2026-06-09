@@ -1936,7 +1936,7 @@ function buildBlockPill() {
   if (MODE === 'student') {
     const hi = document.createElement('div'); hi.className = 'block-dd-item' + (isHome ? ' bdd-active' : '');
     hi.innerHTML = '🏠 Home';
-    hi.onclick = () => setView('home');
+    hi.onclick = () => { setView('home'); renderAll(); };
     ddi.appendChild(hi);
     const s = document.createElement('div'); s.className = 'block-dd-sep'; ddi.appendChild(s);
   } else {
@@ -3961,14 +3961,36 @@ function _rosterOpenRow(rowIdx, poem, cardEl) {
   panel.querySelector('[data-close]').addEventListener('click', ()=>{ _rosterPlayClose(); _rosterCloseActive(); });
   _rosterActiveRow = rowIdx; _rosterActiveCard = cardEl; cardEl.classList.add('selected');
   _rosterBounceRows(rowIdx);
-  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
+  // On mobile (2-col grid), move expansion panel right after the clicked pair of cards
+  const isMobile = window.innerWidth <= 700;
+  if (isMobile) {
+    const cardIndex = _rosterRowCards[rowIdx].indexOf(cardEl);
+    const pairLastCard = _rosterRowCards[rowIdx][Math.min(Math.floor(cardIndex / 2) * 2 + 1, _rosterRowCards[rowIdx].length - 1)];
+    if (pairLastCard && pairLastCard.nextSibling !== panel) {
+      pairLastCard.parentNode.insertBefore(panel, pairLastCard.nextSibling);
+    }
+  }
+  setTimeout(()=>{
+    if (isMobile) {
+      panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+    } else {
+      panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  }, 100);
 }
 
 function _rosterCloseActive() {
   if (_rosterActiveRow !== null) {
     const panel = _rosterExpPanels[_rosterActiveRow];
     panel.classList.remove('open');
-    setTimeout(()=>{ panel.querySelector('.roster-expansion-inner').innerHTML=''; }, 400);
+    setTimeout(()=>{
+      panel.querySelector('.roster-expansion-inner').innerHTML='';
+      // Restore panel to end of its row group if it was moved for mobile
+      const lastCard = _rosterRowCards[_rosterActiveRow]?.[_rosterRowCards[_rosterActiveRow].length - 1];
+      if (lastCard && lastCard.nextSibling !== panel && lastCard.parentNode) {
+        lastCard.parentNode.insertBefore(panel, lastCard.nextSibling);
+      }
+    }, 400);
     _rosterBounceRows(_rosterActiveRow);
   }
   if (_rosterActiveCard) { _rosterActiveCard.classList.remove('selected'); _rosterActiveCard = null; }
