@@ -3404,26 +3404,27 @@ function rebuildHamburgerMenu() {
   const isTeacher = MODE === 'teacher';
   const isHome = currentView === 'home';
 
-  // ── HOME ──
-  const homeEl = document.createElement('div');
-  homeEl.className = 'hmenu-item';
-  homeEl.innerHTML = '🏠 Home';
-  if (isHome) homeEl.style.cssText = 'color:#4338ca;font-weight:700;';
-  homeEl.onclick = () => { _hmenuExpandedBlock = null; setView('home'); renderAll(); m.classList.remove('open'); };
-  m.appendChild(homeEl);
-
-  // Teacher mode: Student View link; Student mode: Settings link
-  const modeEl = document.createElement('div');
-  modeEl.className = 'hmenu-item';
+  // ── TOP ITEMS (mode-specific) ──
   if (isTeacher) {
-    modeEl.textContent = '👁 Student View';
-    modeEl.onclick = () => { setMode('student'); m.classList.remove('open'); };
+    const svEl = document.createElement('div');
+    svEl.className = 'hmenu-item';
+    svEl.textContent = '👁 Student View';
+    svEl.onclick = () => { setMode('student'); m.classList.remove('open'); };
+    m.appendChild(svEl);
   } else {
-    modeEl.style.color = '#6b7280';
-    modeEl.textContent = '⚙ Settings';
-    modeEl.onclick = () => { requestTeacherMode(); m.classList.remove('open'); };
+    const homeEl = document.createElement('div');
+    homeEl.className = 'hmenu-item';
+    homeEl.innerHTML = '🏠 Home';
+    if (isHome) homeEl.style.cssText = 'color:#4338ca;font-weight:700;';
+    homeEl.onclick = () => { _hmenuExpandedBlock = null; setView('home'); renderAll(); m.classList.remove('open'); };
+    m.appendChild(homeEl);
+    const settingsEl = document.createElement('div');
+    settingsEl.className = 'hmenu-item';
+    settingsEl.style.color = '#6b7280';
+    settingsEl.textContent = '⚙ Settings';
+    settingsEl.onclick = () => { requestTeacherMode(); m.classList.remove('open'); };
+    m.appendChild(settingsEl);
   }
-  m.appendChild(modeEl);
 
   sep();
 
