@@ -104,7 +104,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   .teacher-btn{display:none!important;}
 }
 .app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;position:relative;top:-3px;left:55px;}
-.vote-nav-pill{display:inline-flex;align-items:center;gap:5px;margin-top:0;padding:.38rem .85rem;border-radius:99px;background:#f59e0b;color:#1c1400;font-size:.78rem;font-weight:800;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 0 0 0 rgba(245,158,11,.6);animation:votePillPulse 1.8s ease-in-out infinite;}
+.vote-nav-pill{display:inline-flex;align-items:center;gap:5px;margin-top:0;margin-left:-6px;padding:.38rem .85rem;border-radius:99px;background:#f59e0b;color:#1c1400;font-size:.78rem;font-weight:800;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 0 0 0 rgba(245,158,11,.6);animation:votePillPulse 1.8s ease-in-out infinite;}
 @keyframes votePillPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5);}60%{box-shadow:0 0 0 7px rgba(245,158,11,0);}}
 .app-bar .live-chip{background:rgba(103,232,249,.14);color:#67e8f9;border:1px solid rgba(103,232,249,.28);}
 .app-bar .live-dot{background:#67e8f9;}
@@ -1115,6 +1115,31 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 @keyframes annPulse{0%,100%{opacity:1;}50%{opacity:.88;}}
 body.projection #votingAnnouncementBar{display:none!important;}
 body.projection #sectionNav{display:none!important;}
+
+/* ── Usage Analytics Panel ─────────────────────────────────── */
+.ua-wrap{padding:.85rem 1rem 0;max-width:560px;margin:0 auto;}
+.ua-class-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.9rem;}
+.ua-class-btn{font-size:.72rem;font-weight:700;padding:.28rem .75rem;border-radius:99px;border:1.5px solid var(--md-outline-variant);background:transparent;color:var(--md-on-surface-variant);cursor:pointer;transition:all .15s;}
+.ua-class-btn.active{background:var(--md-primary);color:#fff;border-color:var(--md-primary);}
+.ua-section{margin-bottom:1rem;}
+.ua-section-title{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:.55rem;display:flex;align-items:center;gap:.35rem;}
+.ua-card{background:var(--md-surface-container);border-radius:16px;padding:.85rem 1rem;margin-bottom:.6rem;}
+.ua-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.6rem;}
+.ua-stat{background:var(--md-surface-container-high);border-radius:12px;padding:.65rem .5rem;text-align:center;}
+.ua-stat-num{font-size:1.5rem;font-weight:800;color:var(--md-primary);line-height:1;}
+.ua-stat-lbl{font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--md-on-surface-variant);margin-top:2px;}
+.ua-bar-row{display:flex;align-items:center;gap:.55rem;margin-bottom:.45rem;}
+.ua-bar-name{font-size:.72rem;color:var(--md-on-surface-variant);width:52px;flex-shrink:0;text-align:right;}
+.ua-bar-track{flex:1;height:7px;background:var(--md-surface-container-highest);border-radius:4px;overflow:hidden;}
+.ua-bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.ua-bar-pct{font-size:.7rem;font-weight:600;color:var(--md-on-surface-variant);width:32px;text-align:right;flex-shrink:0;}
+.ua-poem-row{display:flex;align-items:center;gap:.55rem;margin-bottom:.45rem;}
+.ua-poem-rank{font-size:.68rem;color:var(--md-on-surface-variant);width:14px;flex-shrink:0;}
+.ua-poem-name{font-size:.78rem;color:var(--md-on-surface);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ua-poem-count{font-size:.7rem;color:var(--md-on-surface-variant);white-space:nowrap;}
+.ua-empty{font-size:.8rem;color:var(--md-on-surface-variant);text-align:center;padding:1.5rem 0;}
+.ua-divider{height:1px;background:var(--md-outline-variant);opacity:.4;margin:.25rem 0 1rem;}
+/* ── End Usage Analytics ────────────────────────────────────── */
 </style>
 </head>
 <body>
@@ -1377,6 +1402,30 @@ const SUPABASE_URL = 'https://livkhrzrcbbnmrfqoiai.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpdmtocnpyY2Jibm1yZnFvaWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MzI0OTgsImV4cCI6MjA5NjIwODQ5OH0.Xoj0YIdPE2P_nhj5UzmCL_4fBB8Srzrk3kFEdu7ZM7I';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── Analytics ─────────────────────────────────────────────────────────────
+let _viewStartTime = null, _viewName = null;
+function _anonSid() {
+  let s = localStorage.getItem('bw_asid');
+  if (!s) { s = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)); localStorage.setItem('bw_asid',s); }
+  return s;
+}
+function trackEvent(type, payload={}, durationMs=null) {
+  if (typeof MODE !== 'undefined' && MODE === 'teacher') return;
+  try {
+    const row = { session_id: _anonSid(), class_id: (app && app.activeId) || '', event_type: type, payload };
+    if (durationMs !== null) row.duration_ms = durationMs;
+    db.from('bw_events').insert(row); // fire-and-forget
+  } catch(e) {}
+}
+function trackSessionStart() {
+  if (localStorage.getItem('bw_session_tracked')) return;
+  localStorage.setItem('bw_session_tracked','1');
+  trackEvent('session_start');
+  setTimeout(()=>localStorage.removeItem('bw_session_tracked'), 30*60*1000); // reset after 30 min
+}
+// ── End Analytics ──────────────────────────────────────────────────────────
+
 const CORRECT_PASSWORD = 'fghs2025';
 let teacherUnlocked = false, MODE = 'student', currentView = 'home';
 
@@ -1523,6 +1572,12 @@ function setTeacherView(v) {
 }
 
 function setView(v) {
+  // analytics: log exit from previous view
+  if (_viewName && _viewStartTime && (typeof MODE==='undefined'||MODE!=='teacher')) {
+    trackEvent('view_exit', {view:_viewName}, Date.now()-_viewStartTime);
+  }
+  _viewName = v; _viewStartTime = Date.now();
+  if (typeof MODE==='undefined'||MODE!=='teacher') trackEvent('view_enter',{view:v});
   currentView = v;
   saveStudentPrefs();
   ['home','leaderboard','list','bracket','roster'].forEach(x => {
@@ -2119,7 +2174,8 @@ function updateHamburgerLabel() {
   lbl.classList.toggle('visible', !!show);
   if (sep) sep.classList.toggle('visible', !!show);
 }
-function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); updateVotingAnnouncementBar(); updateHamburgerLabel(); }
+function renderAll() {
+  trackSessionStart(); buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); updateVotingAnnouncementBar(); updateHamburgerLabel(); }
 function updateVotingAnnouncementBar() {
   const bar = document.getElementById('votingAnnouncementBar'); if (!bar) return;
   ensureVoting(app);
@@ -2497,6 +2553,7 @@ function buildMatchCard(pA,pB,md,isLatest){
     toggle.classList.toggle('open',open);
     const chev=toggle.querySelector('.lmc-scout-chevron');
     chev.textContent=open?'▴':'▾';
+    if (open) trackEvent('scout_open',{poem_a:winner.name,poem_b:loser.name});
   });
   card.appendChild(toggle);card.appendChild(panel);
   return card;
@@ -2543,10 +2600,142 @@ function dramaCard(parent, icon, label, title, sub, detail) {
   parent.appendChild(c);
 }
 
+
+// ── Usage Analytics ───────────────────────────────────────────────────────
+let _uaClassFilter = 'all';
+
+async function renderUsageAnalytics() {
+  if (MODE !== 'teacher') return;
+  const root = document.getElementById('engagementContent');
+  if (!root) return;
+
+  // Build class tab buttons
+  const wrap = document.createElement('div'); wrap.className = 'ua-wrap'; wrap.id = 'uaWrap';
+
+  // Class tab switcher
+  const tabRow = document.createElement('div'); tabRow.className = 'ua-class-tabs';
+  const allClasses = [{id:'all', name:'All Classes'}, ...app.classes.map(c=>({id:c.id, name:c.name}))];
+  allClasses.forEach(cls => {
+    const btn = document.createElement('button'); btn.className = 'ua-class-btn' + (_uaClassFilter===cls.id?' active':'');
+    btn.textContent = cls.name;
+    btn.onclick = () => { _uaClassFilter = cls.id; renderUsageAnalytics(); };
+    tabRow.appendChild(btn);
+  });
+  wrap.appendChild(tabRow);
+
+  // Loading state
+  const panel = document.createElement('div'); panel.id = 'uaPanel';
+  panel.innerHTML = '<div class="ua-empty">Loading usage data…</div>';
+  wrap.appendChild(panel);
+  root.insertBefore(wrap, root.firstChild);
+
+  // Fetch events
+  let query = db.from('bw_events').select('*');
+  if (_uaClassFilter !== 'all') query = query.eq('class_id', _uaClassFilter);
+  const { data: events, error } = await query;
+
+  if (error || !events || events.length === 0) {
+    panel.innerHTML = '<div class="ua-empty">No usage data yet — data will appear after students use the app.</div>';
+    const div = document.createElement('div'); div.className = 'ua-divider'; root.insertBefore(div, root.children[1]);
+    return;
+  }
+
+  // ── Aggregate ──────────────────────────────────────────────────────────
+  const viewColors = {bracket:'#4338ca',drama:'#065f46',roster:'#9f1239',records:'#92400e',home:'#6b7280',leaderboard:'#7c3aed',list:'#0369a1'};
+  const viewLabels = {bracket:'Bracket',drama:'Drama',roster:'Roster',records:'Records',home:'Home',leaderboard:'Leaders',list:'List'};
+
+  // Sessions
+  const sessions = {};
+  events.filter(e=>e.event_type==='session_start').forEach(e=>{ sessions[e.session_id]=sessions[e.session_id]||{classId:e.class_id,start:e.created_at}; });
+  const sessionCount = Object.keys(sessions).length || new Set(events.map(e=>e.session_id)).size;
+
+  // View time
+  const viewTime = {};
+  events.filter(e=>e.event_type==='view_exit'&&e.duration_ms>0).forEach(e=>{
+    const v = e.payload?.view; if (!v||v==='home') return;
+    viewTime[v] = (viewTime[v]||0) + (e.duration_ms||0);
+  });
+  const totalViewMs = Object.values(viewTime).reduce((s,v)=>s+v,0)||1;
+
+  // Avg session duration (sum of all view_exit durations per session / session count)
+  const sessionMs = {};
+  events.filter(e=>e.event_type==='view_exit'&&e.duration_ms>0).forEach(e=>{
+    sessionMs[e.session_id] = (sessionMs[e.session_id]||0) + (e.duration_ms||0);
+  });
+  const sessionMsVals = Object.values(sessionMs);
+  const avgMs = sessionMsVals.length ? sessionMsVals.reduce((s,v)=>s+v,0)/sessionMsVals.length : 0;
+  const avgMin = avgMs>0 ? (avgMs/60000).toFixed(1) : '—';
+
+  // Poem taps
+  const poemTaps = {};
+  events.filter(e=>e.event_type==='poem_tap').forEach(e=>{
+    const k = e.payload?.poem||'Unknown'; poemTaps[k]=(poemTaps[k]||0)+1;
+  });
+  const topPoems = Object.entries(poemTaps).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+  // Scout opens
+  const scoutOpens = {};
+  events.filter(e=>e.event_type==='scout_open').forEach(e=>{
+    const k = e.payload?.poem_a||'Unknown'; scoutOpens[k]=(scoutOpens[k]||0)+1;
+  });
+  const topScout = Object.entries(scoutOpens).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+  const totalTaps = events.filter(e=>e.event_type==='poem_tap').length;
+  const totalScout = events.filter(e=>e.event_type==='scout_open').length;
+
+  // ── Render ─────────────────────────────────────────────────────────────
+  panel.innerHTML = '';
+
+  // Stats row
+  const statRow = document.createElement('div'); statRow.className = 'ua-stat-row';
+  [{num:sessionCount,lbl:'Sessions'},{num:totalTaps,lbl:'Poem Taps'},{num:avgMin==='—'?'—':avgMin+'m',lbl:'Avg Time'}].forEach(s=>{
+    statRow.innerHTML += `<div class="ua-stat"><div class="ua-stat-num">${s.num}</div><div class="ua-stat-lbl">${s.lbl}</div></div>`;
+  });
+  panel.appendChild(statRow);
+
+  // View time bars
+  if (totalViewMs > 1) {
+    const vSec = document.createElement('div'); vSec.className = 'ua-section';
+    vSec.innerHTML = '<div class="ua-section-title">⏱ Where students spent time</div>';
+    const vCard = document.createElement('div'); vCard.className = 'ua-card';
+    const sorted = Object.entries(viewTime).sort((a,b)=>b[1]-a[1]);
+    sorted.forEach(([v,ms])=>{
+      const pct = Math.round(ms/totalViewMs*100);
+      const color = viewColors[v]||'#6b7280';
+      vCard.innerHTML += `<div class="ua-bar-row"><span class="ua-bar-name">${viewLabels[v]||v}</span><div class="ua-bar-track"><div class="ua-bar-fill" style="width:${pct}%;background:${color}"></div></div><span class="ua-bar-pct">${pct}%</span></div>`;
+    });
+    vSec.appendChild(vCard); panel.appendChild(vSec);
+  }
+
+  // Top poem taps
+  const tapSec = document.createElement('div'); tapSec.className = 'ua-section';
+  tapSec.innerHTML = '<div class="ua-section-title">👆 Most-tapped poems</div>';
+  const tapCard = document.createElement('div'); tapCard.className = 'ua-card';
+  if (topPoems.length) {
+    topPoems.forEach(([name,count],i)=>{ tapCard.innerHTML += `<div class="ua-poem-row"><span class="ua-poem-rank">${i+1}.</span><span class="ua-poem-name">${name}</span><span class="ua-poem-count">${count} tap${count!==1?'s':''}</span></div>`; });
+  } else { tapCard.innerHTML = '<div class="ua-empty" style="padding:.5rem 0">No taps recorded yet</div>'; }
+  tapSec.appendChild(tapCard); panel.appendChild(tapSec);
+
+  // Scout opens
+  const scoutSec = document.createElement('div'); scoutSec.className = 'ua-section';
+  scoutSec.innerHTML = '<div class="ua-section-title">🔍 Scout reports opened</div>';
+  const scoutCard = document.createElement('div'); scoutCard.className = 'ua-card';
+  if (topScout.length) {
+    topScout.forEach(([name,count],i)=>{ scoutCard.innerHTML += `<div class="ua-poem-row"><span class="ua-poem-rank">${i+1}.</span><span class="ua-poem-name">${name}</span><span class="ua-poem-count">${count} open${count!==1?'s':''}</span></div>`; });
+    scoutCard.innerHTML += `<div style="font-size:.68rem;color:var(--md-on-surface-variant);margin-top:.5rem;">${totalScout} total · ${totalTaps>0?Math.round(totalScout/totalTaps*100):0}% of taps led to a scout report</div>`;
+  } else { scoutCard.innerHTML = '<div class="ua-empty" style="padding:.5rem 0">No scout reports opened yet</div>'; }
+  scoutSec.appendChild(scoutCard); panel.appendChild(scoutSec);
+
+  // Divider before existing bracket stats
+  const div = document.createElement('div'); div.className = 'ua-divider'; root.insertBefore(div, root.children[1]);
+}
+// ── End Usage Analytics ───────────────────────────────────────────────────
+
 function renderEngagement() {
   if (MODE !== 'teacher') return;
   const elRoot = document.getElementById('engagementContent'); if (!elRoot) return;
   elRoot.innerHTML = '';
+  renderUsageAnalytics(); // async — fills usage panel at top
   if (!activeClass()) return;
 
   const matchups = getAllMatchups();
@@ -4181,6 +4370,7 @@ function renderRoster() {
       card.style.cssText = `--r-accent:${p.accentColor};`;
       card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}<div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap"><img src="${p.svg}" alt="${p.author}"></div><div class="roster-author-name" style="color:${p.accentColor}">${p.author}</div><div class="roster-poem-title">${p.title}</div>`;
       card.addEventListener('click', ()=>{
+        trackEvent('poem_tap',{poem:p.title,author:p.author,seed:p.num,view:'roster'});
         if (_rosterActiveCard===card) { _rosterPlayClose(); _rosterCloseActive(); return; }
         _rosterPlayOpen(); _rosterOpenRow(row, p, card);
       });
