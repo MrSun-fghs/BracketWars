@@ -2724,14 +2724,9 @@ function renderBracket(){
     if(subs[i]){const sub=document.createElement('span');sub.className='col-header-sub';sub.textContent=subs[i];textBlock.appendChild(sub);}
     // Inner wrapper: button on outer edge, text block centered
     const inner=document.createElement('div');inner.className='col-header-inner';
-    if(colNum===4){
-      // Crown col: add collapse buttons on both sides
-      const hbtnL=document.createElement('button');hbtnL.className='col-hide-btn';hbtnL.textContent='‹';hbtnL.title='Collapse center';
-      hbtnL.onclick=(e)=>{e.stopPropagation();toggleCrownCol();};
-      const hbtnR=document.createElement('button');hbtnR.className='col-hide-btn';hbtnR.textContent='›';hbtnR.title='Collapse center';
-      hbtnR.onclick=(e)=>{e.stopPropagation();toggleCrownCol();};
-      inner.appendChild(hbtnL);inner.appendChild(textBlock);inner.appendChild(hbtnR);
-    } else if(roundDone[colNum]){
+    // Show collapse button on QF (2,6) and SF (3,5) always; other non-crown cols only when round done
+    const showBtn = colNum!==4 && (roundDone[colNum] || [2,3,5,6].includes(colNum));
+    if(showBtn){
       const hbtn=document.createElement('button');hbtn.className='col-hide-btn';
       const isRight=colNum>=5;
       hbtn.textContent=isRight?'›':'‹';hbtn.title='Collapse this round';
