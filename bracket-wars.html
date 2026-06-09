@@ -68,15 +68,16 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 }
 /* Hamburger */
 .hamburger-wrap{display:flex;align-items:center;position:relative;margin-left:.6rem;}
-.hamburger-btn{height:36px;border-radius:8px;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:7px;padding:0 10px;transition:background .2s;}
-.hmenu-btn-lines{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:18px;}
-.hmenu-btn-lines span{display:block;width:18px;height:2px;background:currentColor;border-radius:2px;}
-.hmenu-btn-label{font-size:.78rem;font-weight:700;color:#fff;white-space:nowrap;display:none;letter-spacing:.02em;}
-.hmenu-btn-label.visible{display:inline;}
-.hamburger-btn span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s ease;}
-.hamburger-btn.open .hmenu-btn-lines span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+.hamburger-btn{height:34px;min-width:34px;border-radius:8px;background:rgba(255,255,255,.1);border:none;cursor:pointer;display:flex;flex-direction:row;align-items:center;justify-content:center;padding:0 9px;gap:0;transition:background .2s;font-size:12px;}
+.hmenu-btn-lines{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4.5px;width:16px;flex-shrink:0;}
+.hmenu-btn-lines span{display:block;width:16px;height:2px;background:#fff;border-radius:2px;transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s ease;}
+.hamburger-btn.open .hmenu-btn-lines span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
 .hamburger-btn.open .hmenu-btn-lines span:nth-child(2){opacity:0;transform:scaleX(0);}
-.hamburger-btn.open .hmenu-btn-lines span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+.hamburger-btn.open .hmenu-btn-lines span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+.hmenu-btn-label{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;display:none;letter-spacing:.04em;line-height:1;margin-right:6px;}
+.hmenu-btn-label.visible{display:block;}
+.hmenu-btn-sep{width:1px;height:13px;background:rgba(255,255,255,.3);display:none;flex-shrink:0;margin-right:8px;}
+.hmenu-btn-sep.visible{display:block;}
 .hamburger-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:220px;z-index:200;overflow:hidden;max-height:80vh;overflow-y:auto;opacity:0;transform:scale(.88) translateY(-10px);transform-origin:top right;pointer-events:none;visibility:hidden;transition:opacity .22s ease,transform .28s cubic-bezier(.34,1.4,.64,1),visibility 0s linear .28s;}
 .hamburger-menu.open{opacity:1;transform:scale(1) translateY(0);pointer-events:auto;visibility:visible;transition:opacity .18s ease,transform .28s cubic-bezier(.34,1.4,.64,1),visibility 0s linear 0s;}
 .hmenu-item{padding:.6rem 1rem;font-size:.85rem;font-weight:500;color:#1c1b1f;cursor:pointer;}
@@ -1137,6 +1138,7 @@ body.projection #sectionNav{display:none!important;}
     <div class="hamburger-wrap">
       <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleHamburger(event)">
         <span class="hmenu-btn-label" id="hmenuBtnLabel"></span>
+        <span class="hmenu-btn-sep" id="hmenuBtnSep"></span>
         <div class="hmenu-btn-lines"><span></span><span></span><span></span></div>
       </button>
       <div class="hamburger-menu" id="hamburgerMenu"></div>
@@ -2101,16 +2103,14 @@ function buildSecondaryToolbar() {
 
 function updateHamburgerLabel() {
   const lbl = document.getElementById('hmenuBtnLabel');
+  const sep = document.getElementById('hmenuBtnSep');
   if (!lbl || !app || !app.classes) return;
   const onStudentHome = MODE === 'student' && currentView === 'home';
   const activeCls = activeClass();
-  if (!onStudentHome && activeCls) {
-    lbl.textContent = activeCls.name;
-    lbl.classList.add('visible');
-  } else {
-    lbl.textContent = '';
-    lbl.classList.remove('visible');
-  }
+  const show = !onStudentHome && activeCls;
+  lbl.textContent = show ? activeCls.name : '';
+  lbl.classList.toggle('visible', !!show);
+  if (sep) sep.classList.toggle('visible', !!show);
 }
 function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); updateVotingAnnouncementBar(); updateHamburgerLabel(); }
 function updateVotingAnnouncementBar() {
