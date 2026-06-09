@@ -359,8 +359,33 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .lm-section-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;}
 .lm-section-title{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);white-space:nowrap;}
 .lm-section-line{flex:1;height:1px;background:var(--md-outline-variant);}
-.lmc{background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);border-radius:var(--shape-lg);padding:12px 14px;margin-bottom:8px;transition:transform .15s ease,box-shadow .15s ease;cursor:default;}
+.lmc{background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);border-radius:var(--shape-lg);padding:0;margin-bottom:8px;transition:transform .15s ease,box-shadow .15s ease;cursor:default;overflow:hidden;}
 .lmc:hover{transform:translateY(-2px);box-shadow:var(--elev-3);}
+.lmc-inner{padding:12px 14px;}
+/* Scout Report toggle + panel */
+.lmc-scout-toggle{display:flex;align-items:center;justify-content:space-between;padding:6px 14px;border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container);cursor:pointer;user-select:none;}
+.lmc-scout-toggle:hover{background:var(--md-surface-container-high);}
+.lmc-scout-toggle-lbl{font-size:.6rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.lmc-scout-chevron{font-size:.75rem;color:var(--md-on-surface-variant);transition:transform .25s ease;}
+.lmc-scout-panel{max-height:0;overflow:hidden;transition:max-height .38s ease;display:grid;grid-template-columns:1fr 1fr;border-top:0 solid var(--md-outline-variant);}
+.lmc-scout-panel.open{max-height:700px;border-top-width:1px;}
+.lmc-scout-col{padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:9px;}
+.lmc-scout-col.win-col{border-right:1px solid var(--md-outline-variant);}
+.lmc-scout-portrait{width:84px;height:84px;border-radius:50%;overflow:hidden;border:2.5px solid var(--md-primary);flex-shrink:0;}
+.lmc-scout-portrait.elim{border-color:var(--md-outline-variant);filter:grayscale(1);opacity:.65;}
+.lmc-scout-portrait img{width:100%;height:100%;object-fit:cover;}
+.lmc-scout-author{font-size:.75rem;font-weight:600;color:var(--md-on-surface);text-align:center;}
+.lmc-scout-author.elim{color:var(--md-on-surface-variant);}
+.lmc-scout-sp{font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:var(--shape-full);text-align:center;line-height:1.55;border:1px solid transparent;}
+.lmc-scout-section-lbl{font-size:.58rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--md-on-surface-variant);align-self:flex-start;}
+.lmc-scout-stats{width:100%;display:flex;flex-direction:column;gap:4px;}
+.lmc-scout-stat-row{display:flex;align-items:center;gap:5px;}
+.lmc-scout-stat-lbl{font-size:.58rem;color:var(--md-on-surface-variant);width:58px;flex-shrink:0;}
+.lmc-scout-stat-track{height:3px;border-radius:99px;background:var(--md-surface-container-high);flex:1;}
+.lmc-scout-stat-fill{height:3px;border-radius:99px;}
+.lmc-scout-lens{background:var(--md-surface-container);border-radius:var(--shape-md);padding:8px 10px;width:100%;}
+.lmc-scout-lens-lbl{font-size:.58rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:3px;}
+.lmc-scout-lens-q{font-size:.68rem;color:var(--md-on-surface-variant);font-style:italic;line-height:1.55;}
 .lmc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
 .lmc-tag{font-size:.58rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 8px;border-radius:var(--shape-full);}
 .lmc-tag.close{background:#FEF3C7;color:#92400E;}
@@ -2143,6 +2168,7 @@ function renderList() {
 }
 function buildMatchCard(pA,pB,md,isLatest){
   const card=document.createElement('div');card.className='lmc';
+  const inner=document.createElement('div');inner.className='lmc-inner';
   const isC=md&&md.winnerIdx!==null;
   const tv=isC?(md.votes[0]||0)+(md.votes[1]||0):0;
   const winner=isC?(md.winnerIdx===0?pA:pB):null;
@@ -2160,20 +2186,20 @@ function buildMatchCard(pA,pB,md,isLatest){
     if(marginClass){const t=document.createElement('span');t.className='lmc-tag '+marginClass;t.textContent=marginLabel;left.appendChild(t);}
     top.appendChild(left);
     if(isLatest){const lt=document.createElement('span');lt.className='lmc-latest';lt.textContent='LATEST';top.appendChild(lt);}
-    card.appendChild(top);
+    inner.appendChild(top);
   }
   if(!isC){
     const pr=document.createElement('div');pr.className='lmc-pending-row';
     const na=document.createElement('div');na.className='lmc-pending-name';na.innerHTML=(pA?esc(pA.name):'TBD')+(pA&&pA.author?`<span class="lmc-author">by ${pA.author}</span>`:'');
     const vs=document.createElement('span');vs.className='lmc-pending-vs';vs.textContent='vs';
     const nb=document.createElement('div');nb.className='lmc-pending-name right';nb.innerHTML=(pB?esc(pB.name):'TBD')+(pB&&pB.author?`<span class="lmc-author">by ${pB.author}</span>`:'');
-    pr.appendChild(na);pr.appendChild(vs);pr.appendChild(nb);card.appendChild(pr);
-    return card;
+    pr.appendChild(na);pr.appendChild(vs);pr.appendChild(nb);inner.appendChild(pr);
+    card.appendChild(inner);return card;
   }
   const poems=document.createElement('div');poems.className='lmc-poems';
   const wn=document.createElement('div');wn.className='lmc-winner';wn.innerHTML=(winner?esc(winner.name):'TBD')+(winner&&winner.author?`<span class="lmc-author">by ${winner.author}</span>`:'');
   const ln=document.createElement('div');ln.className='lmc-loser';ln.innerHTML=(loser?esc(loser.name):'TBD')+(loser&&loser.author?`<span class="lmc-author">by ${loser.author}</span>`:'');
-  poems.appendChild(wn);poems.appendChild(ln);card.appendChild(poems);
+  poems.appendChild(wn);poems.appendChild(ln);inner.appendChild(poems);
   if(tv>0){
     const bw=document.createElement('div');bw.className='lmc-bar-wrap';
     const bt=document.createElement('div');bt.className='lmc-bar-track';
@@ -2186,8 +2212,66 @@ function buildMatchCard(pA,pB,md,isLatest){
     const lv=md.votes[1-md.winnerIdx]||0;
     const ll=document.createElement('span');ll.className='lmc-lbl-l';ll.textContent=`${lv} votes · ${100-pctW}%`;
     lbls.appendChild(lw);lbls.appendChild(ll);
-    card.appendChild(bw);card.appendChild(lbls);
+    inner.appendChild(bw);inner.appendChild(lbls);
   }
+  card.appendChild(inner);
+
+  // ── Scout Report (completed matches only) ──
+  function makeScoutCol(poem,rp,isWin){
+    const col=document.createElement('div');col.className='lmc-scout-col'+(isWin?' win-col':'');
+    const port=document.createElement('div');port.className='lmc-scout-portrait'+(isWin?'':' elim');
+    if(isWin&&rp) port.style.borderColor=rp.accentColor||'var(--md-primary)';
+    if(rp&&rp.svg){
+      const img=document.createElement('img');img.src=rp.svg;img.alt=rp.author||'';
+      const z=rp.cropZoom||1.6,cx=rp.cropX!=null?rp.cropX:50,cy=rp.cropY!=null?rp.cropY:12;
+      img.style.cssText=`width:100%;height:100%;object-fit:cover;transform:scale(${z});transform-origin:${cx}% ${cy}%;`;
+      port.appendChild(img);
+    }
+    col.appendChild(port);
+    const authEl=document.createElement('div');authEl.className='lmc-scout-author'+(isWin?'':' elim');
+    authEl.textContent=rp?rp.author:(poem?DEFAULT_AUTHORS[poem.seed-1]||'':'');
+    col.appendChild(authEl);
+    if(rp&&rp.superpower){
+      const sp=document.createElement('div');sp.className='lmc-scout-sp';
+      sp.textContent='⚡ '+rp.superpower;
+      if(isWin){const ac=rp.accentColor||'#f97316';sp.style.cssText=`background:color-mix(in srgb,${ac} 15%,transparent);color:${ac};border-color:color-mix(in srgb,${ac} 30%,transparent);`;}
+      else sp.style.cssText='background:var(--md-surface-container);color:var(--md-on-surface-variant);border-color:var(--md-outline-variant);';
+      col.appendChild(sp);
+    }
+    const sLbl=document.createElement('div');sLbl.className='lmc-scout-section-lbl';sLbl.textContent='Player Stats';col.appendChild(sLbl);
+    if(rp&&rp.stats){
+      const wrap=document.createElement('div');wrap.className='lmc-scout-stats';
+      [['accessibility','Accessibility'],['emotionalImpact','Emotional'],['imageryPower','Imagery'],['themeStrength','Theme'],['relatability','Relatability']].forEach(([k,l])=>{
+        const val=rp.stats[k]||0;
+        const row=document.createElement('div');row.className='lmc-scout-stat-row';
+        const lbl=document.createElement('span');lbl.className='lmc-scout-stat-lbl';lbl.textContent=l;
+        const track=document.createElement('div');track.className='lmc-scout-stat-track';
+        const fill=document.createElement('div');fill.className='lmc-scout-stat-fill';
+        fill.style.cssText=`width:${val/5*100}%;background:${isWin?'var(--md-primary)':'var(--md-outline-variant)'};`;
+        track.appendChild(fill);row.appendChild(lbl);row.appendChild(track);wrap.appendChild(row);
+      });
+      col.appendChild(wrap);
+    }
+    if(rp&&rp.readingLens){
+      const lens=document.createElement('div');lens.className='lmc-scout-lens';
+      const ll=document.createElement('div');ll.className='lmc-scout-lens-lbl';ll.textContent='Reading Lens';
+      const lq=document.createElement('div');lq.className='lmc-scout-lens-q';lq.textContent=rp.readingLens;
+      lens.appendChild(ll);lens.appendChild(lq);col.appendChild(lens);
+    }
+    return col;
+  }
+  const rosterW=ROSTER_POEMS.find(p=>p.num===winner.seed);
+  const rosterL=ROSTER_POEMS.find(p=>p.num===loser.seed);
+  const toggle=document.createElement('div');toggle.className='lmc-scout-toggle';
+  toggle.innerHTML='<span class="lmc-scout-toggle-lbl">Scout Report</span><span class="lmc-scout-chevron">▾</span>';
+  const panel=document.createElement('div');panel.className='lmc-scout-panel';
+  panel.appendChild(makeScoutCol(winner,rosterW,true));
+  panel.appendChild(makeScoutCol(loser,rosterL,false));
+  toggle.addEventListener('click',()=>{
+    const open=panel.classList.toggle('open');
+    toggle.querySelector('.lmc-scout-chevron').style.transform=open?'rotate(180deg)':'rotate(0deg)';
+  });
+  card.appendChild(toggle);card.appendChild(panel);
   return card;
 }
 
