@@ -313,6 +313,16 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .hmenu-sub-roster.hmenu-active svg line:nth-child(2){animation:navEraseTop 1.8s ease-in-out infinite;animation-delay:.12s;}
 .hmenu-sub-roster.hmenu-active svg line:nth-child(3){animation:navEraseBot 1.8s ease-in-out infinite;animation-delay:.24s;}
 .hmenu-sub-roster.hmenu-active svg line:nth-child(4){animation:navEraseBot 1.8s ease-in-out infinite;animation-delay:.32s;}
+/* Hamburger sub-item hover animations */
+.hmenu-sub-bracket:not(.hmenu-active):hover svg{animation:navSpin .5s cubic-bezier(0.2,0,0,1);}
+.hmenu-sub-list svg rect{transform-box:fill-box;transform-origin:center;}
+.hmenu-sub-list:not(.hmenu-active):hover svg rect:nth-child(1){animation:dramaHover .45s ease both;}
+.hmenu-sub-list:not(.hmenu-active):hover svg rect:nth-child(2){animation:dramaHover .45s ease .06s both;}
+.hmenu-sub-list:not(.hmenu-active):hover svg rect:nth-child(3){animation:dramaHover .45s ease .12s both;}
+.hmenu-sub-list:not(.hmenu-active):hover svg rect:nth-child(4){animation:dramaHover .45s ease .18s both;}
+.hmenu-sub-list:not(.hmenu-active):hover svg rect:nth-child(5){animation:dramaHover .45s ease .24s both;}
+.hmenu-sub-leaderboard:not(.hmenu-active):hover svg{animation:navBounce .4s ease;}
+.hmenu-sub-roster:not(.hmenu-active):hover svg{animation:navClash .5s ease;}
 /* BRACKET */
 .bracket-scroll{overflow-x:auto;padding:1.25rem 1rem 3rem;display:flex;}
 .bracket-scroll>.mm-bracket{margin:0 auto;flex-shrink:0;}
