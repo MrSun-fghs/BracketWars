@@ -369,6 +369,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 .lmc-poems{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
 .lmc-winner{font-size:.88rem;font-weight:600;color:var(--md-on-surface);flex:1;line-height:1.3;}
 .lmc-loser{font-size:.88rem;font-weight:400;color:var(--md-on-surface-variant);text-align:right;flex:1;line-height:1.3;}
+.lmc-author{display:block;font-size:.62rem;font-weight:400;color:var(--md-on-surface-variant);opacity:.7;margin-top:1px;}
 .lmc-bar-wrap{position:relative;padding:5px 0;margin-bottom:5px;}
 .lmc-bar-track{height:10px;border-radius:var(--shape-full);background:var(--md-surface-container-high);overflow:visible;display:flex;}
 @keyframes lmcGlow{0%,100%{box-shadow:0 0 5px 1px rgba(74,58,255,.25);}50%{box-shadow:0 0 12px 4px rgba(74,58,255,.5);}}
@@ -1853,7 +1854,7 @@ function renderTabs() {
           currentView='bracket';
           renderAll();
         } else {
-          if(currentView==='home'||currentView==='vote'||currentView==='engagement') currentView='bracket';
+          if(currentView==='home'||currentView==='vote'||currentView==='engagement') setView('bracket');
           saveStudentPrefs();
           renderAll();
           showCurrentView();
@@ -2071,7 +2072,7 @@ function renderList() {
   const el=document.getElementById('listContent');el.innerHTML='';if(!activeClass())return;
   const champ=champion();
   const cc=document.createElement('div');cc.className='list-champion'+(champ?' crowned':'');
-  cc.innerHTML=`<div class="list-champ-trophy">👑</div><div><div class="list-champ-label">Poetry Champion</div><div class="list-champ-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div></div>`;
+  cc.innerHTML=`<div class="list-champ-trophy">👑</div><div><div class="list-champ-label">Poetry Champion</div><div class="list-champ-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div>${champ&&champ.author?`<div class="lmc-author" style="margin-top:3px;">by ${champ.author}</div>`:''}</div>`;
   el.appendChild(cc);
   const rounds=[
     {label:'Final',matchups:[[finalPoem(0),finalPoem(1),bkt().final]]},
@@ -2116,15 +2117,15 @@ function buildMatchCard(pA,pB,md,isLatest){
   }
   if(!isC){
     const pr=document.createElement('div');pr.className='lmc-pending-row';
-    const na=document.createElement('span');na.className='lmc-pending-name';na.textContent=pA?pA.name:'TBD';
+    const na=document.createElement('div');na.className='lmc-pending-name';na.innerHTML=(pA?esc(pA.name):'TBD')+(pA&&pA.author?`<span class="lmc-author">by ${pA.author}</span>`:'');
     const vs=document.createElement('span');vs.className='lmc-pending-vs';vs.textContent='vs';
-    const nb=document.createElement('span');nb.className='lmc-pending-name right';nb.textContent=pB?pB.name:'TBD';
+    const nb=document.createElement('div');nb.className='lmc-pending-name right';nb.innerHTML=(pB?esc(pB.name):'TBD')+(pB&&pB.author?`<span class="lmc-author">by ${pB.author}</span>`:'');
     pr.appendChild(na);pr.appendChild(vs);pr.appendChild(nb);card.appendChild(pr);
     return card;
   }
   const poems=document.createElement('div');poems.className='lmc-poems';
-  const wn=document.createElement('span');wn.className='lmc-winner';wn.textContent=winner?winner.name:'TBD';
-  const ln=document.createElement('span');ln.className='lmc-loser';ln.textContent=loser?loser.name:'TBD';
+  const wn=document.createElement('div');wn.className='lmc-winner';wn.innerHTML=(winner?esc(winner.name):'TBD')+(winner&&winner.author?`<span class="lmc-author">by ${winner.author}</span>`:'');
+  const ln=document.createElement('div');ln.className='lmc-loser';ln.innerHTML=(loser?esc(loser.name):'TBD')+(loser&&loser.author?`<span class="lmc-author">by ${loser.author}</span>`:'');
   poems.appendChild(wn);poems.appendChild(ln);card.appendChild(poems);
   if(tv>0){
     const bw=document.createElement('div');bw.className='lmc-bar-wrap';
