@@ -120,8 +120,10 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .add-tab-btn:hover{background:rgba(74,58,255,.08);}
 /* Block selector pill + dropdown */
 .block-pill-wrap{position:relative;display:inline-flex;align-items:center;}
-.block-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:99px;font-size:.78rem;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;line-height:1.4;}
+.block-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:99px;font-size:.78rem;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,color .15s;line-height:1.4;}
 .block-pill:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.35);}
+.block-pill.pill-home{background:rgba(165,180,252,.18);border-color:rgba(165,180,252,.4);color:#c4b5fd;}
+.block-pill.pill-home:hover{background:rgba(165,180,252,.28);}
 .block-pill-caret{font-size:.6rem;opacity:.55;}
 .block-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22),0 1px 4px rgba(0,0,0,.1);min-width:160px;z-index:500;border:0.5px solid rgba(0,0,0,.08);overflow:hidden;animation:ddFadeIn .12s ease;}
 @keyframes ddFadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
@@ -990,7 +992,7 @@ body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
 <div class="app-bar">
   <div class="app-bar-inner">
     <div>
-      <div class="app-bar-title"><span style="color:var(--md-on-surface)">Bracket Wars</span><span style="color:var(--md-outline-variant);font-weight:300;margin:0 .35rem">·</span><span style="font-weight:400;font-style:italic">Poetry Madness</span></div>
+      <div class="app-bar-title" style="cursor:pointer;" onclick="if(typeof setView==='function'&&MODE==='student')setView('home')"><span style="color:var(--md-on-surface)">Bracket Wars</span><span style="color:var(--md-outline-variant);font-weight:300;margin:0 .35rem">·</span><span style="font-weight:400;font-style:italic">Poetry Madness</span></div>
       <div class="app-bar-subtitle">FGHS · English 1 · Mr. Sun</div>
     </div>
     <div class="app-bar-actions" id="appBarActions"></div>
@@ -1851,7 +1853,7 @@ function buildBlockPill() {
   const isHome = currentView === 'home' || currentView === 'engagement';
   const label = isHome ? '🏠 Home' : (activeClass() ? activeClass().name : 'Select Block');
   const btn = document.createElement('button');
-  btn.className = 'block-pill'; btn.id = 'blockPillBtn';
+  btn.className = 'block-pill' + (isHome ? ' pill-home' : ''); btn.id = 'blockPillBtn';
   btn.innerHTML = `<span id="blockPillLabel">${esc(label)}</span><span class="block-pill-caret">▾</span>`;
   btn.onclick = e => { e.stopPropagation(); toggleBlockDropdown(); };
   const dd = document.createElement('div');
@@ -1976,11 +1978,13 @@ function buildSecondaryToolbar() {
 function renderAll() { buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); }
 
 function renderTabs() {
-  // Block pill is now in the header; just update the label
+  // Block pill is now in the header; update label + color state
   const lbl = document.getElementById('blockPillLabel');
   if (!lbl) return;
   const isHome = currentView === 'home' || currentView === 'engagement';
   lbl.textContent = isHome ? '🏠 Home' : (activeClass() ? activeClass().name : 'Select Block');
+  const btn = document.getElementById('blockPillBtn');
+  if (btn) btn.classList.toggle('pill-home', isHome);
 }
 
 function updateStatus() {
