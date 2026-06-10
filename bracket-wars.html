@@ -3810,43 +3810,42 @@ body{background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);colo
 #codeLbl{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:-8px;}
 #code{font-size:clamp(56px,10vw,96px);font-weight:900;color:#fff;letter-spacing:.18em;line-height:1;}
 #codeHint{font-size:13px;color:rgba(255,255,255,.35);margin-top:-4px;}
-.vs-row{display:flex;align-items:stretch;gap:16px;width:100%;max-width:900px;}
+.vs-row{display:flex;align-items:stretch;gap:20px;width:100%;max-width:1140px;}
 /* ── White cards matching teacher lobby ── */
-.p-card{flex:1;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;overflow:hidden;background:rgba(255,255,255,.97);}
-.p-card.ca{border:2px solid #4A3AFF;}
-.p-card.cb{border:2px solid #7C5CBF;}
-.vs-badge{width:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:rgba(255,255,255,.5);}
+.p-card{flex:1;border-radius:18px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;overflow:hidden;background:rgba(255,255,255,.97);}
+.p-card.ca{border:2.5px solid #4A3AFF;}
+.p-card.cb{border:2.5px solid #7C5CBF;}
+.vs-badge{width:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:rgba(255,255,255,.5);}
 /* Portrait */
-.portrait{width:88px;height:88px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(0,0,0,.12);flex-shrink:0;}
+.portrait{width:120px;height:120px;border-radius:50%;overflow:hidden;border:3px solid rgba(0,0,0,.12);flex-shrink:0;}
 .portrait img{width:100%;height:100%;object-fit:cover;display:block;}
 /* Author first (large), then poem title */
-.pauthor{font-size:clamp(14px,1.8vw,17px);font-weight:800;color:#1c1b3a;text-align:center;line-height:1.2;}
-.ptitle{font-size:11px;color:#6b7280;text-align:center;margin-top:-2px;}
+.pauthor{font-size:clamp(16px,2vw,21px);font-weight:800;color:#1c1b3a;text-align:center;line-height:1.2;}
+.ptitle{font-size:13px;color:#6b7280;text-align:center;margin-top:-2px;}
 /* Superpower pill */
-.ppill{font-size:9px;font-weight:700;padding:4px 10px;border-radius:99px;color:#fff;text-align:center;line-height:1.4;max-width:100%;}
+.ppill{font-size:11px;font-weight:700;padding:5px 12px;border-radius:99px;color:#fff;text-align:center;line-height:1.4;max-width:100%;}
 .ca .ppill{background:#4A3AFF;}
 .cb .ppill{background:#7C5CBF;}
 /* Section labels */
-.sec-lbl{font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9ca3af;width:100%;margin-top:2px;}
+.sec-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9ca3af;width:100%;margin-top:4px;}
 /* 6-stat bars matching lobby */
-.stats{width:100%;display:flex;flex-direction:column;gap:4px;}
+.stats{width:100%;display:flex;flex-direction:column;gap:5px;}
 .srow{display:flex;align-items:center;gap:8px;}
-.slbl{font-size:9px;font-weight:500;color:#6b7280;width:68px;flex-shrink:0;}
-.strack{flex:1;height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+.slbl{font-size:11px;font-weight:500;color:#6b7280;width:78px;flex-shrink:0;}
+.strack{flex:1;height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
 .sfill{height:100%;border-radius:99px;}
 .ca .sfill{background:#4A3AFF;}
 .cb .sfill{background:#7C5CBF;}
 /* Reading lens */
-.lens{font-size:10px;color:#374151;font-style:italic;line-height:1.5;width:100%;}
+.lens{font-size:12px;color:#374151;font-style:italic;line-height:1.5;width:100%;}
 /* Student tracker */
-.tracker-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:580px;}
-.tracker-header{display:flex;justify-content:space-between;width:100%;font-size:12px;color:rgba(255,255,255,.5);}
-.tracker-bar-bg{width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;}
-.tracker-bar-fill{height:100%;border-radius:99px;background:#86efac;transition:width .4s;}
-.pips-row{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
-.pip{color:rgba(255,255,255,.18);display:inline-flex;transition:color .3s,transform .25s;}
-.pip.joined{color:#86efac;transform:scale(1.1);}
-#pipsLbl{font-size:13px;color:rgba(255,255,255,.4);}
+.tracker-wrap{width:100%;max-width:900px;display:flex;flex-direction:column;gap:8px;}
+.tracker-header{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:rgba(255,255,255,.6);}
+.tracker-bar-bg{width:100%;height:6px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;}
+.tracker-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#4A3AFF,#5eead4);transition:width .4s;}
+.pips-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(22px,1fr));gap:3px;width:100%;}
+.pip{color:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;transition:color .3s,transform .25s;}
+.pip.joined{color:#5eead4;transform:scale(1.08);}
 </style></head><body>
 <div id="codeLbl">Join Code</div>
 <div id="code">—</div>
@@ -3856,8 +3855,7 @@ body{background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);colo
 <div class="vs-badge">VS</div>
 <div class="p-card cb" id="cardB"></div>
 </div>
-<div class="pips-row" id="pipsRow"></div>
-<div id="pipsLbl">Waiting for students…</div>
+<div class="tracker-wrap" id="trackerWrap"><div style="font-size:13px;color:rgba(255,255,255,.35);text-align:center;">Waiting for students…</div></div>
 <script>
 const _ps='<svg width="18" height="22" viewBox="0 0 20 24" fill="currentColor"><circle cx="10" cy="6" r="5"/><path d="M10 13C4.5 13 1 16.2 1 18.5V22h18v-3.5C19 16.2 15.5 13 10 13z"/></svg>';
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
@@ -3876,12 +3874,18 @@ function buildCard(el,p){
     lens;
 }
 function buildPips(joined,total){
-  const row=document.getElementById('pipsRow');
-  const lbl=document.getElementById('pipsLbl');
-  row.innerHTML='';
-  if(total>0){const show=Math.min(total,40);for(let i=0;i<show;i++){const d=document.createElement('div');d.className='pip'+(i<joined?' joined':'');d.innerHTML=_ps;row.appendChild(d);}
-  lbl.textContent=joined>0?joined+' of '+total+' students joined':'Waiting for students…';}
-  else{lbl.textContent='Waiting for students…';}
+  const wrap=document.getElementById('trackerWrap'); if(!wrap) return;
+  if(joined>0||total>0){
+    const pct=total>0?Math.round(joined/total*100):100;
+    const show=Math.min(total>0?total:joined,60);
+    let pipsHTML='';
+    for(let i=0;i<show;i++) pipsHTML+='<div class="pip'+(i<joined?' joined':'')+'">'+_ps+'</div>';
+    const countLabel=total>0?joined+' / '+total:String(joined);
+    const barHtml=total>0?'<div class="tracker-bar-bg"><div class="tracker-bar-fill" style="width:'+pct+'%"></div></div>':'';
+    wrap.innerHTML='<div class="tracker-header"><span>Students joined</span><span>'+countLabel+'</span></div>'+barHtml+'<div class="pips-row">'+pipsHTML+'</div>';
+  } else {
+    wrap.innerHTML='<div style="font-size:13px;color:rgba(255,255,255,.35);text-align:center;">Waiting for students…</div>';
+  }
 }
 const ch=new BroadcastChannel('bw-lobby');
 ch.onmessage=e=>{const d=e.data;
