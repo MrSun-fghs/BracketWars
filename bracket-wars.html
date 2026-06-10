@@ -994,7 +994,7 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .home-poem-row.alive .home-poem-name{color:var(--md-on-primary-container);font-weight:700;}
 .home-poem-pct{font-family:monospace;font-size:.72rem;font-weight:700;color:var(--md-primary);flex-shrink:0;}
 .home-card-waiting{text-align:center;padding:1.5rem 1rem;color:var(--md-on-surface-variant);}
-.home-card-waiting-icon{font-size:2rem;margin-bottom:.5rem;}
+.home-card-waiting-icon{font-size:2rem;margin-bottom:.5rem;color:var(--md-primary);}
 .home-card-waiting-text{font-size:.88rem;font-weight:500;color:var(--md-on-surface-variant);margin-bottom:.2rem;}
 .home-card-waiting-sub{font-size:.72rem;color:var(--md-outline);}
 .home-card-footer{display:flex;gap:.5rem;padding:.75rem 1.25rem;border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container-low);}
@@ -2093,7 +2093,7 @@ function renderHome() {
         });
       } else if (!anyPlayed) {
         const w = document.createElement('div'); w.className = 'home-card-waiting';
-        w.innerHTML = '<div class="home-card-waiting-icon">🎯</div><div class="home-card-waiting-text">Tournament Starting Soon</div><div class="home-card-waiting-sub">Mr. Sun will kick things off shortly</div>'; body.appendChild(w);
+        w.innerHTML = '<div class="home-card-waiting-icon"><i class="ti ti-clock"></i></div><div class="home-card-waiting-text">Tournament Starting Soon</div><div class="home-card-waiting-sub">Mr. Sun will kick things off shortly</div>'; body.appendChild(w);
       }
     }
 
