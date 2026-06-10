@@ -2170,9 +2170,8 @@ function renderHome() {
           tbl.appendChild(panel);
         });
         body.appendChild(tbl);
-        // Vote CTA when there's still an active matchup
-        const rInfo2 = getCurrentRoundInfo(b);
-        if (rInfo2.done < rInfo2.total) {
+        // Vote CTA only when voting is actively open for this class
+        if (app.voting.open && app.voting.classId === cls.id) {
           const cta = document.createElement('div'); cta.className = 'home-card-vote-cta';
           cta.innerHTML = `<span>Active matchup — cast your vote</span><span class="home-card-vote-cta-arrow"><i class="ti ti-arrow-right"></i></span>`;
           cta.addEventListener('click', e => { e.stopPropagation(); app.activeId = cls.id; setView('bracket'); renderAll(); showCurrentView(); });
