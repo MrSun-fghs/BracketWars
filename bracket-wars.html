@@ -832,24 +832,35 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .tl-code{font-size:clamp(52px,9vw,96px);font-weight:800;color:#fff;letter-spacing:.15em;line-height:1;font-variant-numeric:tabular-nums;}
 .tl-code-hint{font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;}
 .tl-vs-row{display:flex;align-items:stretch;gap:14px;width:100%;max-width:720px;}
-.tl-poem-card{flex:1;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.2);border-radius:16px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;overflow:hidden;}
-.tl-poem-card.tl-side-a{background:rgba(74,58,255,.18);border-color:#4A3AFF;}
-.tl-poem-card.tl-side-b{background:rgba(124,92,191,.2);border-color:#7C5CBF;}
-.tl-portrait-circle{width:76px;height:76px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.25);flex-shrink:0;}
-.tl-portrait-circle img{width:100%;height:100%;object-fit:cover;display:block;}
-.tl-card-title{font-size:clamp(13px,1.9vw,18px);font-weight:800;color:#fff;text-align:center;line-height:1.2;}
-.tl-card-author{font-size:11px;color:rgba(255,255,255,.45);text-align:center;margin-top:-1px;}
-.tl-superpower-pill{font-size:9.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);text-align:center;line-height:1.5;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.tl-stats{width:100%;display:flex;flex-direction:column;gap:4px;margin-top:2px;}
-.tl-stat-row{display:flex;align-items:center;gap:6px;}
-.tl-stat-label{font-size:8px;font-weight:600;color:rgba(255,255,255,.35);width:48px;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em;}
-.tl-stat-bars{display:flex;gap:2px;}
-.tl-stat-bar{width:10px;height:4px;border-radius:2px;background:rgba(255,255,255,.1);}
-.tl-stat-bar.filled{background:rgba(255,255,255,.7);}
+.tl-poem-card{flex:1;background:rgba(255,255,255,.97);border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;overflow:hidden;}
+.tl-poem-card.tl-side-a{border:2px solid #4A3AFF;}
+.tl-poem-card.tl-side-b{border:2px solid #7C5CBF;}
+.tl-portrait-circle{width:96px;height:96px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(0,0,0,.12);flex-shrink:0;}
+.tl-portrait-circle img{width:100%;height:100%;object-fit:contain;display:block;}
+.tl-card-author{font-size:clamp(14px,2vw,18px);font-weight:800;color:#1c1b3a;text-align:center;line-height:1.2;}
+.tl-card-title{font-size:11px;color:#6b7280;text-align:center;margin-top:-2px;}
+.tl-superpower-pill{font-size:9px;font-weight:700;padding:4px 10px;border-radius:99px;color:#fff;text-align:center;line-height:1.5;max-width:100%;letter-spacing:.03em;text-transform:uppercase;}
+.tl-side-a .tl-superpower-pill{background:#4A3AFF;}
+.tl-side-b .tl-superpower-pill{background:#7C5CBF;}
+.tl-section-label{font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9ca3af;width:100%;margin-top:4px;}
+.tl-stats{width:100%;display:flex;flex-direction:column;gap:5px;}
+.tl-stat-row{display:flex;align-items:center;gap:8px;}
+.tl-stat-label{font-size:9px;font-weight:500;color:#6b7280;width:72px;flex-shrink:0;}
+.tl-stat-track{flex:1;height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+.tl-stat-fill{height:100%;border-radius:99px;background:#4A3AFF;}
+.tl-side-b .tl-stat-fill{background:#7C5CBF;}
+.tl-reading-lens{font-size:11px;color:#374151;font-style:italic;line-height:1.5;width:100%;}
 .tl-vs-badge{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:.05em;}
 .tl-pips-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:480px;}
+.tl-tracker{width:100%;max-width:680px;display:flex;flex-direction:column;gap:8px;}
+.tl-tracker-header{display:flex;justify-content:space-between;align-items:center;}
+.tl-tracker-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:.03em;}
+.tl-tracker-count{font-size:13px;font-weight:700;color:#fff;}
+.tl-tracker-bar{width:100%;height:6px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;}
+.tl-tracker-fill{height:100%;background:linear-gradient(90deg,#4A3AFF,#7C5CBF);border-radius:99px;transition:width .4s ease;}
+.tl-pips-row{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-start;}
 .tl-pip{color:rgba(255,255,255,.18);transition:color .35s,transform .25s;display:inline-flex;}
-.tl-pip.joined{color:#86efac;transform:scale(1.12);}
+.tl-pip.joined{color:#5eead4;transform:scale(1.08);}
 .tl-pips-label{font-size:12px;color:rgba(255,255,255,.45);margin-top:4px;}
 .tl-footer{display:flex;align-items:center;gap:16px;padding:14px 20px;border-top:1px solid rgba(255,255,255,.1);flex-shrink:0;flex-wrap:wrap;}
 .tl-footer-inputs{display:flex;gap:12px;flex:1;flex-wrap:wrap;}
@@ -1238,6 +1249,13 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 @media(max-width:960px){.roster-grid{grid-template-columns:repeat(4,1fr);max-width:100%;gap:10px;}.roster-stats-inner{grid-template-columns:130px 1fr;}.roster-stats-name{font-size:22px;}}
 @media(max-width:700px){.roster-grid{grid-template-columns:repeat(2,1fr);gap:10px;}.roster-avatar-wrap{height:130px;}.roster-stats-inner{grid-template-columns:1fr;}.roster-stats-left{border-right:none;border-bottom:1px solid #1e1e3a;flex-direction:row;justify-content:flex-start;padding:16px;gap:20px;}.roster-scout-cols{grid-template-columns:1fr;}.roster-scout-col-right{border-left:none;padding-left:0;border-top:1px solid #1e1e3a;padding-top:14px;}}
 /* Voting announcement bar */
+/* Voting-open student splash */
+#voteOpenOverlay{position:fixed;inset:0;z-index:800;background:linear-gradient(135deg,#4A3AFF 0%,#7C5CBF 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .3s;}
+#voteOpenOverlay.show{opacity:1;pointer-events:all;}
+.vo-icon{font-size:clamp(48px,12vw,80px);animation:voBounce .5s ease-out;}
+.vo-title{font-size:clamp(24px,6vw,42px);font-weight:900;color:#fff;text-align:center;letter-spacing:-.01em;}
+.vo-sub{font-size:clamp(13px,2.5vw,17px);color:rgba(255,255,255,.7);text-align:center;}
+@keyframes voBounce{0%{transform:scale(.4);opacity:0;}60%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
 #votingAnnouncementBar{display:none;background:linear-gradient(90deg,#f59e0b,#ef4444,#ec4899);color:#fff;text-align:center;padding:.75rem 1rem;font-size:.92rem;font-weight:600;cursor:pointer;letter-spacing:.01em;animation:annPulse 3s ease-in-out infinite;}
 #votingAnnouncementBar:hover{filter:brightness(1.08);}
 @keyframes annPulse{0%,100%{opacity:1;}50%{opacity:.88;}}
@@ -1461,6 +1479,13 @@ body.projection #sectionNav{display:none!important;}
   <div class="polls-closed-bang" id="pollsBang">!</div>
   <div class="polls-closed-headline">The Polls Are<br>Now Closed</div>
   <div class="polls-closed-sub">Stand by for results…</div>
+</div>
+
+<!-- VOTING OPEN STUDENT OVERLAY -->
+<div id="voteOpenOverlay">
+  <div class="vo-icon">🗳️</div>
+  <div class="vo-title">Voting is Now Open!</div>
+  <div class="vo-sub">Cast your vote below</div>
 </div>
 
 <!-- TALLYING OVERLAY -->
@@ -3587,26 +3612,28 @@ function openTeacherLobby(key, pA, pB) {
     const auth = rp ? rp.author : (DEFAULT_AUTHORS[idx] || '');
     el.className = 'tl-poem-card tl-side-' + side;
     if (rp) {
-      const zoom = rp.cropZoom || 1.6;
-      const cx = rp.cropX != null ? rp.cropX : 50;
-      const cy = rp.cropY != null ? rp.cropY : 12;
       const statDefs = [
-        ['Access.', rp.stats.accessibility],
-        ['Emotion', rp.stats.emotionalImpact],
-        ['Imagery', rp.stats.imageryPower],
-        ['Relate',  rp.stats.relatability],
+        ['Accessibility', rp.stats.accessibility],
+        ['Emotional',     rp.stats.emotionalImpact],
+        ['Imagery',       rp.stats.imageryPower],
+        ['Lit. Devices',  rp.stats.literaryDevicePower],
+        ['Theme',         rp.stats.themeStrength],
+        ['Relatability',  rp.stats.relatability],
       ];
-      const statBars = statDefs.map(([lbl, val]) =>
-        `<div class="tl-stat-row"><span class="tl-stat-label">${lbl}</span><div class="tl-stat-bars">${[1,2,3,4,5].map(i=>`<div class="tl-stat-bar${i<=val?' filled':''}"></div>`).join('')}</div></div>`
+      const statRows = statDefs.map(([lbl, val]) =>
+        `<div class="tl-stat-row"><span class="tl-stat-label">${lbl}</span><div class="tl-stat-track"><div class="tl-stat-fill" style="width:${val/5*100}%"></div></div></div>`
       ).join('');
       el.innerHTML = `
-        <div class="tl-portrait-circle"><img src="${rp.svg}" loading="lazy" style="transform:scale(${zoom});transform-origin:${cx}% ${cy}%;object-fit:cover;width:100%;height:100%;"></div>
-        <div class="tl-card-title">${esc(poem.name)}</div>
+        <div class="tl-portrait-circle"><img src="${rp.svg}" loading="lazy" decoding="async"></div>
         <div class="tl-card-author">${esc(auth)}</div>
+        <div class="tl-card-title">${esc(poem.name)}</div>
         <div class="tl-superpower-pill">⚡ ${esc(rp.superpower)}</div>
-        <div class="tl-stats">${statBars}</div>`;
+        <div class="tl-section-label">Player Stats</div>
+        <div class="tl-stats">${statRows}</div>
+        <div class="tl-section-label">Reading Lens</div>
+        <div class="tl-reading-lens">${esc(rp.readingLens)}</div>`;
     } else {
-      el.innerHTML = `<div class="tl-card-title">${esc(poem.name)}</div><div class="tl-card-author">${esc(auth)}</div>`;
+      el.innerHTML = `<div class="tl-card-author">${esc(auth)}</div><div class="tl-card-title">${esc(poem.name)}</div>`;
     }
   }
   buildPoemCard(document.getElementById('tlPoemA'), pA, 'a');
@@ -3756,20 +3783,33 @@ function updateTlPips(joinedCount) {
   const joined = joinedCount !== undefined ? joinedCount : 0;
   const row = document.getElementById('tlPipsRow');
   const lbl = document.getElementById('tlPipsLabel');
-  row.innerHTML = '';
-  if (count > 0) {
-    const show = Math.min(count, 40);
-    for (let i=0;i<show;i++) {
-      const pip = document.createElement('div');
-      pip.className = 'tl-pip' + (i < joined ? ' joined' : '');
-      pip.innerHTML = _personSVG;
-      row.appendChild(pip);
-    }
-    lbl.textContent = joined > 0 ? `${joined} of ${count} students joined` : `Waiting for students…`;
-  } else {
-    lbl.textContent = 'Waiting for students…';
+  // Rebuild tracker wrapper if needed
+  let tracker = document.getElementById('tlTracker');
+  if (!tracker) {
+    // Replace the old pips-row + label with tracker
+    const parent = row.parentNode;
+    tracker = document.createElement('div');
+    tracker.id = 'tlTracker';
+    tracker.className = 'tl-tracker';
+    parent.insertBefore(tracker, row);
+    parent.removeChild(row);
+    if (lbl && lbl.parentNode) parent.removeChild(lbl);
   }
-  // Sync to pop-out
+  if (count > 0) {
+    const pct = Math.round(joined / count * 100);
+    const show = Math.min(count, 48);
+    let pipsHTML = '';
+    for (let i=0;i<show;i++) pipsHTML += `<div class="tl-pip${i<joined?' joined':''}">${_personSVG}</div>`;
+    tracker.innerHTML = `
+      <div class="tl-tracker-header">
+        <span class="tl-tracker-label">Students joined</span>
+        <span class="tl-tracker-count">${joined} / ${count}</span>
+      </div>
+      <div class="tl-tracker-bar"><div class="tl-tracker-fill" style="width:${pct}%"></div></div>
+      <div class="tl-pips-row">${pipsHTML}</div>`;
+  } else {
+    tracker.innerHTML = `<div class="tl-tracker-label" style="text-align:center;padding:8px 0;">Waiting for students…</div>`;
+  }
   if (_lobbyChannel) _lobbyChannel.postMessage({type:'pips', joined, total: count});
 }
 
@@ -4705,7 +4745,14 @@ async function boot() {
           liveVoteCounts=[0,0];
           subscribeToVotes(app.voting.sessionId);
           if (app.voting.timerEndsAt && app.voting.timerEndsAt > Date.now()) startVotingTimer();
-          setView('vote');
+          // Show "Voting is Now Open!" splash for 2s then go to vote view
+          const _vo = document.getElementById('voteOpenOverlay');
+          if (_vo && MODE === 'student') {
+            _vo.classList.add('show');
+            setTimeout(() => { _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); }, 2000);
+          } else {
+            setView('vote');
+          }
         } else if (!app.voting.open && prevSessionId) {
           stopVotePolling(); liveVoteCounts=[0,0];
           if (currentView==='vote') setView('home');
