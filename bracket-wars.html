@@ -3877,7 +3877,7 @@ const _ps='<svg width="18" height="22" viewBox="0 0 20 24" fill="currentColor"><
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function buildCard(el,p){
   const st=p.stats||{};
-  const defs=[['Accessibility',st.accessibility||0],['Emotional',st.emotionalImpact||0],['Imagery',st.imageryPower||0],['Lit. Devices',st.literaryDevicePower||0],['Theme',st.themeStrength||0],['Relatability',st.relatability||0]];
+  const defs=[['Emotional',st.emotionalImpact||0],['Imagery',st.imageryPower||0],['Lit. Devices',st.literaryDevicePower||0],['Theme',st.themeStrength||0]];
   const bars=defs.map(([l,v])=>'<div class="srow"><span class="slbl">'+l+'</span><div class="strack"><div class="sfill" style="width:'+(v/5*100)+'%"></div></div></div>').join('');
   el.innerHTML=
     '<div class="portrait"><img src="'+p.imgSrc+'" loading="lazy" style="transform:scale('+p.zoom+');transform-origin:'+p.cx+'% '+p.cy+'%;"></div>'+
