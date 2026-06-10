@@ -3808,13 +3808,13 @@ function popoutLobby() {
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);color:#fff;font-family:'Nunito',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:20px;padding:12px 32px 24px;overflow:hidden;}
+body{background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);color:#fff;font-family:'Nunito',sans-serif;height:100vh;max-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:0;padding:12px 32px 12px;overflow:hidden;}
 #codeLbl{font-size:22px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:-8px;}
 #code{font-size:160px;font-weight:900;color:#fff;letter-spacing:.18em;line-height:1;}
 #codeHint{font-size:23px;color:rgba(255,255,255,.35);margin-top:-4px;}
-.vs-row{display:flex;align-items:stretch;gap:20px;width:100%;max-width:1860px;}
+.vs-row{display:flex;align-items:stretch;gap:20px;width:100%;max-width:1860px;flex:1;min-height:0;padding:8px 0;}
 /* ── White cards matching teacher lobby ── */
-.p-card{flex:0 0 48%;border-radius:18px;padding:16px 50px;display:flex;flex-direction:column;align-items:center;gap:12px;overflow:hidden;background:rgba(255,255,255,.97);}
+.p-card{flex:0 0 48%;border-radius:18px;padding:16px 50px;display:flex;flex-direction:column;align-items:center;gap:12px;overflow:hidden;background:rgba(255,255,255,.97);min-height:0;}
 .p-card.ca{border:2.5px solid #4A3AFF;}
 .p-card.cb{border:2.5px solid #7C5CBF;}
 .vs-badge{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:rgba(255,255,255,.5);font-family:sans-serif;}
