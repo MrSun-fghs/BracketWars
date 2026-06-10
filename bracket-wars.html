@@ -2487,24 +2487,72 @@ function updateHamburgerLabel() {
 }
 function renderAll() {
   trackSessionStart(); buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); updateVotingAnnouncementBar(); updateHamburgerLabel(); }
+function submitJoinCode() {
+  const input = document.getElementById('barCodeInput'); if (!input) return;
+  const entered = input.value.trim().toUpperCase();
+  ensureVoting(app);
+  if (entered && entered === app.voting.joinCode) {
+    localStorage.setItem('bw-join-code', entered);
+    updateVotingAnnouncementBar();
+    showSnack('✅ You're in! Waiting for the vote to start…');
+    // If voting is already open, go straight to vote view
+    if (app.voting.open) {
+      const _vo = document.getElementById('voteOpenOverlay');
+      if (_vo) { _vo.classList.add('show'); setTimeout(()=>{ _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); },2000); }
+      else { setView('vote'); renderAll(); showCurrentView(); }
+    }
+  } else {
+    showSnack('Wrong code — check the board and try again');
+    if (input) { input.value=''; input.focus(); }
+  }
+}
+
 function updateVotingAnnouncementBar() {
   const bar = document.getElementById('votingAnnouncementBar'); if (!bar) return;
+  if (MODE !== 'student') { bar.style.display='none'; return; }
   ensureVoting(app);
-  const votingOpen = MODE === 'student' && app.voting.open && currentView !== 'vote';
-  if (votingOpen) {
-    const cls = app.classes.find(c => c.id === app.voting.classId);
-    const name = cls ? cls.name : 'Your Class';
-    bar.innerHTML = `🗳 <strong>${esc(name)} Voting is now open!</strong> &nbsp;Click here to cast your vote now! →`;
-    bar.onclick = () => {
-      if (app.voting.classId && app.activeId !== app.voting.classId) {
-        app.activeId = app.voting.classId;
-        saveStudentPrefs();
-      }
-      setView('vote'); renderAll(); showCurrentView();
-    };
-    bar.style.display = 'block';
+  const joinCode = app.voting.joinCode;
+  const votingOpen = app.voting.open;
+  const onVoteView = currentView === 'vote';
+  const enrolled = joinCode && localStorage.getItem('bw-join-code') === joinCode;
+
+  // Hidden when: no lobby active, not voting, or enrolled + on vote view
+  if (!joinCode && !votingOpen) { bar.style.display='none'; bar.onclick=null; return; }
+  if (votingOpen && enrolled && onVoteView) { bar.style.display='none'; bar.onclick=null; return; }
+
+  const inputHtml = `<input id="barCodeInput" type="text" maxlength="4" placeholder="CODE"
+    style="margin-left:10px;width:68px;padding:3px 6px;font-size:.95rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;border:none;border-radius:6px;background:rgba(255,255,255,.25);color:#fff;text-align:center;outline:2px solid rgba(255,255,255,.5);"
+    oninput="this.value=this.value.toUpperCase()"
+    onkeydown="if(event.key==='Enter'){event.stopPropagation();submitJoinCode();}"
+    onclick="event.stopPropagation()">
+  <button onclick="event.stopPropagation();submitJoinCode()"
+    style="margin-left:6px;padding:3px 12px;font-size:.82rem;font-weight:700;border:none;border-radius:6px;background:rgba(255,255,255,.92);color:#ef4444;cursor:pointer;">Join →</button>`;
+
+  bar.style.display = 'flex';
+  bar.style.alignItems = 'center';
+  bar.style.justifyContent = 'center';
+  bar.style.flexWrap = 'wrap';
+  bar.style.gap = '4px';
+  bar.onclick = null;
+
+  if (votingOpen && enrolled) {
+    // Enrolled, voting open, not on vote view → clickable to go vote
+    bar.innerHTML = `🗳️ &nbsp;<strong>Voting is open!</strong>&nbsp; Tap here to cast your vote →`;
+    bar.style.cursor = 'pointer';
+    bar.onclick = () => { setView('vote'); renderAll(); showCurrentView(); };
+  } else if (votingOpen && !enrolled) {
+    // Voting open but student never entered the code
+    bar.innerHTML = `🗳️ &nbsp;<strong>Voting is open!</strong>&nbsp; Enter the code to join:${inputHtml}`;
+    bar.style.cursor = 'default';
+  } else if (joinCode && !votingOpen && enrolled) {
+    // Lobby active, enrolled, waiting
+    bar.innerHTML = `✅ &nbsp;<strong>You're in!</strong>&nbsp; Waiting for your teacher to start the vote…`;
+    bar.style.cursor = 'default';
   } else {
-    bar.style.display = 'none';
+    // Lobby active, not enrolled → show code input
+    bar.innerHTML = `🗳️ &nbsp;<strong>Vote incoming!</strong>&nbsp; Enter the code from the board:${inputHtml}`;
+    bar.style.cursor = 'default';
+    setTimeout(()=>{ const inp=document.getElementById('barCodeInput'); if(inp)inp.focus(); },50);
   }
 }
 
@@ -3653,6 +3701,10 @@ function openTeacherLobby(key, pA, pB) {
   // Hide countdown
   document.getElementById('tlCountdown').classList.remove('active');
   document.getElementById('tlFsBtn').innerHTML = '<i class="ti ti-arrows-maximize"></i>';
+  // Save join code to Supabase so student announcement bar activates
+  ensureVoting(app);
+  app.voting.joinCode = code;
+  saveApp();
   // Open
   // Init broadcast channel for pop-out sync
   if (_lobbyChannel) { _lobbyChannel.close(); _lobbyChannel = null; }
@@ -3664,6 +3716,9 @@ function closeLobby() {
   if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
   if (_lobbyChannel) { _lobbyChannel.close(); _lobbyChannel = null; }
   pendingVotingKey = null;
+  // Clear join code — student bar disappears
+  ensureVoting(app);
+  if (!app.voting.open) { app.voting.joinCode = null; saveApp(); }
 }
 
 function popoutLobby() {
@@ -3761,7 +3816,7 @@ ch.onmessage=e=>{const d=e.data;
       ?'<div style="font-size:clamp(140px,20vw,200px);font-weight:900;color:#fff;line-height:1;animation:cdPop .4s ease-out;">'+d.n+'</div><div style="font-size:clamp(18px,3vw,26px);color:rgba(255,255,255,.7);font-weight:600;letter-spacing:.05em;">STARTING VOTE…</div>'
       :'<div style="font-size:clamp(48px,8vw,80px);font-weight:900;color:#fff;line-height:1;animation:cdPop .4s ease-out;">🗳️</div><div style="font-size:clamp(22px,4vw,32px);color:#fff;font-weight:800;">Voting is Open!</div>';
   }
-  if(d.type==='navigate'){window.location.href=d.url;}
+  if(d.type==='navigate'){if(d.code)localStorage.setItem('bw-join-code',d.code);window.location.href=d.url;}
 };
 // Request initial state
 ch.postMessage({type:'ready'});
@@ -3858,7 +3913,8 @@ function startFromLobby() {
       exitFs.catch(()=>{}).finally(()=>{
         startVotingSession().then(()=>{
           // Tell pop-out to navigate to student app
-          if (_lobbyChannel) _lobbyChannel.postMessage({type:'navigate', url: _appUrl});
+          ensureVoting(app);
+          if (_lobbyChannel) _lobbyChannel.postMessage({type:'navigate', url: _appUrl, code: app.voting.joinCode||''});
           // Force vote view visible — showCurrentView() skips teacher mode
           currentView = 'vote';
           ['homeView','leaderboardView','listView','bracketView','rosterView','resultsView','engagementView'].forEach(id=>{
@@ -4410,7 +4466,8 @@ async function startVotingSession() {
   const timerMins = parseInt(document.getElementById('votingTimerInput')?.value)||0;
   const timerEndsAt = timerMins > 0 ? Date.now() + timerMins * 60000 : null;
   ensureVoting(app);
-  app.voting = {open:true,sessionId,classId:app.activeId,matchupKey:key,poemA:{name:pA.name,seed:pA.seed},poemB:{name:pB.name,seed:pB.seed},studentCount:count,timerEndsAt};
+  const _jc = app.voting.joinCode; // preserve join code across state overwrite
+  app.voting = {open:true,sessionId,joinCode:_jc,classId:app.activeId,matchupKey:key,poemA:{name:pA.name,seed:pA.seed},poemB:{name:pB.name,seed:pB.seed},studentCount:count,timerEndsAt};
   closeOpenVotingDialog();
   autoCloseTriggered = false;
   await saveApp();
@@ -4771,14 +4828,17 @@ async function boot() {
           liveVoteCounts=[0,0];
           subscribeToVotes(app.voting.sessionId);
           if (app.voting.timerEndsAt && app.voting.timerEndsAt > Date.now()) startVotingTimer();
-          // Show "Voting is Now Open!" splash for 2s then go to vote view
-          const _vo = document.getElementById('voteOpenOverlay');
-          if (_vo && MODE === 'student') {
-            _vo.classList.add('show');
-            setTimeout(() => { _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); }, 2000);
-          } else {
-            setView('vote');
+          // Only enrolled students (entered correct code) get auto-navigated
+          const _enrolled = app.voting.joinCode && localStorage.getItem('bw-join-code') === app.voting.joinCode;
+          if (_enrolled) {
+            const _vo = document.getElementById('voteOpenOverlay');
+            if (_vo) {
+              _vo.classList.add('show');
+              setTimeout(() => { _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); }, 2000);
+            } else { setView('vote'); renderAll(); showCurrentView(); }
           }
+          // Bar updates for all students (enrolled see "tap to vote", others see code input)
+          updateVotingAnnouncementBar();
         } else if (!app.voting.open && prevSessionId) {
           stopVotePolling(); liveVoteCounts=[0,0];
           if (currentView==='vote') setView('home');
@@ -4811,16 +4871,18 @@ async function boot() {
     subscribeToVotes(app.voting.sessionId);
     if (app.voting.timerEndsAt && app.voting.timerEndsAt > Date.now()) startVotingTimer();
     // Students who load the page while voting is already open:
-    // show the "Voting is Now Open!" splash and auto-navigate to vote view.
-    // This also handles the pop-out window (it navigates to app URL mid-session).
+    // only auto-navigate if they entered the correct join code.
     if (MODE === 'student') {
-      const _vo = document.getElementById('voteOpenOverlay');
-      if (_vo) {
-        _vo.classList.add('show');
-        setTimeout(() => { _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); }, 2000);
-      } else {
-        setView('vote'); renderAll(); showCurrentView();
+      const _enrolled = app.voting.joinCode && localStorage.getItem('bw-join-code') === app.voting.joinCode;
+      if (_enrolled) {
+        const _vo = document.getElementById('voteOpenOverlay');
+        if (_vo) {
+          _vo.classList.add('show');
+          setTimeout(() => { _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); }, 2000);
+        } else { setView('vote'); renderAll(); showCurrentView(); }
       }
+      // Bar shows for all students (enrolled or not)
+      renderAll(); showCurrentView();
     }
   }
 }
