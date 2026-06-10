@@ -4820,14 +4820,14 @@ document.getElementById('newClassInput').addEventListener('keydown',e=>{if(e.key
 async function boot() {
   // Detect projector mode: pop-out window navigated here from lobby blob
   // Params: ?projector=1&jc=JOINCODE
+  // Uses sessionStorage (per-tab) so it never overwrites the teacher's shared localStorage
   (function detectProjector() {
     try {
       const _p = new URLSearchParams(location.search);
       if (!_p.has('projector')) return;
-      document.body.classList.add('projection');
+      sessionStorage.setItem('bw-projector', '1');
       const _jc = _p.get('jc');
-      if (_jc) localStorage.setItem('bw-join-code', decodeURIComponent(_jc));
-      // Strip params from URL bar (cosmetic)
+      if (_jc) sessionStorage.setItem('bw-proj-jc', decodeURIComponent(_jc));
       history.replaceState(null, '', location.pathname);
     } catch(e) {}
   })();
@@ -4836,7 +4836,8 @@ async function boot() {
   restoreStudentPrefs();
   buildAppBar();
   buildSecondaryToolbar();
-  if (localStorage.getItem('bw-teacher') === '1') {
+  const _isProjector = sessionStorage.getItem('bw-projector') === '1';
+  if (!_isProjector && localStorage.getItem('bw-teacher') === '1') {
     teacherUnlocked = true;
     // Restore active class before rendering
     try { const tp=JSON.parse(localStorage.getItem('bw-teacher-prefs')||'{}'); if(tp.activeId&&app.classes.find(c=>c.id===tp.activeId)) app.activeId=tp.activeId; } catch(e) {}
@@ -4845,6 +4846,8 @@ async function boot() {
     try { const tp=JSON.parse(localStorage.getItem('bw-teacher-prefs')||'{}'); if(tp.view==='engagement') setTeacherView('engagement'); } catch(e) {}
   } else {
     setMode('student');
+    // Projector tab: add projection CSS class (hides nav, bars, teacher UI)
+    if (_isProjector) document.body.classList.add('projection');
   }
   // Restore overlay states for students only
   ensureVoting(app);
@@ -4867,17 +4870,18 @@ async function boot() {
           liveVoteCounts=[0,0];
           subscribeToVotes(app.voting.sessionId);
           if (app.voting.timerEndsAt && app.voting.timerEndsAt > Date.now()) startVotingTimer();
-          // Only enrolled students (entered correct code) get auto-navigated
-          const _enrolled = app.voting.joinCode && localStorage.getItem('bw-join-code') === app.voting.joinCode;
-          if (_enrolled) {
+          // Only enrolled students (or projector tab) get auto-navigated
+          const _projBc = sessionStorage.getItem('bw-projector') === '1';
+          const _enrolledBc = _projBc || (app.voting.joinCode && localStorage.getItem('bw-join-code') === app.voting.joinCode);
+          if (_enrolledBc) {
             const _vo = document.getElementById('voteOpenOverlay');
             if (_vo) {
               _vo.classList.add('show');
               setTimeout(() => { _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); }, 2000);
             } else { setView('vote'); renderAll(); showCurrentView(); }
           }
-          // Bar updates for all students (enrolled see "tap to vote", others see code input)
-          updateVotingAnnouncementBar();
+          // Bar updates for non-projector students
+          if (!_projBc) updateVotingAnnouncementBar();
         } else if (!app.voting.open && prevSessionId) {
           stopVotePolling(); liveVoteCounts=[0,0];
           if (currentView==='vote') setView('home');
@@ -4912,7 +4916,9 @@ async function boot() {
     // Students who load the page while voting is already open:
     // only auto-navigate if they entered the correct join code.
     if (MODE === 'student') {
-      const _enrolled = app.voting.joinCode && localStorage.getItem('bw-join-code') === app.voting.joinCode;
+      const _projMode = sessionStorage.getItem('bw-projector') === '1';
+      const _projJc = sessionStorage.getItem('bw-proj-jc');
+      const _enrolled = _projMode || (app.voting.joinCode && (localStorage.getItem('bw-join-code') === app.voting.joinCode || _projJc === app.voting.joinCode));
       if (_enrolled) {
         const _vo = document.getElementById('voteOpenOverlay');
         if (_vo) {
@@ -4920,8 +4926,8 @@ async function boot() {
           setTimeout(() => { _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); }, 2000);
         } else { setView('vote'); renderAll(); showCurrentView(); }
       }
-      // Bar shows for all students (enrolled or not)
-      renderAll(); showCurrentView();
+      // Bar shows for all non-projector students (enrolled or not)
+      if (!_projMode) { renderAll(); showCurrentView(); }
     }
   }
 }
