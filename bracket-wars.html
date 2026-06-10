@@ -3818,16 +3818,16 @@ function popoutLobby() {
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);font-family:'Nunito',sans-serif;color:#fff;}
-#scaler{position:absolute;top:0;left:0;width:1920px;height:1080px;overflow:hidden;transform-origin:top left;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:36px 48px 28px;}
+#scaler{position:absolute;top:0;left:0;width:1920px;height:1080px;overflow:hidden;transform-origin:top left;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px 48px 28px;}
 #codeLbl{font-size:22px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:-8px;}
 #code{font-size:160px;font-weight:900;color:#fff;letter-spacing:.18em;line-height:1;}
-#codeHint{font-size:23px;color:rgba(255,255,255,.35);margin-top:-4px;}
-.vs-row{display:flex;align-items:stretch;gap:20px;width:100%;max-width:1860px;flex:1;min-height:0;padding:8px 0;}
+#codeHint{font-size:26px;color:rgba(255,255,255,.35);margin-top:-4px;}
+.vs-row{display:flex;align-items:stretch;gap:68px;justify-content:center;width:100%;max-width:1860px;flex:1;min-height:0;padding:8px 0;}
 /* ── White cards matching teacher lobby ── */
-.p-card{flex:0 0 48%;border-radius:18px;padding:16px 50px;display:flex;flex-direction:column;align-items:center;gap:12px;overflow:hidden;background:rgba(255,255,255,.97);min-height:0;}
+.p-card{flex:0 0 42%;border-radius:18px;padding:26px 50px;display:flex;flex-direction:column;align-items:center;gap:12px;overflow:hidden;background:rgba(255,255,255,.97);min-height:0;height:630px;}
 .p-card.ca{border:2.5px solid #4A3AFF;}
 .p-card.cb{border:2.5px solid #7C5CBF;}
-.vs-badge{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:rgba(255,255,255,.5);font-family:sans-serif;}
+.vs-badge{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:800;color:rgba(255,255,255,.5);font-family:monospace;}
 /* Portrait */
 .portrait{width:160px;height:160px;border-radius:50%;overflow:hidden;border:3px solid rgba(0,0,0,.12);flex-shrink:0;}
 .portrait img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -3835,16 +3835,16 @@ body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:line
 .pauthor{font-size:24px;font-weight:800;color:#1c1b3a;text-align:center;line-height:1.2;}
 .ptitle{font-size:38px;color:#6b7280;text-align:center;margin-top:-2px;}
 /* Superpower pill */
-.ppill{font-size:26px;font-weight:700;padding:5px 12px;border-radius:99px;color:#fff;text-align:center;line-height:1.4;max-width:100%;}
+.ppill{font-size:29px;font-weight:700;padding:5px 12px;border-radius:99px;color:#fff;text-align:center;line-height:1.4;max-width:100%;}
 .ca .ppill{background:#4A3AFF;}
 .cb .ppill{background:#7C5CBF;}
 /* Section labels */
-.sec-lbl{font-size:23px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9ca3af;width:100%;margin-top:4px;}
+.sec-lbl{font-size:20px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9ca3af;width:100%;margin-top:4px;}
 /* 6-stat bars matching lobby */
 .stats{width:100%;display:flex;flex-direction:column;gap:5px;}
 .srow{display:flex;align-items:center;gap:8px;}
-.slbl{font-size:38px;font-weight:500;color:#6b7280;width:260px;flex-shrink:0;}
-.strack{flex:1;height:27px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+.slbl{font-size:34px;font-weight:500;color:#6b7280;width:228px;flex-shrink:0;}
+.strack{flex:1;height:29px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
 .sfill{height:100%;border-radius:99px;}
 .ca .sfill{background:#4A3AFF;}
 .cb .sfill{background:#7C5CBF;}
