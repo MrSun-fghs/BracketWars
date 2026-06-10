@@ -4593,7 +4593,7 @@ function showVoteResultCelebration(r) {
   const _vrDlg = document.querySelector('#voteResultDialog .dialog');
   if (_vrDlg) {
     if (document.body.classList.contains('projection')) {
-      const s = Math.min(window.innerWidth * 0.85 / 420, window.innerHeight * 0.85 / 520);
+      const s = Math.min(window.innerWidth * 0.85 / 420, window.innerHeight * 0.85 / 520) * 1.2;
       _vrDlg.style.transform = `scale(${s.toFixed(2)})`;
       _vrDlg.style.transformOrigin = 'center center';
     } else {
