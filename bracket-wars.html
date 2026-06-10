@@ -2113,6 +2113,7 @@ function renderHome() {
   const grid = document.createElement('div'); grid.className = 'home-classes';
 
   app.classes.forEach(cls => {
+    if (MODE === 'student' && cls.hidden) return;
     const b = cls.bracket;
     // Compute stats
     let done = 0, total = 0;
@@ -2347,6 +2348,7 @@ function buildBlockPill() {
   }
   // Class items
   app.classes.forEach(cls => {
+    if (MODE === 'student' && cls.hidden) return;
     const item = document.createElement('div');
     item.className = 'block-dd-item' + (cls.id === app.activeId && !isHome && currentView !== 'engagement' ? ' bdd-active' : '');
     const dot = document.createElement('span');
@@ -3499,7 +3501,8 @@ function closeRename(){document.getElementById('renameDialog').classList.remove(
 function openAddClass(){document.getElementById('newClassInput').value=`Block ${app.classes.length+1}`;document.getElementById('addClassDialog').classList.add('open');setTimeout(()=>{const i=document.getElementById('newClassInput');i.focus();i.select();},80);}
 function saveAddClass(){const v=document.getElementById('newClassInput').value.trim();if(!v)return;const nc={id:uid(),name:v,bracket:defaultBracket()};app.classes.push(nc);app.activeId=nc.id;saveApp();closeAddClass();renderAll();}
 function closeAddClass(){document.getElementById('addClassDialog').classList.remove('open');}
-function confirmDeleteClass(id){const cls=app.classes.find(c=>c.id===id);if(!cls)return;if(!confirm(`Remove "${cls.name}"?`))return;app.classes=app.classes.filter(c=>c.id!==id);if(app.activeId===id)app.activeId=app.classes[0].id;saveApp();renderAll();}
+function confirmDeleteClass(id){const cls=app.classes.find(c=>c.id===id);if(!cls)return;if(!confirm(`Delete "${cls.name}" permanently? This cannot be undone.`))return;app.classes=app.classes.filter(c=>c.id!==id);if(app.activeId===id)app.activeId=app.classes[0].id;saveApp();renderAll();showSnack(`"${cls.name}" deleted`);}
+function toggleHideClass(id){const cls=app.classes.find(c=>c.id===id);if(!cls)return;cls.hidden=!cls.hidden;saveApp();renderAll();showSnack(cls.hidden?`"${cls.name}" hidden from students`:`"${cls.name}" now visible to students`);}
 function openReset(){document.getElementById('resetHeadline').textContent=`Reset ${activeClass().name}?`;document.getElementById('resetDialog').classList.add('open');}
 function closeReset(){document.getElementById('resetDialog').classList.remove('open');}
 function doReset(){const p=[...activeClass().bracket.poems];activeClass().bracket=defaultBracket();activeClass().bracket.poems=p;saveApp();closeReset();renderAll();showSnack('Bracket reset');}
@@ -4034,7 +4037,7 @@ function rebuildHamburgerMenu() {
       const blockEl = document.createElement('div');
       blockEl.className = 'hmenu-item hmenu-block-row';
       blockEl.style.cssText = isActive ? 'color:#4338ca;font-weight:700;' : '';
-      blockEl.innerHTML = `<span>${isActive ? '● ' : '○ '}${esc(cls.name)}</span><span class="hmenu-chevron">›</span>`;
+      blockEl.innerHTML = `<span>${isActive ? '● ' : '○ '}${esc(cls.name)}${(isTeacher && cls.hidden) ? ' <span style="font-size:.62rem;font-weight:400;opacity:.45;">(hidden)</span>' : ''}</span><span class="hmenu-chevron">›</span>`;
       blockEl.onclick = (e) => {
         e.stopPropagation();
         // Block name click: switch to this block + go to Bracket + close menu
@@ -4054,13 +4057,18 @@ function rebuildHamburgerMenu() {
       subContainer.className = 'hmenu-sub-container' + (isExpanded || isActive ? ' hmenu-sub-visible' : '');
 
       if (isTeacher) {
+        const isHidden = !!cls.hidden;
         const teacherActions = [
           { label: '⬇ Export', fn: () => exportBracket() },
           { label: '✎ Rename', fn: () => openRenameClass() },
           { label: '📝 Edit Poems', fn: () => openSetup() },
+          { sep: true },
+          { label: isHidden ? '👁 Show to students' : '🙈 Hide from students', fn: () => toggleHideClass(cls.id) },
           { label: '🔴 Reset', fn: () => openReset(), danger: true },
+          { label: '🗑 Delete', fn: () => confirmDeleteClass(cls.id), danger: true },
         ];
-        teacherActions.forEach(({ label, fn, danger }) => {
+        teacherActions.forEach(({ label, fn, danger, sep }) => {
+          if (sep) { const d = document.createElement('div'); d.className = 'hmenu-sep'; subContainer.appendChild(d); return; }
           const sub = document.createElement('div');
           sub.className = 'hmenu-item hmenu-subitem';
           if (danger) sub.style.cssText = 'color:var(--md-error);';
