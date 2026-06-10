@@ -4077,6 +4077,8 @@ function hideTallyingOverlay() { document.getElementById('tallyingOverlay').clas
 
 function closeWinnerAndGoBracket() {
   document.getElementById('voteResultDialog').classList.remove('open');
+  const _vrDlgR = document.querySelector('#voteResultDialog .dialog');
+  if (_vrDlgR) _vrDlgR.style.transform = '';
   hideTallyingOverlay();
   const matchupKey = app.lastVoteResult?.matchupKey;
   if (app.lastVoteResult?.classId) app.activeId = app.lastVoteResult.classId;
@@ -4587,6 +4589,17 @@ function showVoteResultCelebration(r) {
     <div class="vr-stat-card"><div class="vr-stat-num">${r.winVotes>=r.loseVotes?'+':''}${r.winVotes-r.loseVotes}</div><div class="vr-stat-label">margin</div></div>`;
   document.getElementById('vrLoser').innerHTML = `⚔️ Defeated: <strong style="color:rgba(255,255,255,.8)">${esc(r.loserName)}</strong> &nbsp;·&nbsp; ${r.loseVotes} votes`;
   document.getElementById('voteResultDialog').classList.add('open');
+  // Scale up the card in projection mode (Option A — same approach as lobby blob)
+  const _vrDlg = document.querySelector('#voteResultDialog .dialog');
+  if (_vrDlg) {
+    if (document.body.classList.contains('projection')) {
+      const s = Math.min(window.innerWidth * 0.85 / 420, window.innerHeight * 0.85 / 520);
+      _vrDlg.style.transform = `scale(${s.toFixed(2)})`;
+      _vrDlg.style.transformOrigin = 'center center';
+    } else {
+      _vrDlg.style.transform = '';
+    }
+  }
   playSound('victory');
   setTimeout(launchConfetti, 200);
 }
