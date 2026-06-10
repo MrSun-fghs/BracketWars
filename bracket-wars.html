@@ -500,8 +500,8 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .list-champion{border-radius:var(--shape-xl);background:linear-gradient(135deg,var(--md-primary),var(--md-secondary));padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:var(--elev-3);position:relative;overflow:hidden;}
 .list-champion.crowned{animation:champGlow 2.5s ease-in-out infinite alternate;}
 .list-champion.crowned::after{content:'';position:absolute;top:0;left:-70%;bottom:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:bannerShimmer 3s ease-in-out infinite;pointer-events:none;}
-.list-champ-trophy{font-size:2.25rem;flex-shrink:0;display:inline-block;animation:crownFloat 2.2s ease-in-out infinite;filter:drop-shadow(0 4px 12px rgba(245,158,11,.5));}
-.list-champion.crowned .list-champ-trophy{animation:crownFloat 2.2s ease-in-out infinite,crownPulse 3s ease-in-out infinite;filter:drop-shadow(0 4px 16px rgba(245,158,11,.8));}
+.list-champ-trophy{width:44px;height:44px;object-fit:contain;flex-shrink:0;display:block;animation:shimmerCrown 1.8s ease-in-out infinite;}
+.list-champion.crowned .list-champ-trophy{animation:shimmerCrownIntense 1.8s ease-in-out infinite;}
 @keyframes crownPulse{0%,100%{filter:drop-shadow(0 4px 16px rgba(245,158,11,.7));}50%{filter:drop-shadow(0 6px 28px rgba(245,158,11,1)) drop-shadow(0 0 12px rgba(239,68,68,.4));}}
 .list-champ-label{font-size:.65rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:.2rem;}
 .list-champ-name{font-size:1.35rem;font-weight:700;color:#FFF;line-height:1.2;}
@@ -786,7 +786,7 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .vote-result-overlay::before{content:'';position:absolute;top:0;left:0;bottom:0;width:35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);pointer-events:none;animation:cardShine 3.5s ease-in-out infinite;}
 @keyframes shimmerText{0%{background-position:-200% center;}100%{background-position:200% center;}}
 .vr-winner-text{color:#fff;font-weight:800;}
-.vr-trophy{font-size:3rem;display:inline-block;filter:drop-shadow(0 0 18px rgba(245,158,11,.7));}
+.vr-trophy{width:64px;height:64px;object-fit:contain;display:block;margin:0 auto;animation:shimmerCrown 1.8s ease-in-out infinite;}
 .vr-stat-card{background:rgba(245,158,11,.1);border-radius:12px;padding:.65rem 1rem;flex:1;text-align:center;border:1px solid rgba(245,158,11,.25);}
 .vr-stat-num{font-size:1.6rem;font-weight:800;color:#F59E0B;font-family:monospace;line-height:1;}
 .vr-stat-label{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-top:.2rem;}
@@ -949,7 +949,7 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .home-champ-showcase{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #F59E0B;border-radius:var(--shape-xl);padding:1.1rem 1.25rem;margin-bottom:.9rem;position:relative;overflow:hidden;}
 .home-champ-showcase::after{content:'';position:absolute;top:0;left:-70%;bottom:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:bannerShimmer 3.5s ease-in-out 0.5s infinite;pointer-events:none;}
 .home-champ-showcase-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;gap:.5rem;}
-.home-champ-showcase-crown{font-size:4.5rem;flex-shrink:0;animation:crownFloat 2.2s ease-in-out infinite;filter:drop-shadow(0 4px 16px rgba(245,158,11,.7));line-height:1;}
+.home-champ-showcase-crown{width:56px;height:56px;object-fit:contain;flex-shrink:0;display:block;animation:shimmerCrownIntense 1.8s ease-in-out infinite;}
 .home-champ-showcase-eyebrow{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#92400E;margin-bottom:.25rem;}
 .home-champ-showcase-name{font-size:1.55rem;font-weight:800;color:#78350F;line-height:1.15;}
 .home-champ-rounds{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.65rem;}
@@ -980,7 +980,7 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .home-card-bar{height:100%;background:linear-gradient(90deg,var(--md-primary),var(--md-secondary),#97F0FF);border-radius:var(--shape-full);transition:width .8s var(--motion-decel);box-shadow:0 0 6px rgba(74,58,255,.4);}
 .home-card-body{padding:1rem 1.25rem 1.25rem;flex:1;}
 .home-card-champ{display:flex;align-items:center;gap:.6rem;padding:.65rem .85rem;border-radius:var(--shape-lg);background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:1px solid #F59E0B;margin-bottom:.9rem;}
-.home-card-champ-icon{font-size:1.4rem;}
+.home-card-champ-icon{width:28px;height:28px;object-fit:contain;display:block;flex-shrink:0;animation:shimmerCrown 1.8s ease-in-out infinite;}
 .home-card-champ-label{font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#92400E;margin-bottom:.1rem;}
 .home-card-champ-name{font-size:.9rem;font-weight:700;color:#78350F;line-height:1.2;}
 .home-card-champ-name.empty{font-size:.8rem;font-weight:400;font-style:italic;color:#B45309;}
@@ -1377,7 +1377,7 @@ body.projection #sectionNav{display:none!important;}
 <!-- VOTE RESULT CELEBRATION -->
 <div class="dialog-scrim" id="voteResultDialog">
   <div class="dialog vote-result-overlay" style="max-width:420px;text-align:center;background:linear-gradient(160deg,#2D1B69,#4A3AFF 55%,#7C5CBF);">
-    <div class="vr-trophy">🏆</div>
+    <img src="Corona Crayola.svg" class="vr-trophy" alt="crown">
     <div style="font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);margin:.6rem 0 .3rem">Round Winner</div>
     <div style="font-size:1.75rem;font-weight:800;line-height:1.15;margin-bottom:1rem" id="vrWinnerName" class="vr-winner-text"></div>
     <div style="display:flex;gap:.5rem;margin-bottom:.75rem" id="vrStats"></div>
@@ -1795,7 +1795,7 @@ function renderResults() {
   // Champion banner
   const banner=document.createElement('div');
   banner.className='results-champ-banner';
-  banner.innerHTML=`<div style="font-size:3.5rem;filter:drop-shadow(0 4px 16px rgba(245,158,11,.7));animation:crownFloat 2.2s ease-in-out infinite">${champ?'👑':'⏳'}</div><div style="min-width:0"><div style="font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.3rem">${champ?'🥇 Poetry Champion':'Tournament in Progress'}</div><div style="font-size:1.75rem;font-weight:800;color:#fff;line-height:1.1">${champ?esc(champ.name):'Who will be crowned?'}</div>${champ?`<div style="font-size:.8rem;color:rgba(255,255,255,.7);margin-top:.35rem">Undefeated · 4 rounds · ${activeClass().name}</div>`:''}</div>`;
+  banner.innerHTML=`<div style="flex-shrink:0">${champ?'<img src="Corona Crayola.svg" style="width:52px;height:52px;object-fit:contain;display:block;animation:shimmerCrownIntense 1.8s ease-in-out infinite" alt="crown">':'<span style="font-size:2.5rem">⏳</span>'}</div><div style="min-width:0"><div style="font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.3rem">${champ?'🥇 Poetry Champion':'Tournament in Progress'}</div><div style="font-size:1.75rem;font-weight:800;color:#fff;line-height:1.1">${champ?esc(champ.name):'Who will be crowned?'}</div>${champ?`<div style="font-size:.8rem;color:rgba(255,255,255,.7);margin-top:.35rem">Undefeated · 4 rounds · ${activeClass().name}</div>`:''}</div>`;
   el.appendChild(banner);
 
   // Gather all completed matchups for stats
@@ -2040,7 +2040,7 @@ function renderHome() {
       const champPct = champFull.totalMatchVotes > 0 ? Math.round((champFull.totalVotes / champFull.totalMatchVotes) * 100) : 0;
       const showcase = document.createElement('div'); showcase.className = 'home-champ-showcase';
       // Crown + name
-      showcase.innerHTML = `<div class="home-champ-showcase-header"><div><div class="home-champ-showcase-eyebrow">Poetry Champion</div><div class="home-champ-showcase-name">${esc(champPoem.name)}</div></div><div class="home-champ-showcase-crown">👑</div></div>`;
+      showcase.innerHTML = `<div class="home-champ-showcase-header"><div><div class="home-champ-showcase-eyebrow">Poetry Champion</div><div class="home-champ-showcase-name">${esc(champPoem.name)}</div></div><img src="Corona Crayola.svg" class="home-champ-showcase-crown" alt="crown"></div>`;
       // Round chips
       const roundRow = document.createElement('div'); roundRow.className = 'home-champ-rounds';
       champFull.rounds.forEach(rnd => {
@@ -2083,7 +2083,7 @@ function renderHome() {
     } else {
       // === IN-PROGRESS STATE ===
       const champDiv = document.createElement('div'); champDiv.className = 'home-card-champ';
-      champDiv.innerHTML = `<div class="home-card-champ-icon">👑</div><div><div class="home-card-champ-label">Poetry Champion</div><div class="home-card-champ-name empty">To be decided…</div></div>`;
+      champDiv.innerHTML = `<img src="Corona Crayola.svg" class="home-card-champ-icon" alt="crown"><div><div class="home-card-champ-label">Poetry Champion</div><div class="home-card-champ-name empty">To be decided…</div></div>`;
       body.appendChild(champDiv);
       if (anyPlayed && alivePoems.length > 0) {
         const lbl = document.createElement('div'); lbl.className = 'home-card-section-label';
@@ -2495,7 +2495,7 @@ function renderList() {
   const el=document.getElementById('listContent');el.innerHTML='';if(!activeClass())return;
   const champ=champion();
   const cc=document.createElement('div');cc.className='list-champion'+(champ?' crowned':'');
-  cc.innerHTML=`<div class="list-champ-trophy">👑</div><div><div class="list-champ-label">Poetry Champion</div><div class="list-champ-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div>${champ&&champ.author?`<div class="lmc-author" style="margin-top:3px;">by ${champ.author}</div>`:''}</div>`;
+  cc.innerHTML=`<img src="Corona Crayola.svg" class="list-champ-trophy" alt="crown"><div><div class="list-champ-label">Poetry Champion</div><div class="list-champ-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div>${champ&&champ.author?`<div class="lmc-author" style="margin-top:3px;">by ${champ.author}</div>`:''}</div>`;
   el.appendChild(cc);
   const rounds=[
     {label:'Final',matchups:[[finalPoem(0),finalPoem(1),bkt().final]]},
