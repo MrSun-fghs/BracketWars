@@ -2494,7 +2494,7 @@ function submitJoinCode() {
   if (entered && entered === app.voting.joinCode) {
     localStorage.setItem('bw-join-code', entered);
     updateVotingAnnouncementBar();
-    showSnack('✅ You're in! Waiting for the vote to start…');
+    showSnack('✅ You are in! Waiting for the vote to start…');
     // If voting is already open, go straight to vote view
     if (app.voting.open) {
       const _vo = document.getElementById('voteOpenOverlay');
