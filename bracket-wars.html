@@ -654,6 +654,7 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .m3-tab.vote-tab.active{background:#ffffff;color:var(--md-primary);}
 .open-voting-btn{display:flex;align-items:center;justify-content:center;gap:.3rem;font-size:.65rem;font-weight:600;padding:.2rem .6rem;width:100%;margin-top:.15rem;border:none;cursor:pointer;background:transparent;color:var(--md-tertiary);border-radius:var(--shape-sm);}
 .open-voting-btn:hover{background:var(--md-tertiary-container);}
+.open-voting-btn.voting-closed{color:#dc2626;}
 .close-voting-btn{display:flex;align-items:center;justify-content:center;gap:.3rem;font-size:.65rem;font-weight:600;padding:.2rem .6rem;width:100%;margin-top:.15rem;border:none;cursor:pointer;background:var(--md-error-container);color:var(--md-error);border-radius:var(--shape-sm);}
 .voting-active-card{border-color:var(--md-tertiary) !important;}
 /* Vote view — pill design */
@@ -3526,7 +3527,7 @@ function bcard(type,ri,mi,mirrored,isT){
       const vb=document.createElement('button'); vb.className='close-voting-btn'; vb.textContent='🏁 Finalize Votes';
       vb.onclick=(e)=>{e.stopPropagation();document.getElementById('closeVotingConfirmDialog').classList.add('open');}; wrapper.appendChild(vb);
     } else if (!app.voting.open) {
-      const vb=document.createElement('button'); vb.className='open-voting-btn'; vb.textContent='🗳 Open Voting';
+      const vb=document.createElement('button'); vb.className='open-voting-btn'+(isC?' voting-closed':''); vb.textContent=isC?'🔒 Voting Closed':'🗳 Open Voting';
       vb.onclick=(e)=>{e.stopPropagation();openVotingSetup({type,ri,mi},pA,pB);}; wrapper.appendChild(vb);
     }
   }
