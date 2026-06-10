@@ -70,7 +70,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
     transform:translateX(-50%) translateY(0);
   }
   /* Keep vote pill text visible at medium sizes */
-  #sectionNav .vote-nav-pill{font-size:.72rem;padding:.32rem .6rem;}
+
 }
 /* Hamburger */
 .hamburger-wrap{display:flex;align-items:center;position:relative;margin-left:.6rem;}
@@ -103,13 +103,13 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
   #sectionNav{display:none!important;}
   /* Hide all header action items on mobile — everything moves into hamburger */
   .block-pill-wrap{display:none!important;}
-  .vote-nav-pill{display:none!important;}
+
   .app-bar .live-chip{display:none!important;}
   .fullscreen-btn{display:none!important;}
   .teacher-btn{display:none!important;}
 }
 .app-bar-subtitle{font-size:.72rem;color:rgba(255,255,255,.38);letter-spacing:.05em;position:relative;top:-3px;left:55px;}
-.vote-nav-pill{display:inline-flex;align-items:center;gap:5px;margin-top:0;margin-left:-6px;padding:.38rem .85rem;border-radius:99px;background:#f59e0b;color:#1c1400;font-size:.78rem;font-weight:800;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 0 0 0 rgba(245,158,11,.6);animation:votePillPulse 1.8s ease-in-out infinite;}
+
 @keyframes votePillPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5);}60%{box-shadow:0 0 0 7px rgba(245,158,11,0);}}
 .app-bar .live-chip{background:rgba(103,232,249,.14);color:#67e8f9;border:1px solid rgba(103,232,249,.28);}
 .app-bar .live-dot{background:#67e8f9;}
@@ -1309,7 +1309,6 @@ body.projection #sectionNav{display:none!important;}
     <!-- Center nav — hidden on home, collapses to hamburger on small screens -->
     <div id="sectionNav" style="display:none">
       <div class="seg-btn-track" id="viewToggle">
-        <button id="btnVote" class="vote-nav-pill" onclick="setView('vote')" style="display:none">🗳 Vote Now</button>
         <button class="seg-btn active" id="btnBracket" onclick="setView('bracket')" data-label="Bracket"><svg width="15" height="15" viewBox="2 2 44 44" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="22"/></svg><span class="nav-label"> Bracket</span></button>
         <button class="seg-btn" id="btnList" onclick="setView('list')" data-label="Drama"><svg width="16" height="13" viewBox="0 0 42 32" fill="currentColor" style="display:inline-block;vertical-align:-2px"><rect x="0" y="9" width="6" height="14" rx="3"/><rect x="9" y="2" width="6" height="28" rx="3"/><rect x="18" y="5" width="6" height="22" rx="3"/><rect x="27" y="7" width="6" height="18" rx="3"/><rect x="36" y="10" width="6" height="12" rx="3"/></svg><span class="nav-label"> Drama</span></button>
         <button class="seg-btn" id="btnLeaderboard" onclick="setView('leaderboard')" data-label="Records"><svg width="15" height="15" viewBox="0 0 48 48" fill="none" style="display:inline-block;vertical-align:-2px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="60"/></svg><span class="nav-label"> Records</span></button>
@@ -1837,14 +1836,7 @@ function showCurrentView() {
   const sn = document.getElementById('sectionNav');
   if (sn) sn.style.display = (MODE === 'student' && currentView !== 'home') ? 'flex' : 'none';
   updateVotingAnnouncementBar();
-  const voteBtn = document.getElementById('btnVote');
-  if (voteBtn) {
-    ensureVoting(app);
-    const showVote = app.voting.open && app.voting.classId === app.activeId;
-    voteBtn.style.display = showVote ? 'inline-flex' : 'none';
-    voteBtn.classList.toggle('vote-live', showVote);
-    voteBtn.classList.toggle('active', showVote && currentView === 'vote');
-  }
+
   const hideBar = currentView === 'home' || currentView === 'vote' || currentView === 'roster';
   const tb = document.getElementById('secondaryToolbar');
   if (tb) tb.style.display = hideBar ? 'none' : 'block';
@@ -3692,10 +3684,14 @@ function openTeacherLobby(key, pA, pB) {
     const ri = getCurrentRoundInfo(cls.bracket);
     document.getElementById('tlRoundBadge').textContent = ri.label;
   }
-  // Join code (4-char alphanumeric, display only for now)
+  // Join code: reuse existing if restoring the same matchup (page refresh),
+  // otherwise generate a fresh code
+  const _isRestore = app.voting && app.voting.joinCode
+    && app.voting.pendingKey
+    && JSON.stringify(app.voting.pendingKey) === JSON.stringify(key);
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  let code = _isRestore ? app.voting.joinCode : '';
+  if (!code) { for (let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)]; }
   document.getElementById('tlCode').textContent = code;
   // Poem cards — portrait + stats + superpower
   function buildPoemCard(el, poem, side) {
@@ -3739,14 +3735,22 @@ function openTeacherLobby(key, pA, pB) {
   // Hide countdown
   document.getElementById('tlCountdown').classList.remove('active');
   document.getElementById('tlFsBtn').innerHTML = '<i class="ti ti-arrows-maximize"></i>';
-  // Save join code to Supabase so student announcement bar activates
+  // Save join code + pending key to Supabase so refresh can restore the lobby
   ensureVoting(app);
   app.voting.joinCode = code;
+  app.voting.pendingKey = key;
   saveApp();
   // Subscribe to real-time lobby joins (student devices call trackEvent → bw_events)
   _lobbyJoinSet = new Set();
   if (_lobbyJoinSub) { try { db.removeChannel(_lobbyJoinSub); } catch(e) {} _lobbyJoinSub = null; }
   const _joinCode = code;
+  // On restore (page refresh), backfill any students who already joined
+  db.from('bw_events').select('session_id,payload').eq('event_type','lobby_join').then(({data})=>{
+    if (data) {
+      data.filter(r=>r.payload&&r.payload.code===_joinCode).forEach(r=>_lobbyJoinSet.add(r.session_id));
+      if (_lobbyJoinSet.size>0) updateTlPips(_lobbyJoinSet.size);
+    }
+  }).catch(()=>{});
   _lobbyJoinSub = db.channel('bw-lobby-joins-' + _joinCode)
     .on('postgres_changes', {event:'INSERT', schema:'public', table:'bw_events', filter:'event_type=eq.lobby_join'}, (pl) => {
       if (pl.new && pl.new.payload && pl.new.payload.code === _joinCode) {
@@ -3947,18 +3951,30 @@ function updateTlPips(joinedCount) {
     parent.removeChild(row);
     if (lbl && lbl.parentNode) parent.removeChild(lbl);
   }
-  if (count > 0) {
-    const pct = Math.round(joined / count * 100);
-    const show = Math.min(count, 48);
-    let pipsHTML = '';
-    for (let i=0;i<show;i++) pipsHTML += `<div class="tl-pip${i<joined?' joined':''}">${_personSVG}</div>`;
-    tracker.innerHTML = `
-      <div class="tl-tracker-header">
-        <span class="tl-tracker-label">Students joined</span>
-        <span class="tl-tracker-count">${joined} / ${count}</span>
-      </div>
-      <div class="tl-tracker-bar"><div class="tl-tracker-fill" style="width:${pct}%"></div></div>
-      <div class="tl-pips-row">${pipsHTML}</div>`;
+  if (joined > 0 || count > 0) {
+    if (count > 0) {
+      const pct = Math.round(joined / count * 100);
+      const show = Math.min(count, 48);
+      let pipsHTML = '';
+      for (let i=0;i<show;i++) pipsHTML += `<div class="tl-pip${i<joined?' joined':''}">${_personSVG}</div>`;
+      tracker.innerHTML = `
+        <div class="tl-tracker-header">
+          <span class="tl-tracker-label">Students joined</span>
+          <span class="tl-tracker-count">${joined} / ${count}</span>
+        </div>
+        <div class="tl-tracker-bar"><div class="tl-tracker-fill" style="width:${pct}%"></div></div>
+        <div class="tl-pips-row">${pipsHTML}</div>`;
+    } else {
+      // Teacher hasn't set a total — show just the growing joined count
+      let pipsHTML = '';
+      for (let i=0;i<Math.min(joined,48);i++) pipsHTML += `<div class="tl-pip joined">${_personSVG}</div>`;
+      tracker.innerHTML = `
+        <div class="tl-tracker-header">
+          <span class="tl-tracker-label">Students joined</span>
+          <span class="tl-tracker-count">${joined}</span>
+        </div>
+        <div class="tl-pips-row">${pipsHTML}</div>`;
+    }
   } else {
     tracker.innerHTML = `<div class="tl-tracker-label" style="text-align:center;padding:8px 0;">Waiting for students…</div>`;
   }
@@ -4447,14 +4463,7 @@ function rebuildHamburgerMenu() {
           sub.onclick = () => { app.activeId = cls.id; setView(v); renderAll(); showCurrentView(); m.classList.remove('open'); };
           subContainer.appendChild(sub);
         });
-        if (app.voting.open && app.voting.classId === cls.id) {
-          const vEl = document.createElement('div');
-          vEl.className = 'hmenu-item hmenu-subitem';
-          vEl.style.cssText = 'background:#fef3c7;color:#92400e;font-weight:800;';
-          vEl.textContent = '🗳 Vote Now';
-          vEl.onclick = () => { setView('vote'); m.classList.remove('open'); };
-          subContainer.appendChild(vEl);
-        }
+
       }
 
       groupEl.appendChild(subContainer);
@@ -4898,6 +4907,13 @@ async function boot() {
     setMode('teacher');
     // Restore teacher view (engagement vs bracket) after setMode resets it
     try { const tp=JSON.parse(localStorage.getItem('bw-teacher-prefs')||'{}'); if(tp.view==='engagement') setTeacherView('engagement'); } catch(e) {}
+    // Restore lobby if teacher refreshed while lobby was open
+    ensureVoting(app);
+    if (app.voting.joinCode && !app.voting.open && app.voting.pendingKey) {
+      const _rKey = app.voting.pendingKey;
+      const _rPA = getPoemForKey(_rKey, 0), _rPB = getPoemForKey(_rKey, 1);
+      if (_rPA && _rPB) openTeacherLobby(_rKey, _rPA, _rPB);
+    }
   } else {
     setMode('student');
     // Projector tab: add projection CSS class (hides nav, bars, teacher UI)
