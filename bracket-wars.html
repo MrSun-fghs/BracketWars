@@ -1564,6 +1564,7 @@ function saveTeacherPrefs() {
 }
 function setTeacherView(v) {
   currentView = v;
+  updateHamburgerLabel();
   document.getElementById('bracketView').style.display = v === 'engagement' ? 'none' : 'block';
   document.getElementById('engagementView').style.display = v === 'engagement' ? 'block' : 'none';
   if (v === 'engagement') renderEngagement();
@@ -2083,7 +2084,7 @@ function buildBlockPill() {
   // Class items
   app.classes.forEach(cls => {
     const item = document.createElement('div');
-    item.className = 'block-dd-item' + (cls.id === app.activeId && !isHome ? ' bdd-active' : '');
+    item.className = 'block-dd-item' + (cls.id === app.activeId && !isHome && currentView !== 'engagement' ? ' bdd-active' : '');
     const dot = document.createElement('span');
     dot.style.cssText = `width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;background:${cls.bracket.final.winnerIdx!==null?'var(--gold)':'transparent'};border:${cls.bracket.final.winnerIdx!==null?'none':'1.5px solid #cac4d0'};`;
     item.appendChild(dot); item.appendChild(document.createTextNode(cls.name));
