@@ -911,6 +911,24 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .home-hero-skull{display:block;margin:0 auto 2rem;}
 .home-choose-lbl{font-size:.7rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);display:flex;align-items:center;gap:8px;padding:.25rem 1.5rem .75rem;max-width:1000px;margin:0 auto;}
 .home-choose-lbl::before,.home-choose-lbl::after{content:'';flex:1;height:1px;background:var(--md-outline-variant);}
+.home-round-guide{padding:.5rem 1.5rem 0;max-width:700px;margin:0 auto;width:100%;}
+.home-round-pills{display:flex;gap:.45rem;overflow-x:auto;padding-bottom:.1rem;margin-bottom:.85rem;scrollbar-width:none;}
+.home-round-pills::-webkit-scrollbar{display:none;}
+.home-round-pill{flex-shrink:0;padding:.38rem 1rem;border-radius:99px;font-size:.75rem;font-weight:600;border:1.5px solid var(--md-outline-variant);background:var(--md-surface-container-lowest);cursor:pointer;color:var(--md-on-surface-variant);white-space:nowrap;transition:all .2s cubic-bezier(.34,1.56,.64,1);transform:scale(1);}
+.home-round-pill:hover:not(.hrp-active){background:var(--md-primary-container);border-color:var(--md-primary);color:var(--md-primary);transform:scale(1.06);}
+.home-round-pill:active:not(.hrp-active){transform:scale(.97);transition:transform .08s;}
+.home-round-pill.hrp-active{background:var(--md-primary);border-color:var(--md-primary);color:#fff;box-shadow:0 4px 14px rgba(83,74,183,.35);}
+.home-round-card{background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);border:1px solid var(--md-outline-variant);overflow:hidden;}
+@keyframes hrCardPop{0%{transform:scale(.94) translateY(6px);opacity:0;}60%{transform:scale(1.02) translateY(-2px);opacity:1;}80%{transform:scale(.99) translateY(1px);}100%{transform:scale(1) translateY(0);}}
+.home-round-card.hrcp{animation:hrCardPop .38s cubic-bezier(.34,1.56,.64,1) forwards;}
+.home-round-card-top{padding:.95rem 1.1rem .8rem;display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;}
+.home-round-card-icon{font-size:36px;flex-shrink:0;}
+.home-round-card-theme{font-size:1.1rem;font-weight:700;color:var(--md-on-surface);margin-bottom:.25rem;}
+.home-round-card-question{font-size:.82rem;color:var(--md-on-surface-variant);font-style:italic;line-height:1.5;}
+.home-round-card-divider{height:.5px;background:var(--md-outline-variant);margin:0 1.1rem;}
+.home-round-card-body{padding:.75rem 1.1rem .9rem;}
+.home-round-card-body-lbl{font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);opacity:.6;margin-bottom:.4rem;}
+.home-round-card-desc{font-size:.82rem;color:var(--md-on-surface-variant);line-height:1.7;}
 .home-hero-intro{font-size:16px;color:var(--md-on-surface-variant);line-height:1.7;max-width:580px;margin:0 auto 1.6rem;font-weight:400;}
 .home-hero-badges{display:flex;justify-content:center;gap:.8rem;flex-wrap:wrap;margin-bottom:2rem;}
 .home-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--md-primary-container);border:1px solid var(--md-outline-variant);border-radius:var(--shape-full);padding:.4rem 1rem;font-size:12px;font-weight:600;color:var(--md-on-primary-container);letter-spacing:.02em;}.home-badge .ti{font-size:.95rem;}
@@ -1868,6 +1886,14 @@ function renderResults() {
   });
 }
 
+
+const ROUND_GUIDE = [
+  {short:'Round 1', theme:'Vibe Check', question:'Which poem hits you the hardest?', desc:'Go with your gut. Read both poems and decide which one grabs your attention, stirs something in you, or just feels more alive. No need to explain it yet — this round is about first impressions and instinct.', icon:'🎯'},
+  {short:'Round 2', theme:'Word Detective', question:"How do the poet's words, images, and details create meaning?", desc:"Slow down and look closely. This round is about language — the specific words a poet chose, the images they built, and the details that stick. Ask yourself: what is the poet doing on purpose, and why does it matter?", icon:'🔍'},
+  {short:'Round 3', theme:'Literary Device Showdown', question:'Which poet uses literary techniques in the most powerful way?', desc:"Now you're thinking like a critic. Look for the tools the poet is using — metaphor, simile, imagery, repetition, tone, structure. Which poem uses these techniques in a way that actually strengthens its meaning?", icon:'⚔️'},
+  {short:'Round 4', theme:'Message Match', question:'Which poem has the strongest theme or message?', desc:"Zoom out to the big picture. What is this poem really about — beneath the words and devices? Which poem has a theme or message that feels true, urgent, or meaningful to you and to the world?", icon:'💬'},
+  {short:'Championship', theme:'The Final Vote', question:'Which poem deserves to be crowned champion?', desc:"This is it. One poem survives. Think about everything — how it hit you, the language it used, the techniques that made it work, and the message it carried. Cast your vote for the poem that earned its place.", icon:'👑'},
+];
 function renderHome() {
   const el = document.getElementById('homeContent'); if (!el) return; el.innerHTML = '';
 
@@ -1885,6 +1911,28 @@ function renderHome() {
       <div class="home-badge"><i class="ti ti-crown" aria-hidden="true"></i> 1 Champion</div>
     </div>`;
   el.appendChild(hero);
+
+  // Round Guide
+  const rg = document.createElement('div'); rg.className = 'home-round-guide';
+  let rgActive = 0;
+  function buildRG() {
+    rg.innerHTML = '';
+    const pills = document.createElement('div'); pills.className = 'home-round-pills';
+    ROUND_GUIDE.forEach((r,i) => {
+      const p = document.createElement('button'); p.className = 'home-round-pill' + (i===rgActive?' hrp-active':'');
+      p.textContent = r.short;
+      p.onclick = () => { rgActive = i; buildRG(); };
+      pills.appendChild(p);
+    });
+    rg.appendChild(pills);
+    const r = ROUND_GUIDE[rgActive];
+    const card = document.createElement('div'); card.className = 'home-round-card hrcp';
+    card.innerHTML = `<div class="home-round-card-top"><div><div class="home-round-card-theme">${esc(r.theme)}</div><div class="home-round-card-question">"${esc(r.question)}"</div></div><div class="home-round-card-icon">${r.icon}</div></div><div class="home-round-card-divider"></div><div class="home-round-card-body"><div class="home-round-card-body-lbl">What you'll do</div><div class="home-round-card-desc">${esc(r.desc)}</div></div>`;
+    rg.appendChild(card);
+  }
+  buildRG();
+  el.appendChild(rg);
+
   // "Choose your class" divider
   const chooseLbl = document.createElement('div'); chooseLbl.className = 'home-choose-lbl'; chooseLbl.textContent = 'Choose your class';
   el.appendChild(chooseLbl);
