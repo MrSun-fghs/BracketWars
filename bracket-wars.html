@@ -2018,7 +2018,7 @@ function renderHome() {
       body.appendChild(champDiv);
       if (anyPlayed && alivePoems.length > 0) {
         const lbl = document.createElement('div'); lbl.className = 'home-card-section-label';
-        lbl.textContent = '🔥 Still Alive'; body.appendChild(lbl);
+        lbl.textContent = '🔥 Still Standing'; body.appendChild(lbl);
         alivePoems.forEach((r, i) => {
           const row = document.createElement('div'); row.className = 'home-poem-row alive';
           const votePct = r.totalMatchVotes > 0 ? Math.round((r.totalVotes / r.totalMatchVotes) * 100) + '%' : '';
@@ -2042,7 +2042,7 @@ function renderHome() {
     } else {
       footer = document.createElement('div'); footer.className = 'home-card-footer';
       footer.innerHTML = `
-        <div class="home-card-stat"><div class="home-card-stat-num">${aliveCount}</div><div class="home-card-stat-label">Still Alive</div></div>
+        <div class="home-card-stat"><div class="home-card-stat-num">${aliveCount}</div><div class="home-card-stat-label">Still Standing</div></div>
         <div class="home-card-stat"><div class="home-card-stat-num">${elimCount}</div><div class="home-card-stat-label">Eliminated</div></div>
         <div class="home-card-stat"><div class="home-card-stat-num">${done}/${total}</div><div class="home-card-stat-label">Matchups Done</div></div>`;
     }
@@ -2875,7 +2875,7 @@ function renderEngagement() {
       const pct=Math.round(survivors/4*100);
       const tile=document.createElement('div'); tile.className='eng-cat-tile';
       tile.style.borderTop=`4px solid ${cat.bg}`;
-      tile.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;"><div style="width:9px;height:9px;border-radius:50%;background:${cat.bg};flex-shrink:0;"></div><div style="font-size:.62rem;font-weight:800;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(shortName)}</div></div><div class="eng-cat-num">${survivors}</div><div class="eng-cat-sub">of 4 still alive</div><div class="eng-bar-track"><div style="height:100%;width:${pct}%;background:${cat.bg};border-radius:9999px;"></div></div>`;
+      tile.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;"><div style="width:9px;height:9px;border-radius:50%;background:${cat.bg};flex-shrink:0;"></div><div style="font-size:.62rem;font-weight:800;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(shortName)}</div></div><div class="eng-cat-num">${survivors}</div><div class="eng-cat-sub">of 4 still standing</div><div class="eng-bar-track"><div style="height:100%;width:${pct}%;background:${cat.bg};border-radius:9999px;"></div></div>`;
       grid.appendChild(tile);
     });
   }
