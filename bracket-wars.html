@@ -1001,6 +1001,44 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .home-card-stat{flex:1;text-align:center;}
 .home-card-stat-num{font-family:monospace;font-size:1.1rem;font-weight:800;color:var(--md-primary);}
 .home-card-stat-label{font-size:.6rem;color:var(--md-on-surface-variant);text-transform:uppercase;letter-spacing:.06em;}
+/* Option B: Round progress pips */
+.home-card-pips-wrap{padding:.65rem 0 .4rem;display:flex;align-items:center;gap:.65rem;}
+.home-card-pips{display:flex;gap:.35rem;align-items:center;}
+.home-card-pip{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;text-align:center;}
+.home-card-pip.done{background:#4338ca;color:#fff;}
+.home-card-pip.active{background:#818cf8;color:#fff;box-shadow:0 0 0 3px rgba(129,140,248,.25);}
+.home-card-pip.future{background:var(--md-surface-container-highest);color:var(--md-on-surface-variant);border:1.5px solid var(--md-outline-variant);}
+.home-card-pips-label{font-size:.68rem;font-weight:600;color:var(--md-on-surface-variant);}
+/* Option B: Poem table */
+.home-poem-table{border:.5px solid var(--md-outline-variant);border-radius:10px;overflow:hidden;margin:.25rem 0;}
+.home-poem-tr{display:flex;align-items:center;gap:.55rem;padding:9px 10px;cursor:pointer;transition:background .12s;user-select:none;}
+.home-poem-tr + .home-poem-tr,.home-poem-expand-panel + .home-poem-tr{border-top:.5px solid var(--md-outline-variant);}
+.home-poem-tr:hover{background:var(--md-surface-container-low);}
+.home-poem-medal{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;}
+.home-poem-medal.gold{background:#fef3c7;color:#92400e;}
+.home-poem-medal.silver{background:#f1f5f9;color:#475569;}
+.home-poem-medal.bronze{background:#fdf4e7;color:#9a3412;}
+.home-poem-medal.other{background:var(--md-surface-container);color:var(--md-on-surface-variant);}
+.home-poem-tr-info{flex:1;min-width:0;}
+.home-poem-tr-name{font-size:.82rem;font-weight:600;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.home-poem-tr-author{font-size:.7rem;color:var(--md-on-surface-variant);}
+.home-poem-tr-chevron{color:var(--md-on-surface-variant);font-size:13px;flex-shrink:0;transition:transform .2s;}
+.home-poem-tr.expanded .home-poem-tr-chevron{transform:rotate(180deg);}
+.home-poem-expand-panel{display:none;padding:7px 10px 9px;gap:5px;flex-wrap:wrap;justify-content:center;background:var(--md-surface-container-lowest);border-top:.5px solid var(--md-outline-variant);}
+.home-poem-expand-panel.open{display:flex;}
+.home-poem-stat-pill{padding:.25rem .7rem;border-radius:99px;font-size:.7rem;font-weight:600;background:var(--md-primary-container);color:var(--md-on-primary-container);white-space:nowrap;}
+/* Vote CTA */
+.home-card-vote-cta{margin:.25rem 0 .25rem;padding:.5rem .85rem;border-radius:8px;background:var(--md-primary-container);border:.5px solid var(--md-primary);display:flex;align-items:center;justify-content:space-between;font-size:.75rem;font-weight:600;color:var(--md-on-primary-container);cursor:pointer;transition:background .12s;}
+.home-card-vote-cta:hover{background:var(--md-secondary-container);}
+/* Option B: Colored stat footer */
+.home-card-footer.colored{padding:0;gap:0;border-top:none;}
+.home-card-stat-cell{flex:1;text-align:center;padding:.6rem .5rem;cursor:default;transition:filter .15s;}
+.home-card-stat-cell:hover{filter:brightness(.85);}
+.home-card-stat-cell.purple{background:#534AB7;color:#fff;}
+.home-card-stat-cell.coral{background:#993C1D;color:#fff;}
+.home-card-stat-cell.teal{background:#0F6E56;color:#fff;}
+.home-card-stat-cell-num{font-family:monospace;font-size:1.05rem;font-weight:800;}
+.home-card-stat-cell-label{font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;opacity:.8;}
 /* ── Voting timer ── */
 .voting-timer{display:inline-flex;align-items:center;gap:.35rem;font-family:monospace;font-size:.88rem;font-weight:700;padding:.3rem .75rem;border-radius:var(--shape-full);background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);}
 .voting-timer.urgent{background:var(--md-error-container);color:var(--md-error);animation:timerUrgent .5s ease-in-out infinite;}
@@ -2024,12 +2062,40 @@ function renderHome() {
     // Body
     const body = document.createElement('div'); body.className = 'home-card-body';
 
-    // Progress bar — inside body at top with round info
+    // Round progress pips
     if (!champPoem) {
+      const r16m = b.regionRounds.flatMap(reg => [reg[0], reg[1]]);
+      const qfm  = b.regionRounds.map(reg => reg[2]);
+      const r16D = r16m.filter(m=>m.winnerIdx!==null).length;
+      const qfD  = qfm.filter(m=>m.winnerIdx!==null).length;
+      const sfD  = b.semis.filter(m=>m.winnerIdx!==null).length;
+      const finD = b.final.winnerIdx!==null ? 1 : 0;
+      const pipStages = [
+        {label:'R1',d:r16D,t:8},
+        {label:'QF',d:qfD,t:4},
+        {label:'SF',d:sfD,t:2},
+        {label:'🏆',d:finD,t:1},
+      ];
+      let seenActive = false;
+      pipStages.forEach(s => {
+        if (!seenActive && s.d >= s.t) { s.state = 'done'; }
+        else if (!seenActive) { s.state = 'active'; seenActive = true; }
+        else { s.state = 'future'; }
+      });
       const rInfo = getCurrentRoundInfo(b);
-      const progWrap = document.createElement('div'); progWrap.className = 'home-card-progress-wrap';
-      progWrap.innerHTML = `<div class="home-card-progress-label"><span class="home-card-progress-title">${esc(rInfo.label)} · ${rInfo.done}/${rInfo.total}</span><span class="home-card-progress-pct">${pct}%</span></div><div class="home-card-progress"><div class="home-card-bar" style="width:${pct}%"></div></div>`;
-      body.appendChild(progWrap);
+      const pipsWrap = document.createElement('div'); pipsWrap.className = 'home-card-pips-wrap';
+      const pipsRow = document.createElement('div'); pipsRow.className = 'home-card-pips';
+      pipStages.forEach(s => {
+        const pip = document.createElement('div');
+        pip.className = 'home-card-pip ' + s.state;
+        pip.textContent = s.label;
+        pipsRow.appendChild(pip);
+      });
+      const pipsLbl = document.createElement('div'); pipsLbl.className = 'home-card-pips-label';
+      pipsLbl.textContent = `${rInfo.done} of ${rInfo.total} matchups complete`;
+      pipsWrap.appendChild(pipsRow);
+      pipsWrap.appendChild(pipsLbl);
+      body.appendChild(pipsWrap);
     }
 
     if (champPoem) {
@@ -2083,14 +2149,34 @@ function renderHome() {
     } else {
       // === IN-PROGRESS STATE ===
       if (anyPlayed && alivePoems.length > 0) {
-        const lbl = document.createElement('div'); lbl.className = 'home-card-section-label';
-        lbl.textContent = '⚔️ Battle-Tested'; body.appendChild(lbl);
+        const medalCls = i => ['gold','silver','bronze'][i] || 'other';
+        const tbl = document.createElement('div'); tbl.className = 'home-poem-table';
         alivePoems.forEach((r, i) => {
-          const row = document.createElement('div'); row.className = 'home-poem-row alive';
-          const votePct = r.totalMatchVotes > 0 ? Math.round((r.totalVotes / r.totalMatchVotes) * 100) + '%' : '';
-          row.innerHTML = `<div class="home-poem-rank">${i+1}</div><div class="home-poem-name">${esc(r.name)}</div>${votePct ? `<div class="home-poem-pct">${votePct}</div>` : ''}`;
-          body.appendChild(row);
+          const seedIdx = b.poems.indexOf(r.name);
+          const author = DEFAULT_AUTHORS[seedIdx] || '';
+          const wins = r.roundsWon;
+          const avgPct = r.totalMatchVotes > 0 ? Math.round((r.totalVotes / r.totalMatchVotes) * 100) : 0;
+          const tr = document.createElement('div'); tr.className = 'home-poem-tr';
+          tr.innerHTML = `<div class="home-poem-medal ${medalCls(i)}">${i+1}</div><div class="home-poem-tr-info"><div class="home-poem-tr-name">${esc(r.name)}</div>${author ? `<div class="home-poem-tr-author">${esc(author)}</div>` : ''}</div><i class="ti ti-chevron-down home-poem-tr-chevron"></i>`;
+          const panel = document.createElement('div'); panel.className = 'home-poem-expand-panel';
+          panel.innerHTML = `<span class="home-poem-stat-pill">🏆 ${wins} win${wins!==1?'s':''}</span><span class="home-poem-stat-pill">🗳 ${r.totalVotes} votes</span>${r.totalMatchVotes>0?`<span class="home-poem-stat-pill">📊 ${avgPct}% avg</span>`:''}`;
+          tr.addEventListener('click', e => {
+            e.stopPropagation();
+            const open = tr.classList.toggle('expanded');
+            panel.classList.toggle('open', open);
+          });
+          tbl.appendChild(tr);
+          tbl.appendChild(panel);
         });
+        body.appendChild(tbl);
+        // Vote CTA when there's still an active matchup
+        const rInfo2 = getCurrentRoundInfo(b);
+        if (rInfo2.done < rInfo2.total) {
+          const cta = document.createElement('div'); cta.className = 'home-card-vote-cta';
+          cta.innerHTML = `<span>Active matchup — cast your vote</span><span class="home-card-vote-cta-arrow"><i class="ti ti-arrow-right"></i></span>`;
+          cta.addEventListener('click', e => { e.stopPropagation(); app.activeId = cls.id; setView('bracket'); renderAll(); showCurrentView(); });
+          body.appendChild(cta);
+        }
       } else if (!anyPlayed) {
         const w = document.createElement('div'); w.className = 'home-card-waiting';
         w.innerHTML = '<div class="home-card-waiting-icon"><i class="ti ti-clock"></i></div><div class="home-card-waiting-text">Tournament Starting Soon</div><div class="home-card-waiting-sub">Mr. Sun will kick things off shortly</div>'; body.appendChild(w);
@@ -2106,11 +2192,11 @@ function renderHome() {
       if (runnerUp) footer.innerHTML += `<div class="home-podium-item"><span class="home-podium-medal">🥈</span><div class="home-podium-place">2nd Place</div><div class="home-podium-name">${esc(runnerUp.name)}</div></div>`;
       thirdPlaces.slice(0,2).forEach(p => { footer.innerHTML += `<div class="home-podium-item"><span class="home-podium-medal">🥉</span><div class="home-podium-place">3rd Place</div><div class="home-podium-name">${esc(p.name)}</div></div>`; });
     } else {
-      footer = document.createElement('div'); footer.className = 'home-card-footer';
+      footer = document.createElement('div'); footer.className = 'home-card-footer colored';
       footer.innerHTML = `
-        <div class="home-card-stat"><div class="home-card-stat-num">${aliveCount}</div><div class="home-card-stat-label">Still Standing</div></div>
-        <div class="home-card-stat"><div class="home-card-stat-num">${elimCount}</div><div class="home-card-stat-label">Eliminated</div></div>
-        <div class="home-card-stat"><div class="home-card-stat-num">${done}/${total}</div><div class="home-card-stat-label">Matchups Done</div></div>`;
+        <div class="home-card-stat-cell purple"><div class="home-card-stat-cell-num">${aliveCount}</div><div class="home-card-stat-cell-label">Standing</div></div>
+        <div class="home-card-stat-cell coral"><div class="home-card-stat-cell-num">${elimCount}</div><div class="home-card-stat-cell-label">Eliminated</div></div>
+        <div class="home-card-stat-cell teal"><div class="home-card-stat-cell-num">${done}/${total}</div><div class="home-card-stat-cell-label">Done</div></div>`;
     }
     card.appendChild(footer);
 
