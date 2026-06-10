@@ -396,7 +396,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 @keyframes nudge{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
 .seed{font-family:monospace;font-size:.58rem;font-weight:500;color:var(--md-on-surface-variant);min-width:1rem;text-align:right;flex-shrink:0;background:var(--md-surface-container-high);padding:.1rem .3rem;border-radius:var(--shape-xs);}
 .poem-slot.winner-slot .seed{background:var(--md-primary);color:var(--md-on-primary);}
-.seed.seed-won{background:#F59E0B!important;color:#fff!important;display:inline-flex!important;align-items:center;justify-content:center;text-align:center;font-size:.8rem;padding:.15rem .3rem;min-width:1.3rem;}
+.seed.seed-won{background:#F59E0B!important;display:inline-flex!important;align-items:center;justify-content:center;padding:.15rem;min-width:1.4rem;min-height:1.4rem;}
 .poem-name-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
 .poem-name{font-size:.82rem;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--md-on-surface);}
 .poem-author{font-size:.66rem;font-weight:400;color:var(--md-on-surface-variant);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.75;}
@@ -3298,7 +3298,7 @@ function flipSeedBadge(el){
   el.style.transition='transform .17s ease-in';
   el.style.transform='scaleX(0)';
   setTimeout(()=>{
-    el.textContent='★';el.classList.add('seed-won');
+    el.innerHTML='<img src="Small Crown.png" style="width:14px;height:14px;object-fit:contain;display:block;">';el.classList.add('seed-won');
     el.style.transition='transform .17s ease-out';
     el.style.transform='scaleX(1)';
     setTimeout(()=>{el.style.transition='';el.style.transform='';},180);
@@ -3505,7 +3505,7 @@ function bcard(type,ri,mi,mirrored,isT){
     const slot=document.createElement('div');slot.className='poem-slot'+(iP?' pending':iW?' winner-slot'+(isA?' alive':''):iL?' loser-slot':'');
     const seed=document.createElement('span');seed.className='seed';
     const _isFresh=iW&&bracketJustSavedKey!==null&&bracketJustSavedKey.type===type&&(bracketJustSavedKey.ri??null)===(ri??null)&&(bracketJustSavedKey.mi??null)===(mi??null);
-    if(iW&&!_isFresh){seed.textContent='★';seed.classList.add('seed-won');}
+    if(iW&&!_isFresh){seed.innerHTML='<img src="Small Crown.png" style="width:14px;height:14px;object-fit:contain;display:block;">';seed.classList.add('seed-won');}
     else{seed.textContent=poem?poem.seed:'?';if(_isFresh)seed.setAttribute('data-flip-pending','1');}
     slot.appendChild(seed);
     const nmWrap=document.createElement('div');nmWrap.className='poem-name-wrap';
