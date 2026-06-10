@@ -709,6 +709,8 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .v2-timer-pill.urgent{background:var(--md-error-container);color:var(--md-error);animation:timerUrgent .5s ease-in-out infinite;}
 .v2-count-pill{display:inline-flex;align-items:center;gap:5px;background:var(--md-surface-container-lowest);color:var(--md-on-surface-variant);border:1px solid var(--md-outline-variant);padding:.25rem .7rem;border-radius:var(--shape-full);font-size:11px;font-weight:500;}
 .v2-code-pill{display:inline-flex;align-items:center;gap:4px;background:#4A3AFF;color:#fff;padding:.25rem .8rem;border-radius:var(--shape-full);font-size:13px;font-weight:800;letter-spacing:.12em;font-family:monospace;}
+.v2-popout-btn{display:inline-flex;align-items:center;gap:5px;background:var(--md-surface-container-lowest);color:var(--md-on-surface-variant);border:1px solid var(--md-outline-variant);padding:.25rem .7rem;border-radius:var(--shape-full);font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;}
+.v2-popout-btn:hover{background:var(--md-surface-container);}
 .v2-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;min-width:0;}
 .v2-card{border-radius:var(--shape-xl);padding:.85rem .75rem;transition:transform .18s ease,box-shadow .18s ease;min-width:0;overflow:hidden;}
 .v2-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
@@ -3776,6 +3778,15 @@ function closeLobby() {
   if (!app.voting.open) { app.voting.joinCode = null; saveApp(); }
 }
 
+function popoutVoteProjector() {
+  // Opens a projector-mode tab pointing directly at the student vote view.
+  // Works from the vote view if teacher forgot to pop out during the lobby.
+  ensureVoting(app);
+  const _appUrl = window.location.href.replace(/[?#].*$/, '');
+  const jc = app.voting.joinCode || '';
+  const url = _appUrl + '?projector=1' + (jc ? '&jc=' + encodeURIComponent(jc) : '');
+  window.open(url, 'bw-vote-projector', 'width=1280,height=760,menubar=no,toolbar=no,location=no');
+}
 function popoutLobby() {
   // Build absolute image URLs for the pop-out window
   function absImg(src) { return src ? new URL(src, window.location.href).href : ''; }
@@ -4708,8 +4719,9 @@ function renderVoteView() {
   // ── Header ──
   const timerPill=v.timerEndsAt?`<div class="v2-timer-pill voting-timer-display${isUrgent?' urgent':''}">⏱ ${remaining>0?formatTimer(remaining):'0:00'}</div>`:'';
   const codePill=MODE==='teacher'&&v.joinCode?`<div class="v2-code-pill">🔑 ${esc(v.joinCode)}</div>`:'';
+  const popoutPill=MODE==='teacher'?`<button class="v2-popout-btn" onclick="popoutVoteProjector()" title="Open projector window">📺 Pop Out</button>`:'';
   const hdr=document.createElement('div'); hdr.className='v2-header';
-  hdr.innerHTML=`<span class="v2-round-label">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</span><div class="v2-pills">${timerPill}${codePill}<div class="v2-count-pill" id="v2CountPill">👥 ${sc>0?total+' of '+sc:total+' votes'}</div></div>`;
+  hdr.innerHTML=`<span class="v2-round-label">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</span><div class="v2-pills">${timerPill}${codePill}${popoutPill}<div class="v2-count-pill" id="v2CountPill">👥 ${sc>0?total+' of '+sc:total+' votes'}</div></div>`;
   view.appendChild(hdr);
 
   // ── Cards grid ──
