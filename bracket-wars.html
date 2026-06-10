@@ -3733,8 +3733,8 @@ function popoutLobby() {
     type: 'init',
     code: d.code || '—',
     className: document.getElementById('tlClassName').textContent,
-    poemA: { name: d.pA ? d.pA.name : '', author: rpA.author || '', imgSrc: absImg(rpA.svg), zoom: rpA.cropZoom || 1.6, cx: rpA.cropX != null ? rpA.cropX : 50, cy: rpA.cropY != null ? rpA.cropY : 12, superpower: rpA.superpower || '', stats: rpA.stats || {} },
-    poemB: { name: d.pB ? d.pB.name : '', author: rpB.author || '', imgSrc: absImg(rpB.svg), zoom: rpB.cropZoom || 1.6, cx: rpB.cropX != null ? rpB.cropX : 50, cy: rpB.cropY != null ? rpB.cropY : 12, superpower: rpB.superpower || '', stats: rpB.stats || {} },
+    poemA: { name: d.pA ? d.pA.name : '', author: rpA.author || '', imgSrc: absImg(rpA.svg), zoom: rpA.cropZoom || 1.6, cx: rpA.cropX != null ? rpA.cropX : 50, cy: rpA.cropY != null ? rpA.cropY : 12, superpower: rpA.superpower || '', stats: rpA.stats || {}, readingLens: rpA.readingLens || '' },
+    poemB: { name: d.pB ? d.pB.name : '', author: rpB.author || '', imgSrc: absImg(rpB.svg), zoom: rpB.cropZoom || 1.6, cx: rpB.cropX != null ? rpB.cropX : 50, cy: rpB.cropY != null ? rpB.cropY : 12, superpower: rpB.superpower || '', stats: rpB.stats || {}, readingLens: rpB.readingLens || '' },
   });
 
   // Open a self-contained projector window
@@ -3742,30 +3742,47 @@ function popoutLobby() {
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);color:#fff;font-family:'Nunito',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:40px 32px;overflow:hidden;}
-#codeLbl{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);}
-#code{font-size:clamp(64px,12vw,112px);font-weight:900;color:#fff;letter-spacing:.18em;line-height:1;}
-#codeHint{font-size:14px;color:rgba(255,255,255,.35);margin-top:6px;}
-.vs-row{display:flex;align-items:stretch;gap:20px;width:100%;max-width:800px;}
-.p-card{flex:1;border-radius:18px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;overflow:hidden;}
-.p-card.ca{background:rgba(74,58,255,.18);border:2px solid #4A3AFF;}
-.p-card.cb{background:rgba(124,92,191,.2);border:2px solid #7C5CBF;}
-.vs-badge{width:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:rgba(255,255,255,.4);}
-.portrait{width:96px;height:96px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.25);flex-shrink:0;}
-.portrait img{width:100%;height:100%;object-fit:cover;display:block;}
-.ptitle{font-size:clamp(16px,2.5vw,22px);font-weight:800;color:#fff;text-align:center;line-height:1.2;}
-.pauthor{font-size:13px;color:rgba(255,255,255,.45);text-align:center;}
-.ppill{font-size:11px;font-weight:700;padding:4px 11px;border-radius:99px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);text-align:center;line-height:1.5;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.stats{width:100%;display:flex;flex-direction:column;gap:5px;margin-top:4px;}
+body{background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);color:#fff;font-family:'Nunito',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:20px;padding:32px 32px 24px;overflow:hidden;}
+#codeLbl{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:-8px;}
+#code{font-size:clamp(56px,10vw,96px);font-weight:900;color:#fff;letter-spacing:.18em;line-height:1;}
+#codeHint{font-size:13px;color:rgba(255,255,255,.35);margin-top:-4px;}
+.vs-row{display:flex;align-items:stretch;gap:16px;width:100%;max-width:900px;}
+/* ── White cards matching teacher lobby ── */
+.p-card{flex:1;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;overflow:hidden;background:rgba(255,255,255,.97);}
+.p-card.ca{border:2px solid #4A3AFF;}
+.p-card.cb{border:2px solid #7C5CBF;}
+.vs-badge{width:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:rgba(255,255,255,.5);}
+/* Portrait */
+.portrait{width:88px;height:88px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(0,0,0,.12);flex-shrink:0;}
+.portrait img{width:100%;height:100%;object-fit:contain;display:block;}
+/* Author first (large), then poem title */
+.pauthor{font-size:clamp(14px,1.8vw,17px);font-weight:800;color:#1c1b3a;text-align:center;line-height:1.2;}
+.ptitle{font-size:11px;color:#6b7280;text-align:center;margin-top:-2px;}
+/* Superpower pill */
+.ppill{font-size:9px;font-weight:700;padding:4px 10px;border-radius:99px;color:#fff;text-align:center;line-height:1.4;max-width:100%;}
+.ca .ppill{background:#4A3AFF;}
+.cb .ppill{background:#7C5CBF;}
+/* Section labels */
+.sec-lbl{font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9ca3af;width:100%;margin-top:2px;}
+/* 6-stat bars matching lobby */
+.stats{width:100%;display:flex;flex-direction:column;gap:4px;}
 .srow{display:flex;align-items:center;gap:8px;}
-.slbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);width:56px;flex-shrink:0;text-transform:uppercase;letter-spacing:.05em;}
-.sbars{display:flex;gap:3px;}
-.sbar{width:13px;height:5px;border-radius:3px;background:rgba(255,255,255,.1);}
-.sbar.on{background:rgba(255,255,255,.72);}
-.pips-row{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:540px;}
+.slbl{font-size:9px;font-weight:500;color:#6b7280;width:68px;flex-shrink:0;}
+.strack{flex:1;height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+.sfill{height:100%;border-radius:99px;}
+.ca .sfill{background:#4A3AFF;}
+.cb .sfill{background:#7C5CBF;}
+/* Reading lens */
+.lens{font-size:10px;color:#374151;font-style:italic;line-height:1.5;width:100%;}
+/* Student tracker */
+.tracker-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:580px;}
+.tracker-header{display:flex;justify-content:space-between;width:100%;font-size:12px;color:rgba(255,255,255,.5);}
+.tracker-bar-bg{width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;}
+.tracker-bar-fill{height:100%;border-radius:99px;background:#86efac;transition:width .4s;}
+.pips-row{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
 .pip{color:rgba(255,255,255,.18);display:inline-flex;transition:color .3s,transform .25s;}
 .pip.joined{color:#86efac;transform:scale(1.1);}
-#pipsLbl{font-size:13px;color:rgba(255,255,255,.4);margin-top:4px;}
+#pipsLbl{font-size:13px;color:rgba(255,255,255,.4);}
 </style></head><body>
 <div id="codeLbl">Join Code</div>
 <div id="code">—</div>
@@ -3782,9 +3799,17 @@ const _ps='<svg width="18" height="22" viewBox="0 0 20 24" fill="currentColor"><
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function buildCard(el,p){
   const st=p.stats||{};
-  const defs=[['Access.',st.accessibility||0],['Emotion',st.emotionalImpact||0],['Imagery',st.imageryPower||0],['Relate',st.relatability||0]];
-  const bars=defs.map(([l,v])=>'<div class="srow"><span class="slbl">'+l+'</span><div class="sbars">'+[1,2,3,4,5].map(i=>'<div class="sbar'+(i<=v?' on':'')+'"></div>').join('')+'</div></div>').join('');
-  el.innerHTML='<div class="portrait"><img src="'+p.imgSrc+'" style="transform:scale('+p.zoom+');transform-origin:'+p.cx+'% '+p.cy+'%;object-fit:cover;width:100%;height:100%;"></div><div class="ptitle">'+esc(p.name)+'</div><div class="pauthor">'+esc(p.author)+'</div><div class="ppill">⚡ '+esc(p.superpower||'')+'</div><div class="stats">'+bars+'</div>';
+  const defs=[['Accessibility',st.accessibility||0],['Emotional',st.emotionalImpact||0],['Imagery',st.imageryPower||0],['Lit. Devices',st.literaryDevicePower||0],['Theme',st.themeStrength||0],['Relatability',st.relatability||0]];
+  const bars=defs.map(([l,v])=>'<div class="srow"><span class="slbl">'+l+'</span><div class="strack"><div class="sfill" style="width:'+(v/5*100)+'%"></div></div></div>').join('');
+  const lens=p.readingLens?'<div class="sec-lbl">Reading Lens</div><div class="lens">'+esc(p.readingLens)+'</div>':'';
+  el.innerHTML=
+    '<div class="portrait"><img src="'+p.imgSrc+'" loading="lazy"></div>'+
+    '<div class="pauthor">'+esc(p.author)+'</div>'+
+    '<div class="ptitle">'+esc(p.name)+'</div>'+
+    '<div class="ppill">⚡ '+esc(p.superpower||'')+'</div>'+
+    '<div class="sec-lbl">Player Stats</div>'+
+    '<div class="stats">'+bars+'</div>'+
+    lens;
 }
 function buildPips(joined,total){
   const row=document.getElementById('pipsRow');
