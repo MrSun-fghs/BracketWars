@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://livkhrzrcbbnmrfqoiai.supabase.co">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bracket Wars</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" as="style" onload="this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"></noscript>
 <link rel="icon" type="image/svg+xml" href="Calabera Favicon.svg">
 <style>
 :root {
@@ -1652,7 +1656,7 @@ function defaultAppState() {
 
 let app = defaultAppState();
 
-async function saveApp() {
+async function saveApp() { _rosterStateKey = null; // invalidate roster cache on bracket change
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(app)); } catch(e) {}
   try {
     await db.from('bracket_state').upsert({ id: STORAGE_KEY, data: app, updated_at: new Date().toISOString() });
@@ -4627,7 +4631,7 @@ function _rosterPlayClose() {
   gain.gain.exponentialRampToValueAtTime(0.001,_rosterAC.currentTime+0.14);
   osc.start(_rosterAC.currentTime); osc.stop(_rosterAC.currentTime+0.15);
 }
-let _rosterBuilt = false;
+let _rosterStateKey = null; // cache: skip full rebuild if bracket state unchanged
 let _rosterActiveRow = null;
 let _rosterActiveCard = null;
 const _rosterRowCards = [[],[],[],[]];
@@ -4748,11 +4752,15 @@ function setRosterHeight() {
 
 function renderRoster() {
   setRosterHeight();
+  const b = bkt();
+  const stateKey = app.activeId + '|' + JSON.stringify(b);
   const grid = document.getElementById('rosterGrid');
+  // Skip full rebuild if bracket state is unchanged (avoids re-loading all 16 SVGs)
+  if (_rosterStateKey === stateKey && grid.children.length > 0) return;
+  _rosterStateKey = stateKey;
   grid.innerHTML = '';
   _rosterRowCards.forEach(r=>r.length=0); _rosterExpPanels.length=0;
   _rosterActiveRow=null; _rosterActiveCard=null;
-  const b = bkt();
 
   const sorted = [...ROSTER_POEMS].sort((a,b)=>a.num-b.num);
 
@@ -4771,7 +4779,7 @@ function renderRoster() {
       card.className = 'roster-card' + (isElim ? ' eliminated' : '');
       card.dataset.color = p.color;
       card.style.cssText = `--r-accent:${p.accentColor};`;
-      card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}<div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap"><img src="${p.svg}" alt="${p.author}"></div><div class="roster-author-name" style="color:${p.accentColor}">${p.author}</div><div class="roster-poem-title">${p.title}</div>`;
+      card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}<div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap"><img src="${p.svg}" alt="${p.author}" loading="lazy" decoding="async"></div><div class="roster-author-name" style="color:${p.accentColor}">${p.author}</div><div class="roster-poem-title">${p.title}</div>`;
       card.addEventListener('click', ()=>{
         trackEvent('poem_tap',{poem:p.title,author:p.author,seed:p.num,view:'roster'});
         if (_rosterActiveCard===card) { _rosterPlayClose(); _rosterCloseActive(); return; }
