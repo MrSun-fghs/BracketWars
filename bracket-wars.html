@@ -1805,6 +1805,12 @@ function setTeacherView(v) {
 }
 
 function setView(v) {
+  // Redirect if target tab is hidden from students
+  const _svCls = activeClass();
+  if (_svCls && Array.isArray(_svCls.hiddenTabs) && _svCls.hiddenTabs.includes(v)) {
+    const _fallback = ['bracket','list','leaderboard','roster'].find(t => !_svCls.hiddenTabs.includes(t));
+    v = _fallback || 'bracket';
+  }
   // analytics: log exit from previous view
   if (_viewName && _viewStartTime && (typeof MODE==='undefined'||MODE!=='teacher')) {
     trackEvent('view_exit', {view:_viewName}, Date.now()-_viewStartTime);
@@ -1838,6 +1844,7 @@ function showCurrentView() {
   });
   const sn = document.getElementById('sectionNav');
   if (sn) sn.style.display = (MODE === 'student' && currentView !== 'home') ? 'flex' : 'none';
+  _applyHiddenTabButtons();
   updateVotingAnnouncementBar();
 
   const hideBar = currentView === 'home' || currentView === 'vote' || currentView === 'roster';
@@ -3641,6 +3648,8 @@ function saveAddClass(){const v=document.getElementById('newClassInput').value.t
 function closeAddClass(){document.getElementById('addClassDialog').classList.remove('open');}
 function confirmDeleteClass(id){const cls=app.classes.find(c=>c.id===id);if(!cls)return;if(!confirm(`Delete "${cls.name}" permanently? This cannot be undone.`))return;app.classes=app.classes.filter(c=>c.id!==id);if(app.activeId===id)app.activeId=app.classes[0].id;saveApp();renderAll();showSnack(`"${cls.name}" deleted`);}
 function toggleHideClass(id){const cls=app.classes.find(c=>c.id===id);if(!cls)return;cls.hidden=!cls.hidden;saveApp();renderAll();showSnack(cls.hidden?`"${cls.name}" hidden from students`:`"${cls.name}" now visible to students`);}
+function toggleHideTab(id,view){const cls=app.classes.find(c=>c.id===id);if(!cls)return;if(!Array.isArray(cls.hiddenTabs))cls.hiddenTabs=[];const i=cls.hiddenTabs.indexOf(view);if(i===-1)cls.hiddenTabs.push(view);else cls.hiddenTabs.splice(i,1);saveApp();_applyHiddenTabButtons();if(document.getElementById('hamburgerMenu')?.classList.contains('open'))rebuildHamburgerMenu();}
+function _applyHiddenTabButtons(){const cls=activeClass();const ht=cls&&Array.isArray(cls.hiddenTabs)?cls.hiddenTabs:[];[['btnBracket','bracket'],['btnList','list'],['btnLeaderboard','leaderboard'],['btnRoster','roster']].forEach(([bid,v])=>{const b=document.getElementById(bid);if(b)b.style.display=ht.includes(v)?'none':'';});}
 function openReset(){document.getElementById('resetHeadline').textContent=`Reset ${activeClass().name}?`;document.getElementById('resetDialog').classList.add('open');}
 function closeReset(){document.getElementById('resetDialog').classList.remove('open');}
 function doReset(){const p=[...activeClass().bracket.poems];activeClass().bracket=defaultBracket();activeClass().bracket.poems=p;saveApp();closeReset();renderAll();showSnack('Bracket reset');}
@@ -4468,6 +4477,22 @@ function rebuildHamburgerMenu() {
           sub.onclick = () => { app.activeId = cls.id; m.classList.remove('open'); fn(); };
           subContainer.appendChild(sub);
         });
+        // ── Tab visibility toggles ──
+        const tabSepEl = document.createElement('div'); tabSepEl.className = 'hmenu-sep'; subContainer.appendChild(tabSepEl);
+        const tabHdr = document.createElement('div');
+        tabHdr.style.cssText = 'padding:.3rem 1rem .2rem 2rem;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:#9ca3af;font-weight:700;';
+        tabHdr.textContent = 'Student Tabs';
+        subContainer.appendChild(tabHdr);
+        const _ht = Array.isArray(cls.hiddenTabs) ? cls.hiddenTabs : [];
+        [['Bracket','bracket'],['Drama','list'],['Records','leaderboard'],['Roster','roster']].forEach(([lbl,v])=>{
+          const hidden = _ht.includes(v);
+          const tabEl = document.createElement('div');
+          tabEl.className = 'hmenu-item hmenu-subitem';
+          tabEl.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;';
+          tabEl.innerHTML = `<span style="flex:1">${lbl}</span><span style="width:9px;height:9px;border-radius:50%;flex-shrink:0;background:${hidden?'#ef4444':'#22c55e'};box-shadow:0 0 0 2px ${hidden?'rgba(239,68,68,.25)':'rgba(34,197,94,.25)'};"></span>`;
+          tabEl.onclick = (e)=>{ e.stopPropagation(); toggleHideTab(cls.id, v); };
+          subContainer.appendChild(tabEl);
+        });
       } else {
         const subViews = [
           ['<svg width="13" height="13" viewBox="2 2 44 44" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="24" y1="4" x2="41" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="14" x2="41" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="41" y1="34" x2="24" y2="44" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="24" y1="44" x2="7" y2="34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="34" x2="7" y2="14" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="7" y1="14" x2="24" y2="4" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Bracket','bracket'],
@@ -4475,7 +4500,9 @@ function rebuildHamburgerMenu() {
           ['<svg width="13" height="13" viewBox="0 0 48 48" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="6" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="16" y1="6" x2="16" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><line x1="32" y1="6" x2="32" y2="42" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>Records','leaderboard'],
           ['<svg width="13" height="13" viewBox="-4 0 56 52" fill="none" style="vertical-align:-1px;margin-right:6px"><line x1="6" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="42" y1="4" x2="24" y2="36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="19" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="24" y1="36" x2="29" y2="44" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>Roster','roster'],
         ];
+        const _clsHt = Array.isArray(cls.hiddenTabs) ? cls.hiddenTabs : [];
         subViews.forEach(([label, v]) => {
+          if (_clsHt.includes(v)) return;
           const sub = document.createElement('div');
           const isSubActive = currentView === v && isActive;
           sub.className = 'hmenu-item hmenu-subitem hmenu-sub-' + v + (isSubActive ? ' hmenu-active' : '');
