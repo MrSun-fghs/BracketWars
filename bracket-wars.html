@@ -861,7 +861,7 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .tl-tracker-count{font-size:13px;font-weight:700;color:#fff;}
 .tl-tracker-bar{width:100%;height:6px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;}
 .tl-tracker-fill{height:100%;background:linear-gradient(90deg,#4A3AFF,#7C5CBF);border-radius:99px;transition:width .4s ease;}
-.tl-pips-row{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-start;}
+.tl-pips-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(22px,1fr));gap:3px;width:100%;justify-items:center;}
 .tl-pip{color:rgba(255,255,255,.18);transition:color .35s,transform .25s;display:inline-flex;}
 .tl-pip.joined{color:#5eead4;transform:scale(1.08);}
 .tl-pips-label{font-size:12px;color:rgba(255,255,255,.45);margin-top:4px;}
@@ -2524,7 +2524,14 @@ function submitJoinCode() {
   ensureVoting(app);
   if (entered && entered === app.voting.joinCode) {
     localStorage.setItem('bw-join-code', entered);
-    trackEvent('lobby_join', {code: entered}); // signals teacher lobby counter
+    trackEvent('lobby_join', {code: entered}); // analytics only
+    // Announce presence so teacher's lobby counter updates in real time
+    try {
+      const _pCh = db.channel('bw-lobby-' + entered);
+      _pCh.subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') await _pCh.track({sid: _anonSid()});
+      });
+    } catch(e) {}
     updateVotingAnnouncementBar();
     showSnack('✅ You are in! Waiting for the vote to start…');
     if (app.voting.open) {
@@ -3742,23 +3749,14 @@ function openTeacherLobby(key, pA, pB) {
   app.voting.joinCode = code;
   app.voting.pendingKey = key;
   saveApp();
-  // Subscribe to real-time lobby joins (student devices call trackEvent → bw_events)
-  _lobbyJoinSet = new Set();
-  if (_lobbyJoinSub) { try { db.removeChannel(_lobbyJoinSub); } catch(e) {} _lobbyJoinSub = null; }
+  // Use Supabase Presence for live join counting — works without any DB config
+  if (_lobbyPresenceCh) { try { db.removeChannel(_lobbyPresenceCh); } catch(e) {} _lobbyPresenceCh = null; }
   const _joinCode = code;
-  // On restore (page refresh), backfill any students who already joined
-  db.from('bw_events').select('session_id,payload').eq('event_type','lobby_join').then(({data})=>{
-    if (data) {
-      data.filter(r=>r.payload&&r.payload.code===_joinCode).forEach(r=>_lobbyJoinSet.add(r.session_id));
-      if (_lobbyJoinSet.size>0) updateTlPips(_lobbyJoinSet.size);
-    }
-  }).catch(()=>{});
-  _lobbyJoinSub = db.channel('bw-lobby-joins-' + _joinCode)
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'bw_events', filter:'event_type=eq.lobby_join'}, (pl) => {
-      if (pl.new && pl.new.payload && pl.new.payload.code === _joinCode) {
-        _lobbyJoinSet.add(pl.new.session_id);
-        updateTlPips(_lobbyJoinSet.size);
-      }
+  _lobbyPresenceCh = db.channel('bw-lobby-' + _joinCode)
+    .on('presence', {event: 'sync'}, () => {
+      const state = _lobbyPresenceCh.presenceState();
+      const cnt = Object.keys(state).length;
+      updateTlPips(cnt);
     })
     .subscribe();
   // Open
@@ -3771,7 +3769,7 @@ function closeLobby() {
   document.getElementById('teacherLobby').classList.remove('open');
   if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
   if (_lobbyChannel) { _lobbyChannel.close(); _lobbyChannel = null; }
-  if (_lobbyJoinSub) { try { db.removeChannel(_lobbyJoinSub); } catch(e) {} _lobbyJoinSub = null; }
+  if (_lobbyPresenceCh) { try { db.removeChannel(_lobbyPresenceCh); } catch(e) {} _lobbyPresenceCh = null; }
   pendingVotingKey = null;
   // Clear join code — student bar disappears
   ensureVoting(app);
@@ -4361,8 +4359,9 @@ function toggleHamburger(e) {
 let _hmenuExpandedBlock = null; // tracks which block is expanded in accordion
 let _lobbyData = {}; // current lobby state for pop-out sync
 let _lobbyChannel = null; // BroadcastChannel for projector pop-out
-let _lobbyJoinSub = null;  // Supabase real-time channel for lobby join tracking
-let _lobbyJoinSet = new Set(); // deduplicated student anon IDs who have joined
+let _lobbyJoinSub = null;  // kept for analytics bw_events subscription
+let _lobbyPresenceCh = null; // Supabase presence channel for live join counting
+let _lobbyJoinSet = new Set(); // deduplicated student presence keys
 
 function rebuildHamburgerMenu() {
   const m = document.getElementById('hamburgerMenu');
