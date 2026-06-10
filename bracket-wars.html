@@ -906,7 +906,10 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
     crownIdle 4.5s ease-in-out .9s infinite;
 }
 .home-hero-title{font-size:.8rem;font-weight:700;color:var(--md-primary);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;}
-.home-hero-subtitle{font-size:2.4rem;font-weight:800;color:var(--md-on-surface);letter-spacing:-.02em;line-height:1.1;margin-bottom:1.25rem;font-style:normal;}
+.home-hero-subtitle{font-family:'MagicSound',system-ui,sans-serif;font-size:25px;font-weight:400;color:var(--md-on-surface);letter-spacing:.01em;line-height:1.15;margin-bottom:1rem;font-style:normal;}
+.home-hero-skull{display:block;margin:0 auto .85rem;}
+.home-choose-lbl{font-size:.7rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);display:flex;align-items:center;gap:8px;padding:.25rem 1.5rem .75rem;max-width:1000px;margin:0 auto;}
+.home-choose-lbl::before,.home-choose-lbl::after{content:'';flex:1;height:1px;background:var(--md-outline-variant);}
 .home-hero-intro{font-size:.92rem;color:var(--md-on-surface-variant);line-height:1.7;max-width:580px;margin:0 auto 1.5rem;font-weight:400;}
 .home-hero-badges{display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap;}
 .home-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--md-primary-container);border:1px solid var(--md-outline-variant);border-radius:var(--shape-full);padding:.4rem 1rem;font-size:.78rem;font-weight:600;color:var(--md-on-primary-container);letter-spacing:.02em;}
@@ -1028,7 +1031,7 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
   .btn-text{padding:.3rem .45rem;font-size:.72rem;}
   .home-classes{grid-template-columns:1fr;padding:1rem .75rem 0;}
   .home-hero{padding:1.2rem 1rem 1rem;}
-  .home-hero-subtitle{font-size:1.75rem;}
+  .home-hero-subtitle{font-size:25px;}
   .home-hero-intro{font-size:.82rem;}
   .home-hero-badges{gap:.4rem;}
   .home-badge{font-size:.7rem;padding:.3rem .7rem;}
@@ -1870,22 +1873,20 @@ function renderHome() {
   // Hero
   const hero = document.createElement('div'); hero.className = 'home-hero';
   hero.innerHTML = `
-    <div class="home-hero-crown">👑</div>
-    <div class="home-hero-title">Bracket Wars</div>
-    <div class="home-hero-subtitle">The Crown Is Up for Grabs</div>
-    <div class="home-hero-intro">
-      16 poems. One crown. Every verse will battle its way through four rounds of class votes —
-      from the Round of 16 all the way to the Championship Final. Which poem has what it takes
-      to outlast the competition and claim the crown? Watch the standings shift in real time
-      as Mr. Sun records each round. Your voice shapes the bracket.
-    </div>
+    <svg class="home-hero-skull" width="64" height="64" viewBox="0 0 1500 1500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="var(--md-primary)"><path d="M1233 728c-22 34-44 54-80 76-36 22-71 34-114 36-36 3-83-6-114-21-73-35-120-112-116-190 1-29 18-84 31-105 39-61 93-98 162-112 36-7 56-7 91-1 77 13 149 77 166 147 11 43 10 61-1 106-9 36-12 44-25 64zm-426 408c-29 7-88 12-112 10-29-2-33-3-41-7-26-15-29-30-19-82 12-60 42-129 71-163 35-40 57-50 96-40 54 13 111 78 123 141 6 30 6 36 4 59-3 37-45 65-122 82zm-122-318c-12 21-33 22-81 4-25-9-77-36-92-46-4-3-10 2-24 19-23 27-57 48-89 55-55 12-72-7-58-64 6-22 12-34 29-60 11-18 21-35 20-37s-6-10-14-18c-52-54-68-121-36-150 18-16 41-20 71-13 24 6 28 8 59 33 32 27 33 27 38 20 15-17 73-68 93-82 30-21 48-26 63-18 16 9 18 20 9 47-10 26-34 73-61 114-11 17-20 32-19 33s18 21 39 45c56 63 69 89 54 116z"/><path d="M1469 540c-15-53-47-135-62-157-4-5-23-14-65-31-103-41-172-64-264-86l-86-22-55 10c-87 15-242 51-314 73-167 51-315 116-465 203-46 27-62 38-67 47-33 60-85 242-89 311-4 61-2 75 11 92 18 24 27 31 167 117 61 38 71 52 86 127 24 116 51 168 105 206 16 11 44 15 68 9 24-6 35-11 76-39 35-25 62-33 87-27 21 5 35 17 61 54 24 34 48 54 70 59 26 6 44 5 66-6 23-12 49-42 68-78 31-59 67-85 106-76 22 5 34 14 61 46 38 43 44 47 80 56l32 8 17-10c30-18 63-65 72-102 2-9 8-45 12-79 10-79 17-100 38-117 8-7 44-27 80-45 61-30 68-35 85-54l17-21 11-47c29-123 24-292-12-421z"/></g></svg>
+    <div class="home-hero-title">Poetry Madness</div>
+    <div class="home-hero-subtitle">16 Poems Enter. One Wins.</div>
+    <div class="home-hero-intro">Four rounds. One champion. Your vote decides which poem takes the crown.</div>
     <div class="home-hero-badges">
-      <div class="home-badge">📖 16 Poems</div>
-      <div class="home-badge">⚔️ 15 Matchups</div>
-      <div class="home-badge">👑 1 Champion</div>
-      <div class="home-badge">🔥 4 Rounds</div>
+      <div class="home-badge">16 Poems</div>
+      <div class="home-badge">15 Matchups</div>
+      <div class="home-badge">1 Champion</div>
+      <div class="home-badge">4 Rounds</div>
     </div>`;
   el.appendChild(hero);
+  // "Choose your class" divider
+  const chooseLbl = document.createElement('div'); chooseLbl.className = 'home-choose-lbl'; chooseLbl.textContent = 'Choose your class';
+  el.appendChild(chooseLbl);
   // Class cards
   const grid = document.createElement('div'); grid.className = 'home-classes';
 
