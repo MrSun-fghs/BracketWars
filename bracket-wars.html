@@ -914,6 +914,26 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .home-hero-intro{font-size:16px;color:var(--md-on-surface-variant);line-height:1.7;max-width:580px;margin:0 auto 1.6rem;font-weight:400;}
 .home-hero-badges{display:flex;justify-content:center;gap:.8rem;flex-wrap:wrap;margin-bottom:2rem;}
 .home-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--md-primary-container);border:1px solid var(--md-outline-variant);border-radius:var(--shape-full);padding:.4rem 1rem;font-size:12px;font-weight:600;color:var(--md-on-primary-container);letter-spacing:.02em;}.home-badge .ti{font-size:.95rem;}
+.home-rg{padding:.5rem 1.5rem 0;max-width:520px;margin:0 auto;}
+.rg-pills{display:flex;gap:.45rem;overflow-x:auto;padding-bottom:.1rem;scrollbar-width:none;justify-content:flex-start;}
+.rg-pills::-webkit-scrollbar{display:none;}
+.rg-pill{flex-shrink:0;padding:.4rem 1.05rem;border-radius:99px;font-size:13px;font-weight:600;border:1.5px solid var(--md-outline-variant);background:var(--md-surface);cursor:pointer;color:var(--md-on-surface-variant);white-space:nowrap;transition:all .2s cubic-bezier(.34,1.56,.64,1);transform:scale(1);}
+.rg-pill:hover:not(.active){background:var(--md-primary-container);border-color:var(--md-primary);color:var(--md-primary);transform:scale(1.06);}
+.rg-pill:active:not(.active){transform:scale(.97);transition:transform .08s;}
+.rg-pill.active{background:var(--md-primary);border-color:var(--md-primary);color:var(--md-on-primary);box-shadow:0 4px 14px rgba(74,58,255,.35);}
+@keyframes rgCardPop{0%{transform:scale(.94) translateY(6px);opacity:0;}60%{transform:scale(1.02) translateY(-2px);opacity:1;}80%{transform:scale(.99) translateY(1px);}100%{transform:scale(1) translateY(0);}}
+.rg-card{background:var(--md-surface);border-radius:16px;border:.5px solid var(--md-outline-variant);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07);margin-top:.9rem;}
+.rg-card.popping{animation:rgCardPop .38s cubic-bezier(.34,1.56,.64,1) forwards;}
+.rg-card-header{padding:1.1rem 1.15rem .95rem;display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;}
+.rg-card-left{flex:1;}
+.rg-card-theme{font-size:20px;font-weight:700;color:var(--md-on-surface);line-height:1.2;margin-bottom:.3rem;}
+.rg-card-question{font-size:13px;color:var(--md-on-surface-variant);font-style:italic;line-height:1.5;}
+.rg-card-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:36px;}
+.rg-card-divider{height:.5px;background:var(--md-outline-variant);margin:0 1.15rem;}
+.rg-card-body{padding:.9rem 1.15rem 1.05rem;}
+.rg-card-body-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:.5rem;display:flex;align-items:center;gap:4px;opacity:.7;}
+.rg-card-body-label i{font-size:13px;}
+.rg-card-desc{font-size:13px;color:var(--md-on-surface-variant);line-height:1.7;}
 .home-classes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;padding:1.75rem 1.5rem 0;max-width:1000px;margin:0 auto;}
 .home-class-card{background:var(--md-surface-container-lowest);border-radius:var(--shape-xl);border:1px solid var(--md-outline-variant);box-shadow:var(--elev-2);overflow:hidden;transition:box-shadow .2s,transform .15s;cursor:pointer;display:flex;flex-direction:column;}
 .home-class-card:hover{box-shadow:var(--elev-3);transform:translateY(-2px);}
@@ -1885,6 +1905,46 @@ function renderHome() {
     </div>`;
   el.appendChild(hero);
 
+  // Round Guide
+  const RG_ROUNDS = [
+    {theme:'Vibe Check',question:'Which poem hits you the hardest?',desc:'Go with your gut. Read both poems and decide which one grabs your attention, stirs something in you, or just feels more alive. No need to explain it yet — this round is about first impressions and instinct.',icon:'🎯'},
+    {theme:'Word Detective',question:"How do the poet's words, images, and details create meaning?",desc:"Slow down and look closely. This round is about language — the specific words a poet chose, the images they built, and the details that stick. Ask yourself: what is the poet doing on purpose, and why does it matter?",icon:'🔍'},
+    {theme:'Literary Device Showdown',question:'Which poet uses literary techniques in the most powerful way?',desc:"Now you're thinking like a critic. Look for the tools the poet is using — metaphor, simile, imagery, repetition, tone, structure. Which poem uses these techniques in a way that actually strengthens its meaning?",icon:'⚔️'},
+    {theme:'Message Match',question:'Which poem has the strongest theme or message?',desc:"Zoom out to the big picture. What is this poem really about — beneath the words and devices? Which poem has a theme or message that feels true, urgent, or meaningful to you and to the world?",icon:'💬'},
+    {theme:'The Final Vote',question:'Which poem deserves to be crowned champion?',desc:"This is it. One poem survives. Think about everything — how it hit you, the language it used, the techniques that made it work, and the message it carried. Cast your vote for the poem that earned its place.",icon:'👑'},
+  ];
+  const rg = document.createElement('div'); rg.className = 'home-rg';
+  rg.innerHTML = `
+    <div class="rg-pills">
+      ${['Round 1','Round 2','Round 3','Round 4','Championship'].map((l,i)=>`<button class="rg-pill${i===0?' active':''}" data-i="${i}">${l}</button>`).join('')}
+    </div>
+    <div class="rg-card popping" id="rgCard">
+      <div class="rg-card-header">
+        <div class="rg-card-left">
+          <div class="rg-card-theme" id="rgTheme">${RG_ROUNDS[0].theme}</div>
+          <div class="rg-card-question" id="rgQuestion">"${RG_ROUNDS[0].question}"</div>
+        </div>
+        <div class="rg-card-icon" id="rgIcon">${RG_ROUNDS[0].icon}</div>
+      </div>
+      <div class="rg-card-divider"></div>
+      <div class="rg-card-body">
+        <div class="rg-card-body-label"><i class="ti ti-info-circle"></i> What you'll do</div>
+        <div class="rg-card-desc" id="rgDesc">${RG_ROUNDS[0].desc}</div>
+      </div>
+    </div>`;
+  rg.querySelectorAll('.rg-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = +btn.dataset.i; const r = RG_ROUNDS[i];
+      rg.querySelectorAll('.rg-pill').forEach((p,j) => p.classList.toggle('active', j===i));
+      rg.querySelector('#rgTheme').textContent = r.theme;
+      rg.querySelector('#rgQuestion').textContent = '"'+r.question+'"';
+      rg.querySelector('#rgDesc').textContent = r.desc;
+      rg.querySelector('#rgIcon').textContent = r.icon;
+      const card = rg.querySelector('#rgCard');
+      card.classList.remove('popping'); void card.offsetWidth; card.classList.add('popping');
+    });
+  });
+  el.appendChild(rg);
 
   // "Choose your class" divider
   const chooseLbl = document.createElement('div'); chooseLbl.className = 'home-choose-lbl'; chooseLbl.textContent = 'Choose your class';
