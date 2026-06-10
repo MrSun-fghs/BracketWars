@@ -2605,10 +2605,19 @@ function dramaCard(parent, icon, label, title, sub, detail) {
 // ── Usage Analytics ───────────────────────────────────────────────────────
 let _uaClassFilter = 'all';
 
+let _uaRendering = false;
 async function renderUsageAnalytics() {
   if (MODE !== 'teacher') return;
+  if (_uaRendering) return;
+  _uaRendering = true;
   const root = document.getElementById('engagementContent');
-  if (!root) return;
+  if (!root) { _uaRendering = false; return; }
+
+  // Remove any existing panel first
+  const existing = document.getElementById('uaWrap');
+  if (existing) existing.remove();
+  const existingDiv = document.getElementById('uaDivider');
+  if (existingDiv) existingDiv.remove();
 
   // Build class tab buttons
   const wrap = document.createElement('div'); wrap.className = 'ua-wrap'; wrap.id = 'uaWrap';
@@ -2728,7 +2737,8 @@ async function renderUsageAnalytics() {
   scoutSec.appendChild(scoutCard); panel.appendChild(scoutSec);
 
   // Divider before existing bracket stats
-  const div = document.createElement('div'); div.className = 'ua-divider'; root.insertBefore(div, root.children[1]);
+  const div = document.createElement('div'); div.className = 'ua-divider'; div.id = 'uaDivider'; root.insertBefore(div, root.children[1]);
+  _uaRendering = false;
 }
 // ── End Usage Analytics ───────────────────────────────────────────────────
 
