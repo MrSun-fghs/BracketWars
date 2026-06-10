@@ -3808,7 +3808,8 @@ function popoutLobby() {
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);color:#fff;font-family:'Nunito',sans-serif;height:100vh;max-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:0;padding:12px 32px 12px;overflow:hidden;}
+body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);font-family:'Nunito',sans-serif;color:#fff;}
+#scaler{position:absolute;top:0;left:0;width:1920px;height:1080px;overflow:hidden;transform-origin:top left;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:36px 48px 28px;}
 #codeLbl{font-size:22px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:-8px;}
 #code{font-size:160px;font-weight:900;color:#fff;letter-spacing:.18em;line-height:1;}
 #codeHint{font-size:23px;color:rgba(255,255,255,.35);margin-top:-4px;}
@@ -3849,6 +3850,7 @@ body{background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);colo
 .pip{color:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;transition:color .3s,transform .25s;}
 .pip.joined{color:#5eead4;transform:scale(1.08);}
 </style></head><body>
+<div id="scaler">
 <div style="text-align:center;flex-shrink:0;">
 <div id="codeLbl">Join Code</div>
 <div id="code">—</div>
@@ -3860,6 +3862,7 @@ body{background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);colo
 <div class="p-card cb" id="cardB"></div>
 </div>
 <div class="tracker-wrap" id="trackerWrap"><div style="font-size:13px;color:rgba(255,255,255,.35);text-align:center;">Waiting for students…</div></div>
+</div>
 <script>
 const _ps='<svg width="18" height="22" viewBox="0 0 20 24" fill="currentColor"><circle cx="10" cy="6" r="5"/><path d="M10 13C4.5 13 1 16.2 1 18.5V22h18v-3.5C19 16.2 15.5 13 10 13z"/></svg>';
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
@@ -3915,6 +3918,8 @@ ch.onmessage=e=>{const d=e.data;
 };
 // Request initial state
 ch.postMessage({type:'ready'});
+function _scaleIt(){const W=window.innerWidth,H=window.innerHeight;const s=Math.min(W/1920,H/1080);const sc=document.getElementById('scaler');sc.style.transform='scale('+s+')';sc.style.left=Math.round((W-1920*s)/2)+'px';sc.style.top=Math.round((H-1080*s)/2)+'px';}
+_scaleIt();window.addEventListener('resize',_scaleIt);
 <\/script></body></html>`;
 
   if (_lobbyChannel) { _lobbyChannel.close(); }
