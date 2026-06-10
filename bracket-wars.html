@@ -3663,7 +3663,7 @@ function rebuildHamburgerMenu() {
         // Block name click: switch to this block + go to Bracket + close menu
         app.activeId = cls.id;
         _hmenuExpandedBlock = cls.id;
-        if (isTeacher) { saveTeacherPrefs(); saveApp(); currentView = 'bracket'; renderAll(); showCurrentView(); }
+        if (isTeacher) { setTeacherView('bracket'); saveApp(); renderAll(); }
         else { setView('bracket'); renderAll(); }
         m.classList.remove('open');
         const _btn = document.getElementById('hamburgerBtn');
