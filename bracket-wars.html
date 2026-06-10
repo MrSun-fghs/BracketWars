@@ -1260,6 +1260,10 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 #votingAnnouncementBar{display:none;background:linear-gradient(90deg,#f59e0b,#ef4444,#ec4899);color:#fff;text-align:center;padding:.75rem 1rem;font-size:.92rem;font-weight:600;cursor:pointer;letter-spacing:.01em;animation:annPulse 3s ease-in-out infinite;}
 #votingAnnouncementBar:hover{filter:brightness(1.08);}
 @keyframes annPulse{0%,100%{opacity:1;}50%{opacity:.88;}}
+.bw-code-boxes{display:inline-flex;gap:6px;align-items:center;margin-left:10px;}
+.bw-code-box{width:34px;height:38px;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);border-radius:8px;color:#fff;font-size:20px;font-weight:800;font-family:monospace;text-align:center;text-transform:uppercase;outline:none;padding:0;caret-color:rgba(255,255,255,.7);transition:border-color .15s,background .15s;}
+.bw-code-box:focus{border-color:#fff;background:rgba(255,255,255,.32);}
+@keyframes bwShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
 body.projection #votingAnnouncementBar{display:none!important;}
 body.projection #sectionNav{display:none!important;}
 
@@ -2488,24 +2492,61 @@ function updateHamburgerLabel() {
 }
 function renderAll() {
   trackSessionStart(); buildAppBar(); renderTabs(); renderHome(); renderLeaderboard(); renderList(); renderBracket(); renderVoteView(); renderResults(); updateStatus(); applyProjectionScale(); updateVotingAnnouncementBar(); updateHamburgerLabel(); }
+function bwBoxInput(i, el) {
+  let v = el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (v.length > 1) v = v.slice(-1);
+  el.value = v;
+  if (v) {
+    if (i < 3) { const nx=document.getElementById('bwBox'+(i+1)); if(nx){nx.focus();nx.select();} }
+    else { submitJoinCode(); }
+  }
+}
+function bwBoxKey(i, el, e) {
+  if (e.key==='Backspace' && !el.value && i>0) {
+    const pv=document.getElementById('bwBox'+(i-1)); if(pv){pv.value='';pv.focus();} e.preventDefault();
+  }
+  if (e.key==='Enter') { e.stopPropagation(); submitJoinCode(); }
+}
+function bwBoxPaste(el, e) {
+  e.preventDefault();
+  const text=(e.clipboardData||window.clipboardData).getData('text').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
+  [...text].forEach((ch,i)=>{ const b=document.getElementById('bwBox'+i); if(b) b.value=ch; });
+  if (text.length===4) submitJoinCode();
+  else { const nx=document.getElementById('bwBox'+text.length); if(nx) nx.focus(); }
+}
 function submitJoinCode() {
-  const input = document.getElementById('barCodeInput'); if (!input) return;
-  const entered = input.value.trim().toUpperCase();
+  // Read from 4-box input (falls back to legacy single input if boxes not present)
+  const boxes = [0,1,2,3].map(i=>document.getElementById('bwBox'+i));
+  let entered;
+  if (boxes[0]) {
+    entered = boxes.map(b=>b?b.value.trim().toUpperCase():'').join('');
+    if (entered.length < 4) {
+      const first=boxes.find(b=>!b.value); if(first) first.focus(); return;
+    }
+  } else {
+    const input=document.getElementById('barCodeInput'); if(!input) return;
+    entered=input.value.trim().toUpperCase();
+  }
   ensureVoting(app);
   if (entered && entered === app.voting.joinCode) {
     localStorage.setItem('bw-join-code', entered);
     trackEvent('lobby_join', {code: entered}); // signals teacher lobby counter
     updateVotingAnnouncementBar();
     showSnack('✅ You are in! Waiting for the vote to start…');
-    // If voting is already open, go straight to vote view
     if (app.voting.open) {
-      const _vo = document.getElementById('voteOpenOverlay');
+      const _vo=document.getElementById('voteOpenOverlay');
       if (_vo) { _vo.classList.add('show'); setTimeout(()=>{ _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); },2000); }
       else { setView('vote'); renderAll(); showCurrentView(); }
     }
   } else {
     showSnack('Wrong code — check the board and try again');
-    if (input) { input.value=''; input.focus(); }
+    const _bwrap=document.getElementById('barCodeBoxes');
+    if (_bwrap) {
+      _bwrap.style.animation='bwShake .4s ease-in-out';
+      setTimeout(()=>{ _bwrap.style.animation=''; },400);
+      boxes.forEach(b=>{ if(b) b.value=''; });
+      const _b0=document.getElementById('bwBox0'); if(_b0) _b0.focus();
+    }
   }
 }
 
@@ -2522,13 +2563,8 @@ function updateVotingAnnouncementBar() {
   if (!joinCode && !votingOpen) { bar.style.display='none'; bar.onclick=null; return; }
   if (votingOpen && enrolled && onVoteView) { bar.style.display='none'; bar.onclick=null; return; }
 
-  const inputHtml = `<input id="barCodeInput" type="text" maxlength="4" placeholder="CODE"
-    style="margin-left:10px;width:68px;padding:3px 6px;font-size:.95rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;border:none;border-radius:6px;background:rgba(255,255,255,.25);color:#fff;text-align:center;outline:2px solid rgba(255,255,255,.5);"
-    oninput="this.value=this.value.toUpperCase()"
-    onkeydown="if(event.key==='Enter'){event.stopPropagation();submitJoinCode();}"
-    onclick="event.stopPropagation()">
-  <button onclick="event.stopPropagation();submitJoinCode()"
-    style="margin-left:6px;padding:3px 12px;font-size:.82rem;font-weight:700;border:none;border-radius:6px;background:rgba(255,255,255,.92);color:#ef4444;cursor:pointer;">Join →</button>`;
+  const _bxs=[0,1,2,3].map(i=>'<input class="bw-code-box" id="bwBox'+i+'" maxlength="1" type="text" autocomplete="off" autocorrect="off" spellcheck="false" oninput="bwBoxInput('+i+',this)" onkeydown="bwBoxKey('+i+',this,event)" onpaste="bwBoxPaste(this,event)" onclick="event.stopPropagation()">').join('');
+  const inputHtml = '<div id="barCodeBoxes" class="bw-code-boxes" onclick="event.stopPropagation()">'+_bxs+'</div>';
 
   bar.style.display = 'flex';
   bar.style.alignItems = 'center';
@@ -2554,7 +2590,7 @@ function updateVotingAnnouncementBar() {
     // Lobby active, not enrolled → show code input
     bar.innerHTML = `🗳️ &nbsp;<strong>Vote incoming!</strong>&nbsp; Enter the code from the board:${inputHtml}`;
     bar.style.cursor = 'default';
-    setTimeout(()=>{ const inp=document.getElementById('barCodeInput'); if(inp)inp.focus(); },50);
+    setTimeout(()=>{ const _b=document.getElementById('bwBox0'); if(_b)_b.focus(); },50);
   }
 }
 
