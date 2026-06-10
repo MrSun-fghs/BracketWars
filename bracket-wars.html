@@ -2169,8 +2169,9 @@ function updateHamburgerLabel() {
   if (!lbl || !app || !app.classes) return;
   const onStudentHome = MODE === 'student' && currentView === 'home';
   const activeCls = activeClass();
-  const show = !onStudentHome && activeCls;
-  lbl.textContent = show ? activeCls.name : '';
+  const onInsights = MODE === 'teacher' && currentView === 'engagement';
+  const show = !onStudentHome && (activeCls || onInsights);
+  lbl.textContent = onInsights ? 'Insights' : (show ? activeCls.name : '');
   lbl.classList.toggle('visible', !!show);
   if (sep) sep.classList.toggle('visible', !!show);
 }
