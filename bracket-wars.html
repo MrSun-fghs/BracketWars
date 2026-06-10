@@ -3634,8 +3634,22 @@ function startFromLobby() {
     if (n <= 0) {
       countdownEl.classList.remove('active');
       document.getElementById('teacherLobby').classList.remove('open');
-      if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-      startVotingSession();
+      const exitFs = document.fullscreenElement ? document.exitFullscreen() : Promise.resolve();
+      exitFs.catch(()=>{}).finally(()=>{
+        startVotingSession().then(()=>{
+          // Force vote view visible — showCurrentView() skips teacher mode
+          currentView = 'vote';
+          ['homeView','leaderboardView','listView','bracketView','rosterView','resultsView','engagementView'].forEach(id=>{
+            const el=document.getElementById(id); if(el) el.style.display='none';
+          });
+          const vv=document.getElementById('voteView');
+          if(vv){
+            vv.style.display='block';
+            renderVoteView();
+            document.documentElement.requestFullscreen().catch(()=>{});
+          }
+        });
+      });
       return;
     }
     numEl.style.animation = 'none';
