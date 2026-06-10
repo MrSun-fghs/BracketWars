@@ -3647,7 +3647,7 @@ function rebuildHamburgerMenu() {
     lbl('Blocks');
     ensureVoting(app);
     app.classes.forEach(cls => {
-      const isActive = cls.id === app.activeId && !isHome;
+      const isActive = cls.id === app.activeId && !isHome && currentView !== 'engagement';
       const isExpanded = _hmenuExpandedBlock === cls.id;
 
       // Wrapper group — sub-items reveal on hover via CSS
