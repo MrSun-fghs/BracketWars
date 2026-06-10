@@ -474,9 +474,10 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .champion-card.crowned{animation:champGlow 2.5s ease-in-out infinite alternate;}
 .champion-card.crowned::after{content:'';position:absolute;top:0;left:-70%;bottom:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:bannerShimmer 3s ease-in-out infinite;pointer-events:none;}
 @keyframes champGlow{from{box-shadow:0 4px 20px rgba(74,58,255,.35);}to{box-shadow:0 12px 40px rgba(74,58,255,.65),0 2px 8px rgba(0,0,0,.2);}}
-.champion-trophy{font-size:3.5rem;margin-bottom:.35rem;display:inline-block;animation:crownFloat 2.2s ease-in-out infinite;}
+.champion-trophy{width:72px;height:72px;object-fit:contain;display:block;margin:0 auto .5rem;animation:crownFloat 2.2s ease-in-out infinite;}
 .champion-card:not(.crowned) .champion-trophy{filter:drop-shadow(0 3px 10px rgba(74,58,255,.35));}
-.champion-card.crowned .champion-trophy{animation:crownFloat 2.2s ease-in-out infinite,crownSpin 6s ease-in-out infinite;}
+.champion-card.crowned .champion-trophy{animation:crownFloat 2.2s ease-in-out infinite,shimmerCrown 1.8s ease-in-out infinite;}
+@keyframes shimmerCrown{0%,100%{filter:brightness(1) saturate(1) drop-shadow(0 4px 12px rgba(245,158,11,.4));}50%{filter:brightness(1.4) saturate(1.6) drop-shadow(0 0 22px rgba(245,158,11,.85)) drop-shadow(0 0 44px rgba(245,158,11,.25));}}
 @keyframes crownFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-8px) scale(1.08);}}
 @keyframes crownSpin{0%,100%{filter:drop-shadow(0 4px 12px rgba(245,158,11,.5));}50%{filter:drop-shadow(0 8px 20px rgba(245,158,11,.9));}}
 .champion-label{font-size:.6rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:.3rem;}
@@ -3115,7 +3116,7 @@ function renderBracket(){
   // Champion card (no duplicate title — col-header already shows it)
   const champ=champion();
   const cc=document.createElement('div');cc.className='champion-card'+(champ?' crowned':'');
-  cc.innerHTML=`<div class="champion-trophy">👑</div><div class="champion-label">Poetry Champion</div><div class="champion-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div>`;
+  cc.innerHTML=`<img src="Corona Crayola.svg" class="champion-trophy" alt="crown"><div class="champion-label">Poetry Champion</div><div class="champion-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div>`;
   center.appendChild(cc);
   // Visual connector
   const conn=document.createElement('div');conn.className='final-to-crown';
