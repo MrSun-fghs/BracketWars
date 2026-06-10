@@ -3741,6 +3741,21 @@ ch.onmessage=e=>{const d=e.data;
     buildCard(document.getElementById('cardB'),d.poemB);
   }
   if(d.type==='pips'){buildPips(d.joined,d.total);}
+  if(d.type==='countdown'){
+    let ov=document.getElementById('cdOv');
+    if(!ov){
+      ov=document.createElement('div');ov.id='cdOv';
+      ov.style.cssText='position:fixed;inset:0;z-index:999;background:rgba(26,16,60,.88);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;';
+      document.body.appendChild(ov);
+      const sty=document.createElement('style');
+      sty.textContent='@keyframes cdPop{0%{transform:scale(2.2);opacity:0;}100%{transform:scale(1);opacity:1;}}';
+      document.head.appendChild(sty);
+    }
+    ov.innerHTML=(d.n>0)
+      ?'<div style="font-size:clamp(140px,20vw,200px);font-weight:900;color:#fff;line-height:1;animation:cdPop .4s ease-out;">'+d.n+'</div><div style="font-size:clamp(18px,3vw,26px);color:rgba(255,255,255,.7);font-weight:600;letter-spacing:.05em;">STARTING VOTE…</div>'
+      :'<div style="font-size:clamp(48px,8vw,80px);font-weight:900;color:#fff;line-height:1;animation:cdPop .4s ease-out;">🗳️</div><div style="font-size:clamp(22px,4vw,32px);color:#fff;font-weight:800;">Voting is Open!</div>';
+  }
+  if(d.type==='navigate'){window.location.href=d.url;}
 };
 // Request initial state
 ch.postMessage({type:'ready'});
@@ -3825,14 +3840,19 @@ function startFromLobby() {
   const numEl = document.getElementById('tlCountdownNum');
   numEl.textContent = n;
   countdownEl.classList.add('active');
+  const _appUrl = window.location.href.replace(/[?#].*$/, ''); // clean base URL for pop-out navigation
   const tick = ()=>{
     n--;
+    // Broadcast countdown tick to pop-out window
+    if (_lobbyChannel) _lobbyChannel.postMessage({type:'countdown', n: n <= 0 ? 0 : n});
     if (n <= 0) {
       countdownEl.classList.remove('active');
       document.getElementById('teacherLobby').classList.remove('open');
       const exitFs = document.fullscreenElement ? document.exitFullscreen() : Promise.resolve();
       exitFs.catch(()=>{}).finally(()=>{
         startVotingSession().then(()=>{
+          // Tell pop-out to navigate to student app
+          if (_lobbyChannel) _lobbyChannel.postMessage({type:'navigate', url: _appUrl});
           // Force vote view visible — showCurrentView() skips teacher mode
           currentView = 'vote';
           ['homeView','leaderboardView','listView','bracketView','rosterView','resultsView','engagementView'].forEach(id=>{
