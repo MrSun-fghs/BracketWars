@@ -4109,6 +4109,15 @@ function rebuildHamburgerMenu() {
       groupEl.appendChild(subContainer);
       m.appendChild(groupEl);
     });
+    // ── Add Block button (teacher only) ──
+    if (isTeacher) {
+      const addBtn = document.createElement('div');
+      addBtn.className = 'hmenu-item';
+      addBtn.style.cssText = 'color:var(--md-primary);font-weight:700;padding-left:1rem;';
+      addBtn.textContent = '＋ Add Block';
+      addBtn.onclick = () => { m.classList.remove('open'); openAddClass(); };
+      m.appendChild(addBtn);
+    }
   }
 }
 document.addEventListener('click', () => {
