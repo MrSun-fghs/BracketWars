@@ -2018,7 +2018,7 @@ function renderHome() {
       body.appendChild(champDiv);
       if (anyPlayed && alivePoems.length > 0) {
         const lbl = document.createElement('div'); lbl.className = 'home-card-section-label';
-        lbl.textContent = '🔥 Still Standing'; body.appendChild(lbl);
+        lbl.textContent = '⚔️ Battle-Tested'; body.appendChild(lbl);
         alivePoems.forEach((r, i) => {
           const row = document.createElement('div'); row.className = 'home-poem-row alive';
           const votePct = r.totalMatchVotes > 0 ? Math.round((r.totalVotes / r.totalMatchVotes) * 100) + '%' : '';
