@@ -2217,7 +2217,7 @@ function renderHome() {
     const statusLabel = champPoem ? 'Champion Crowned' : (anyPlayed ? 'In Progress' : 'Tournament Starting Soon');
     const rInfo0 = !champPoem ? getCurrentRoundInfo(b) : null;
     const roundBadge = (anyPlayed && !champPoem && rInfo0) ? `<span class="home-card-round-badge"><span class="home-card-round-badge-dot"></span> ${rInfo0.label}</span>` : '';
-    hdr.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><div class="home-card-name">${esc(cls.name)}</div><div class="home-card-pct">${statusLabel}</div></div>${roundBadge}</div>`;
+    hdr.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;"><div><div class="home-card-name">${esc(cls.name)}</div><div class="home-card-pct">${statusLabel}</div></div>${roundBadge}</div>`;
     card.appendChild(hdr);
 
     // Body
@@ -2245,7 +2245,8 @@ function renderHome() {
         pipsWrap.appendChild(pip);
       });
       const pipsLbl = document.createElement('span'); pipsLbl.className = 'home-card-pips-label';
-      pipsLbl.textContent = `${rInfo.done} of ${rInfo.total} matchups complete`;
+      const _totDone = r16D + qfD + sfD + finD;
+      pipsLbl.textContent = `${_totDone} of 15 matchups complete`;
       pipsWrap.appendChild(pipsLbl);
       body.appendChild(pipsWrap);
     }
