@@ -3506,7 +3506,13 @@ function saveMatchup(){
     showSnack('Result saved ✓ — students are seeing the winner');
     if(bkt().final.winnerIdx!==null) setTimeout(launchConfetti,500);
     // Teacher does NOT see celebration — navigate to bracket instead
-    setTimeout(()=>{ if(MODE==='teacher') { renderAll(); } },300);
+    setTimeout(()=>{ 
+      if(MODE==='teacher') { 
+        document.getElementById('voteView').style.display='none';
+        setTeacherView('bracket');
+        renderAll();
+      } 
+    },300);
   } else {
     bracketJustSavedKey={...activeKey};bracketFreshResult=true; scheduleCollapseCheck();
     saveApp();closeVoteDialog();renderAll();showSnack('Result saved ✓');
@@ -4804,6 +4810,18 @@ async function boot() {
     liveVoteCounts = [0, 0];
     subscribeToVotes(app.voting.sessionId);
     if (app.voting.timerEndsAt && app.voting.timerEndsAt > Date.now()) startVotingTimer();
+    // Students who load the page while voting is already open:
+    // show the "Voting is Now Open!" splash and auto-navigate to vote view.
+    // This also handles the pop-out window (it navigates to app URL mid-session).
+    if (MODE === 'student') {
+      const _vo = document.getElementById('voteOpenOverlay');
+      if (_vo) {
+        _vo.classList.add('show');
+        setTimeout(() => { _vo.classList.remove('show'); setView('vote'); renderAll(); showCurrentView(); }, 2000);
+      } else {
+        setView('vote'); renderAll(); showCurrentView();
+      }
+    }
   }
 }
 boot();
