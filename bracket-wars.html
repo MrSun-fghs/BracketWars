@@ -812,6 +812,45 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 /* Tallying overlay */
 .tallying-overlay{position:fixed;inset:0;background:rgba(6,0,28,.96);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .5s;}
 .tallying-overlay.visible{opacity:1;pointer-events:all;}
+/* ── Teacher Lobby ── */
+.tl-overlay{position:fixed;inset:0;z-index:1100;background:linear-gradient(160deg,#0f0d2e 0%,#1a1352 50%,#2d1b69 100%);display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .3s;}
+.tl-overlay.open{opacity:1;pointer-events:all;}
+.tl-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;}
+.tl-topbar-left{display:flex;align-items:center;gap:10px;}
+.tl-class-name{font-size:16px;font-weight:600;color:#fff;}
+.tl-round-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);}
+.tl-topbar-right{display:flex;align-items:center;gap:8px;}
+.tl-icon-btn{width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background .15s;}
+.tl-icon-btn:hover{background:rgba(255,255,255,.18);}
+.tl-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 24px;gap:20px;overflow:auto;}
+.tl-code-section{text-align:center;}
+.tl-code-label{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;}
+.tl-code{font-size:clamp(52px,9vw,96px);font-weight:800;color:#fff;letter-spacing:.15em;line-height:1;font-variant-numeric:tabular-nums;}
+.tl-code-hint{font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;}
+.tl-vs-row{display:flex;align-items:stretch;gap:14px;width:100%;max-width:640px;}
+.tl-poem-card{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:16px 18px;}
+.tl-poem-card-title{font-size:clamp(14px,2.2vw,19px);font-weight:600;color:#fff;margin-bottom:3px;}
+.tl-poem-card-author{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:10px;}
+.tl-poem-card-lines{font-size:clamp(11px,1.4vw,13px);color:rgba(255,255,255,.55);font-style:italic;line-height:1.6;}
+.tl-vs-badge{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:.05em;}
+.tl-pips-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:480px;}
+.tl-pip{width:26px;height:8px;border-radius:99px;background:rgba(255,255,255,.15);transition:background .4s,transform .25s;}
+.tl-pip.joined{background:#86efac;transform:scaleY(1.3);}
+.tl-pips-label{font-size:12px;color:rgba(255,255,255,.45);margin-top:4px;}
+.tl-footer{display:flex;align-items:center;gap:16px;padding:14px 20px;border-top:1px solid rgba(255,255,255,.1);flex-shrink:0;flex-wrap:wrap;}
+.tl-footer-inputs{display:flex;gap:12px;flex:1;flex-wrap:wrap;}
+.tl-footer-field{display:flex;flex-direction:column;gap:5px;}
+.tl-footer-field label{font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.45);}
+.tl-footer-field input,.tl-footer-field select{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;padding:7px 10px;font-size:13px;width:140px;outline:none;cursor:pointer;}
+.tl-footer-field input::placeholder{color:rgba(255,255,255,.3);}
+.tl-footer-field select option{background:#1a1352;color:#fff;}
+.tl-start-btn{display:flex;align-items:center;gap:8px;padding:11px 26px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:filter .15s;white-space:nowrap;flex-shrink:0;}
+.tl-start-btn:hover{filter:brightness(1.15);}
+.tl-countdown{position:absolute;inset:0;background:rgba(15,13,46,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;z-index:10;border-radius:inherit;}
+.tl-countdown.active{opacity:1;pointer-events:all;}
+@keyframes tlCountPop{0%{transform:scale(1.8);opacity:.2;}100%{transform:scale(1);opacity:1;}}
+.tl-countdown-num{font-size:clamp(80px,20vw,160px);font-weight:800;color:#fff;line-height:1;animation:tlCountPop .45s ease-out;}
+.tl-countdown-lbl{font-size:15px;color:rgba(255,255,255,.55);margin-top:14px;letter-spacing:.1em;text-transform:uppercase;}
 @keyframes tallyFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
 .tallying-icon{font-size:8rem;animation:tallyFloat 2.2s ease-in-out infinite;}
 .tallying-title{font-size:2.6rem;font-weight:900;color:#fff;margin:1rem 0 .5rem;letter-spacing:-.01em;}
@@ -1455,6 +1494,57 @@ body.projection #sectionNav{display:none!important;}
   </div>
 </div>
 
+<!-- TEACHER LOBBY OVERLAY -->
+<div id="teacherLobby" class="tl-overlay">
+  <div class="tl-topbar">
+    <div class="tl-topbar-left">
+      <span class="tl-class-name" id="tlClassName"></span>
+      <span class="tl-round-badge" id="tlRoundBadge"></span>
+    </div>
+    <div class="tl-topbar-right">
+      <button class="tl-icon-btn" id="tlFsBtn" onclick="toggleLobbyFullscreen()" title="Fullscreen"><i class="ti ti-arrows-maximize"></i></button>
+      <button class="tl-icon-btn" onclick="closeLobby()" title="Close"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+  <div class="tl-main">
+    <div class="tl-code-section">
+      <div class="tl-code-label">Join Code</div>
+      <div class="tl-code" id="tlCode">—</div>
+      <div class="tl-code-hint">Students: open the app and enter this code</div>
+    </div>
+    <div class="tl-vs-row">
+      <div class="tl-poem-card" id="tlPoemA"></div>
+      <div class="tl-vs-badge">VS</div>
+      <div class="tl-poem-card" id="tlPoemB"></div>
+    </div>
+    <div class="tl-pips-row" id="tlPipsRow"></div>
+    <div class="tl-pips-label" id="tlPipsLabel">Waiting for students…</div>
+  </div>
+  <div class="tl-footer">
+    <div class="tl-footer-inputs">
+      <div class="tl-footer-field">
+        <label>Students present</label>
+        <input type="number" id="tlStudentCount" min="1" max="60" placeholder="—" oninput="updateTlPips()">
+      </div>
+      <div class="tl-footer-field">
+        <label>Voting timer</label>
+        <select id="tlTimerInput">
+          <option value="0">No timer</option>
+          <option value="1">1 minute</option>
+          <option value="2" selected>2 minutes</option>
+          <option value="3">3 minutes</option>
+          <option value="5">5 minutes</option>
+        </select>
+      </div>
+    </div>
+    <button class="tl-start-btn" onclick="startFromLobby()"><i class="ti ti-bolt"></i> Start Voting</button>
+  </div>
+  <div class="tl-countdown" id="tlCountdown">
+    <div class="tl-countdown-num" id="tlCountdownNum">5</div>
+    <div class="tl-countdown-lbl">Starting…</div>
+  </div>
+</div>
+
 <!-- CLOSE VOTING DIALOG -->
 <div class="dialog-scrim" id="closeVotingConfirmDialog">
   <div class="dialog" style="max-width:360px;text-align:center">
@@ -1519,6 +1609,25 @@ const DEFAULT_AUTHORS = [
   'Angelou','Shakur','Hughes','Walker',
   'Nye','Oliver','Paz','Berry',
   'Jones','Beaty','Neruda','Blake',
+];
+// First two lines per poem, indexed same as DEFAULT_POEMS
+const POEM_FIRST_LINES = [
+  ["The first time I walked","with a girl, I was twelve,"],                         // Oranges
+  ["I am fourteen","and my skin has betrayed me"],                                   // Hanging Fire
+  ["Nature's first green is gold,","Her hardest hue to hold."],                      // Nothing Gold Can Stay
+  ['"Hope" is the thing with feathers—',"That perches in the soul—"],               // Hope Is the Thing with Feathers
+  ["You may write me down in history","With your bitter, twisted lies,"],            // Still I Rise
+  ["Did you hear about the rose that grew","from a crack in the concrete?"],         // The Rose That Grew from Concrete
+  ["I, too, sing America.","I am the darker brother."],                              // I, Too
+  ["They were women then","My mama's generation"],                                   // Women
+  ["The river is famous to the fish.","The loud voice is famous to silence,"],       // Famous
+  ["You do not have to be good.","You do not have to walk on your knees"],           // Wild Geese
+  ["Water hollows stone,","wind scatters water,"],                                   // Wind, Water, Stone
+  ["When despair for the world grows in me","and I wake in the night at the least sound"], // The Peace of Wild Things
+  ["We used to reach out","and touch each other"],                                   // Touchscreen
+  ["Knock knock.","Who's there?"],                                                   // Knock Knock
+  ["I am in the business","of eliminating words."],                                  // The Dictator
+  ["I was angry with my friend:","I told my wrath, my wrath did end."],              // A Poison Tree
 ];
 
 function defaultBracket() {
@@ -3432,11 +3541,110 @@ function getRoundLabel(key) {
 function openVotingSetup(key, pA, pB) {
   if (!pA||!pB) return;
   pendingVotingKey = key;
-  document.getElementById('openVotingHeadline').textContent = 'Open Voting';
-  document.getElementById('openVotingBody').textContent = pA.name+' vs '+pB.name;
-  document.getElementById('studentCountInput').value = '';
-  document.getElementById('openVotingDialog').classList.add('open');
-  setTimeout(()=>document.getElementById('studentCountInput').focus(), 120);
+  openTeacherLobby(key, pA, pB);
+}
+
+// ── Teacher Lobby ──
+function openTeacherLobby(key, pA, pB) {
+  pendingVotingKey = key;
+  // Header: class name + round badge
+  const cls = app.classes.find(c=>c.id===app.activeId);
+  document.getElementById('tlClassName').textContent = cls ? cls.name : '';
+  if (cls && cls.bracket) {
+    const ri = getCurrentRoundInfo(cls.bracket);
+    document.getElementById('tlRoundBadge').textContent = ri.label;
+  }
+  // Join code (4-char alphanumeric, display only for now)
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('tlCode').textContent = code;
+  // Poem cards
+  function buildPoemCard(el, poem) {
+    const idx = (poem.seedIdx !== undefined) ? poem.seedIdx : (poem.seed - 1);
+    const lines = POEM_FIRST_LINES[idx] || ['',''];
+    const auth = DEFAULT_AUTHORS[idx] || '';
+    el.innerHTML = `<div class="tl-poem-card-title">${esc(poem.name)}</div>${auth?`<div class="tl-poem-card-author">${esc(auth)}</div>`:''}<div class="tl-poem-card-lines">${esc(lines[0])}<br>${esc(lines[1])}</div>`;
+  }
+  buildPoemCard(document.getElementById('tlPoemA'), pA);
+  buildPoemCard(document.getElementById('tlPoemB'), pB);
+  // Reset inputs + pips
+  document.getElementById('tlStudentCount').value = '';
+  document.getElementById('tlTimerInput').value = '2';
+  updateTlPips();
+  // Hide countdown
+  document.getElementById('tlCountdown').classList.remove('active');
+  document.getElementById('tlFsBtn').innerHTML = '<i class="ti ti-arrows-maximize"></i>';
+  // Open
+  document.getElementById('teacherLobby').classList.add('open');
+}
+
+function closeLobby() {
+  document.getElementById('teacherLobby').classList.remove('open');
+  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  pendingVotingKey = null;
+}
+
+function toggleLobbyFullscreen() {
+  const overlay = document.getElementById('teacherLobby');
+  const btn = document.getElementById('tlFsBtn');
+  if (!document.fullscreenElement) {
+    overlay.requestFullscreen().then(()=>{
+      btn.innerHTML = '<i class="ti ti-arrows-minimize"></i>';
+    }).catch(()=>{});
+  } else {
+    document.exitFullscreen().then(()=>{
+      btn.innerHTML = '<i class="ti ti-arrows-maximize"></i>';
+    }).catch(()=>{});
+  }
+}
+
+function updateTlPips() {
+  const count = parseInt(document.getElementById('tlStudentCount').value)||0;
+  const row = document.getElementById('tlPipsRow');
+  const lbl = document.getElementById('tlPipsLabel');
+  row.innerHTML = '';
+  if (count > 0) {
+    const show = Math.min(count, 40);
+    for (let i=0;i<show;i++) {
+      const pip = document.createElement('div');
+      pip.className = 'tl-pip';
+      row.appendChild(pip);
+    }
+    lbl.textContent = `0 of ${count} students joined`;
+  } else {
+    lbl.textContent = 'Waiting for students…';
+  }
+}
+
+function startFromLobby() {
+  // Read lobby inputs → sync to dialog inputs so startVotingSession() picks them up
+  const count = parseInt(document.getElementById('tlStudentCount').value)||0;
+  const timerMins = parseInt(document.getElementById('tlTimerInput').value)||0;
+  document.getElementById('studentCountInput').value = count||'';
+  document.getElementById('votingTimerInput').value = timerMins;
+  // 5-second countdown
+  let n = 5;
+  const countdownEl = document.getElementById('tlCountdown');
+  const numEl = document.getElementById('tlCountdownNum');
+  numEl.textContent = n;
+  countdownEl.classList.add('active');
+  const tick = ()=>{
+    n--;
+    if (n <= 0) {
+      countdownEl.classList.remove('active');
+      document.getElementById('teacherLobby').classList.remove('open');
+      if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+      startVotingSession();
+      return;
+    }
+    numEl.style.animation = 'none';
+    void numEl.offsetHeight; // reflow to restart animation
+    numEl.style.animation = 'tlCountPop .45s ease-out';
+    numEl.textContent = n;
+    setTimeout(tick, 1000);
+  };
+  setTimeout(tick, 1000);
 }
 // ── Student prefs (persist view + block across refresh) ──
 function saveStudentPrefs() {
