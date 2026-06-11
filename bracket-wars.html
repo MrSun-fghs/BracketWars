@@ -608,12 +608,24 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .ncaa-m-port img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
 .ncaa-slot.nwin .ncaa-m-port{background:var(--md-primary-container);}
 .ncaa-slot.nwin .ncaa-m-port img{opacity:.85;}
-.ncaa-m-name{font-size:.72rem;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--md-on-surface);line-height:1.15;}
+.ncaa-m-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:0;}
+.ncaa-m-name{font-size:.72rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--md-on-surface);line-height:1.15;}
 .ncaa-slot.nwin .ncaa-m-name{color:var(--md-on-primary-container);}
 .ncaa-slot.nloss .ncaa-m-name{text-decoration:line-through;color:var(--md-on-surface-variant);}
 .ncaa-slot.ntbd .ncaa-m-name{font-style:italic;font-weight:400;color:var(--md-on-surface-variant);}
-.ncaa-m-badge{font-size:.65rem;flex-shrink:0;opacity:.9;}
+.ncaa-m-author{font-size:.57rem;color:var(--md-on-surface-variant);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ncaa-slot.nwin .ncaa-m-author{color:var(--md-on-primary-container);opacity:.75;}
+.ncaa-m-crown{width:13px;height:13px;object-fit:contain;display:block;flex-shrink:0;}
+@media(max-width:640px){
+  .ncaa-m-seed,.ncaa-m-info,.ncaa-m-crown{display:none;}
+  .ncaa-m-port{width:28px;height:28px;}
+  .ncaa-slot{padding:3px;justify-content:center;}
+  .ncaa-slot[data-tip]{position:relative;}
+  .ncaa-slot[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 5px);transform:translateX(-50%);background:rgba(15,15,15,.88);color:#fff;font-size:.62rem;font-weight:600;white-space:nowrap;padding:.25rem .5rem;border-radius:6px;z-index:200;pointer-events:none;}
+  .ncaa-slot[data-tip]:hover::before{content:'';position:absolute;left:50%;bottom:calc(100% + 1px);transform:translateX(-50%);border:4px solid transparent;border-top-color:rgba(15,15,15,.88);z-index:201;}
+}
 .ncaa-center-col{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:172px;padding:0 10px;gap:8px;flex-shrink:0;}
+.ncaa-center-col .champion-card{width:160px;box-sizing:border-box;}
 .ncaa-final-hdr{font-size:.62rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--md-primary);text-align:center;}
 .ncaa-m.final-m{width:156px;}
 .ncaa-champ-card{background:linear-gradient(145deg,var(--md-primary),var(--md-secondary));border-radius:10px;padding:.8rem .7rem .9rem;text-align:center;width:156px;box-sizing:border-box;}
@@ -3595,8 +3607,8 @@ function renderBracket(){
     const center=document.createElement('div');center.className='ncaa-center-col';
     const fhdr=document.createElement('div');fhdr.className='ncaa-final-hdr';fhdr.textContent='🏆 Championship';center.appendChild(fhdr);
     const fm2=buildNcaaMatch('final',null,null);fm2.classList.add('final-m');center.appendChild(fm2);
-    const champ=champion();const cc2=document.createElement('div');cc2.className='ncaa-champ-card'+(champ?'':' empty');
-    cc2.innerHTML='<span class="ncaa-champ-icon">🏆</span><div class="ncaa-champ-ttl">Poetry Champion</div><div class="ncaa-champ-nm">'+(champ?esc(champ.name):'To be decided')+'</div>';
+    const champ=champion();const cc2=document.createElement('div');cc2.className='champion-card'+(champ?' crowned':'');
+    cc2.innerHTML='<img src="Corona Crayola.png" class="champion-trophy" alt="crown"><div class="champion-label">Poetry Champion</div><div class="champion-name'+(champ?'':' empty')+'">'+(champ?esc(champ.name):'To be decided')+'</div>';
     center.appendChild(cc2);bracket.appendChild(center);
     // Right half: SF → QF → R16 (mirrored)
     const rh=document.createElement('div');rh.className='ncaa-half';
@@ -3762,9 +3774,13 @@ function buildNcaaMatch(type,ri,mi){
     const sd=document.createElement('div');sd.className='ncaa-m-seed';sd.textContent=poem?poem.seed:'?';s.appendChild(sd);
     const port=document.createElement('div');port.className='ncaa-m-port';
     if(poem){const rp=ROSTER_POEMS.find(p=>p.num===poem.seed);if(rp&&rp.svg){const img=document.createElement('img');img.src=rp.svg;img.alt='';img.loading='lazy';const z=rp.cropZoom||1.6,cx=rp.cropX!=null?rp.cropX:50,cy=rp.cropY!=null?rp.cropY:12;img.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scale('+z+');transform-origin:'+cx+'% '+cy+'%;';port.appendChild(img);}}
+    if(poem){const last=poem.author?(poem.author.split(' ').pop()):'';s.dataset.tip=poem.name+(last?' · '+last:'');}
     s.appendChild(port);
-    const nm=document.createElement('div');nm.className='ncaa-m-name';nm.textContent=poem?poem.name:'TBD';s.appendChild(nm);
-    if(isW){const b=document.createElement('span');b.className='ncaa-m-badge';b.textContent='👑';s.appendChild(b);}
+    const info=document.createElement('div');info.className='ncaa-m-info';
+    const nm=document.createElement('div');nm.className='ncaa-m-name';nm.textContent=poem?poem.name:'TBD';info.appendChild(nm);
+    if(poem&&poem.author){const au=document.createElement('div');au.className='ncaa-m-author';au.textContent=poem.author.split(' ').pop();info.appendChild(au);}
+    s.appendChild(info);
+    if(isW){const b=document.createElement('img');b.src='Small Crown.png';b.alt='winner';b.className='ncaa-m-crown';s.appendChild(b);}
     m.appendChild(s);
   });
   return m;
@@ -3809,6 +3825,9 @@ function drawNcaaLines(){
   if(rqf2&&rqf3&&rsf1)conn(rqf2,rqf3,rsf1,true,getMatchData({type:'rQF',ri:2,mi:2}),getMatchData({type:'rQF',ri:3,mi:2}));
   if(rsf1&&finEl){const c=getMatchData({type:'semi',ri:1}).winnerIdx!==null?WC:LC;const x1=lx2(rsf1),y1=my(rsf1),x2=rx2(finEl),y2=my(finEl);ln('M'+x1+','+y1+(Math.abs(y1-y2)<3?' H':' H'+(x1+x2)/2+' V'+y2+' H')+x2,c);}
   bkt.style.position='relative';bkt.appendChild(sv);
+  // Redraw on container resize (fixes lines on small screens / zoom changes)
+  const sc=bkt.parentElement||bkt;
+  if(!sc._ncaaRO){sc._ncaaRO=new ResizeObserver(()=>{clearTimeout(sc._ncaaRT);sc._ncaaRT=setTimeout(()=>{if(bkt.classList.contains('ncaa-bracket'))drawNcaaLines();},120);});sc._ncaaRO.observe(sc);}
 }
 
 let activeKey=null,selectedWinner=null;
