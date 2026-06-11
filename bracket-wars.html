@@ -1798,7 +1798,7 @@ function trackSessionStart() {
 }
 // ── End Analytics ──────────────────────────────────────────────────────────
 
-const CORRECT_PASSWORD = 'fghs2025';
+const TEACHER_EMAIL = 'bsun@fgsd.k12.or.us'; // teacher account email (password stored in Supabase Auth)
 let teacherUnlocked = false, MODE = 'student', currentView = 'home';
 
 const CATEGORIES = [
@@ -1899,19 +1899,28 @@ function isRegionDone(ri) { return bkt().semis[ri<=1?0:1].winnerIdx!==null; }
 function isSemiDone() { return bkt().final.winnerIdx!==null; }
 
 // ── Password ──
-function submitPassword() {
-  if (document.getElementById('passwordInput').value === CORRECT_PASSWORD) {
-    teacherUnlocked = true;
-    localStorage.setItem('bw-teacher', '1');
-    document.getElementById('passwordDialog').classList.remove('open');
-    setMode('teacher');
-  } else {
-    document.getElementById('passwordError').classList.add('show');
+async function submitPassword() {
+  const pw = document.getElementById('passwordInput').value;
+  const errEl = document.getElementById('passwordError');
+  errEl.classList.remove('show');
+  const { data, error } = await db.auth.signInWithPassword({ email: TEACHER_EMAIL, password: pw });
+  if (error || !data.session) {
+    errEl.classList.add('show');
     document.getElementById('passwordInput').value = '';
     document.getElementById('passwordInput').focus();
+    return;
   }
+  teacherUnlocked = true;
+  document.getElementById('passwordDialog').classList.remove('open');
+  setMode('teacher');
 }
-function cancelPassword() { document.getElementById('passwordDialog').classList.remove('open'); localStorage.removeItem('bw-teacher'); teacherUnlocked = false; setMode('student'); }
+async function signOutTeacher() {
+  await db.auth.signOut();
+  teacherUnlocked = false;
+  setMode('student');
+  showSnack('Signed out');
+}
+function cancelPassword() { document.getElementById('passwordDialog').classList.remove('open'); teacherUnlocked = false; setMode('student'); }
 function requestTeacherMode() {
   if (teacherUnlocked) { setMode('teacher'); return; }
   document.getElementById('passwordInput').value = '';
@@ -4889,6 +4898,15 @@ function rebuildHamburgerMenu() {
       m.appendChild(addBtn);
     }
   }
+  if (isTeacher) {
+    sep();
+    const soEl = document.createElement('div');
+    soEl.className = 'hmenu-item';
+    soEl.style.cssText = 'color:#9ca3af;font-size:.8rem;';
+    soEl.textContent = '⏻ Sign out';
+    soEl.onclick = () => { m.classList.remove('open'); signOutTeacher(); };
+    m.appendChild(soEl);
+  }
 }
 document.addEventListener('click', () => {
   const m = document.getElementById('hamburgerMenu');
@@ -5322,7 +5340,8 @@ async function boot() {
   buildAppBar();
   buildSecondaryToolbar();
   const _isProjector = sessionStorage.getItem('bw-projector') === '1';
-  if (!_isProjector && localStorage.getItem('bw-teacher') === '1') {
+  const { data: { session: _teacherSession } } = await db.auth.getSession();
+  if (!_isProjector && _teacherSession) {
     teacherUnlocked = true;
     // Restore active class before rendering
     try { const tp=JSON.parse(localStorage.getItem('bw-teacher-prefs')||'{}'); if(tp.activeId&&app.classes.find(c=>c.id===tp.activeId)) app.activeId=tp.activeId; } catch(e) {}
