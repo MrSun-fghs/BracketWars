@@ -455,7 +455,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .bv3-pair-divider{height:1px;background:var(--md-outline-variant);opacity:.3;margin:0;}
 .bv3-pair-gap{height:6px;}
 .bv3-section-gap{height:6px;margin:.5rem 0;}
-.bv3-row{display:flex;align-items:center;gap:6px;padding:.5rem .75rem;cursor:pointer;transition:background .1s;min-height:36px;}
+.bv3-row{display:flex;align-items:center;gap:6px;padding:0 .75rem;height:38px;box-sizing:border-box;cursor:pointer;transition:background .1s;}
 .bv3-row:hover{background:var(--md-surface-container-high);}
 .bv3-row.active{background:var(--md-primary-container);}
 .bv3-pname{font-size:.85rem;color:var(--md-on-surface);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35;}
@@ -3571,7 +3571,9 @@ function renderBracket(){
     const leg=document.createElement('div');leg.className='bv3-legend';
     CATEGORIES.forEach((cat,i)=>{const it=document.createElement('div');it.className='bv3-leg-item';const sw=document.createElement('div');sw.className='bv3-leg-swatch';sw.style.background=CC[i];it.appendChild(sw);it.appendChild(document.createTextNode(cat.name));leg.appendChild(it);});
     left.appendChild(leg);
-    if(!_bv3Key&&firstKs)_bv3Key=firstKs;
+    if(!_bv3Key){try{const saved=localStorage.getItem('bw-bv3key');if(saved){const validKeys=new Set(sections.flatMap(s=>s.pairs.map(p=>JSON.stringify(p.key))));_bv3Key=validKeys.has(saved)?saved:firstKs;}else{_bv3Key=firstKs;}}catch(e){_bv3Key=firstKs;}}
+    // Sync active highlight after potential restore
+    document.querySelectorAll('#bv3Left .bv3-row').forEach(r=>r.classList.toggle('active',r.dataset.ks===_bv3Key));
     if(_bv3Key)renderBv3Right();else right.innerHTML='<div class="bv3-empty">Select a matchup to view details.</div>';
   } else {
     // Student: NCAA classic bracket with SVG connector lines
@@ -3609,6 +3611,7 @@ function renderBracket(){
 }
 function selectBv3(ks){
   _bv3Key=ks;
+  try{localStorage.setItem('bw-bv3key',ks);}catch(e){}
   document.querySelectorAll('#bv3Left .bv3-row').forEach(r=>r.classList.toggle('active',r.dataset.ks===ks));
   renderBv3Right();
 }
@@ -3644,7 +3647,7 @@ function renderBv3Right(){
       const rp=ROSTER_POEMS.find(p=>p.num===poem.seed);
       if(rp&&rp.svg){const img=document.createElement('img');img.src=rp.svg;img.alt='';img.loading='lazy';const z=rp.cropZoom||1.6,cx=rp.cropX!=null?rp.cropX:50,cy=rp.cropY!=null?rp.cropY:12;img.style.cssText='width:100%;height:100%;object-fit:cover;transform:scale('+z+');transform-origin:'+cx+'% '+cy+'%;';port.appendChild(img);}
       const sd=document.createElement('div');sd.className='bv3-seed';sd.textContent=poem.seed;port.appendChild(sd);
-      if(isD){const bd=document.createElement('div');bd.className='bv3-state-badge '+(isW?'bv3-crown-b':'bv3-x-b');bd.textContent=isW?'👑':'✕';port.appendChild(bd);}
+      if(isD&&!isW){const bd=document.createElement('div');bd.className='bv3-state-badge bv3-x-b';bd.textContent='✕';port.appendChild(bd);}
     }
     card.appendChild(port);
     const info=document.createElement('div');info.className='bv3-card-info';
