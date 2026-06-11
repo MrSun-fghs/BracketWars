@@ -1,6 +1,8 @@
 .DS_Store
 *.docx
 *.png
+!Small Crown.png
+!Corona Crayola.png
 *.jpg
 *.jpeg
 Poetry_March_Madness_Packet.html
