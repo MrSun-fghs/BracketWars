@@ -3503,15 +3503,15 @@ function renderBracket(){
     const CC=['#1565C0','#6A1B9A','#2E7D32','#C62828'];
     const AP='var(--md-primary)';
     const r16=[];for(let ri=0;ri<4;ri++)for(let mi=0;mi<2;mi++){const k={type:'rR1',ri,mi};r16.push({key:k,col:CC[ri],pA:r1Poem(ri,mi,0),pB:r1Poem(ri,mi,1),md:getMatchData(k)});}
-    const qf=[];for(let ri=0;ri<4;ri++){const k={type:'rQF',ri,mi:2};qf.push({key:k,col:CC[ri],pA:qfPoem(ri,0),pB:qfPoem(ri,1),md:getMatchData(k)});}
-    const sf=[];for(let ri=0;ri<2;ri++){const k={type:'semi',ri};sf.push({key:k,col:AP,pA:semiPoem(ri,0),pB:semiPoem(ri,1),md:getMatchData(k)});}
-    const fk={type:'final'};
-    const sections=[
-      {label:'Round of 16',pairs:r16},
-      {label:'Quarterfinals',pairs:qf},
-      {label:'Semifinals',pairs:sf},
-      {label:'Final',pairs:[{key:fk,col:AP,pA:finalPoem(0),pB:finalPoem(1),md:getMatchData(fk)}]}
-    ];
+    const qfAll=[];for(let ri=0;ri<4;ri++){const k={type:'rQF',ri,mi:2};qfAll.push({key:k,col:CC[ri],pA:qfPoem(ri,0),pB:qfPoem(ri,1),md:getMatchData(k)});}
+    const sfAll=[];for(let ri=0;ri<2;ri++){const k={type:'semi',ri};sfAll.push({key:k,col:AP,pA:semiPoem(ri,0),pB:semiPoem(ri,1),md:getMatchData(k)});}
+    const fk={type:'final'};const fpA=finalPoem(0),fpB=finalPoem(1);
+    // Build sections most-advanced-first; each section only appears once it has at least one poem
+    const sections=[];
+    if(fpA||fpB) sections.push({label:'Final',pairs:[{key:fk,col:AP,pA:fpA,pB:fpB,md:getMatchData(fk)}]});
+    const sfVis=sfAll.filter(p=>p.pA||p.pB);if(sfVis.length) sections.push({label:'Semifinals',pairs:sfVis});
+    const qfVis=qfAll.filter(p=>p.pA||p.pB);if(qfVis.length) sections.push({label:'Quarterfinals',pairs:qfVis});
+    sections.push({label:'Round of 16',pairs:r16});
     const phdr=document.createElement('div');phdr.className='bv3-panel-hdr';phdr.textContent='All Matchups';left.appendChild(phdr);
     let firstKs=null;
     sections.forEach(sec=>{
