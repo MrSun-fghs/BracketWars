@@ -455,7 +455,7 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .bv3-pair-divider{height:1px;background:var(--md-outline-variant);opacity:.3;margin:0;}
 .bv3-pair-gap{height:6px;}
 .bv3-section-gap{height:6px;margin:.5rem 0;}
-.bv3-row{display:flex;align-items:center;gap:6px;padding:.55rem .75rem;cursor:pointer;transition:background .1s;}
+.bv3-row{display:flex;align-items:center;gap:6px;padding:.5rem .75rem;cursor:pointer;transition:background .1s;min-height:36px;}
 .bv3-row:hover{background:var(--md-surface-container-high);}
 .bv3-row.active{background:var(--md-primary-container);}
 .bv3-pname{font-size:.85rem;color:var(--md-on-surface);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35;}
@@ -3562,7 +3562,6 @@ function renderBracket(){
           const isW=isD&&poem&&md.winnerIdx===slot,isL=isD&&poem&&md.winnerIdx!==slot;
           const nm=document.createElement('div');nm.className='bv3-pname'+(isL?' strike':'')+(!poem?' tbd':'');nm.textContent=poem?poem.name:'TBD';
           row.appendChild(nm);
-          if(isW){const c=document.createElement('span');c.className='bv3-crown';c.textContent='👑';row.appendChild(c);}
           pair.appendChild(row);
         });
         left.appendChild(pair);
@@ -3677,14 +3676,6 @@ function renderBv3Right(){
       pills.appendChild(fb);
     } else {
       const ob=document.createElement('button');ob.className='bv3-pill';ob.textContent='Open voting';ob.onclick=()=>{openVotingSetup(key,pA,pB);};pills.appendChild(ob);
-    }
-    // Publish winner — when decided
-    if(isD){
-      const wi=md.winnerIdx,wP=wi===0?pA:pB,lP=wi===0?pB:pA;
-      const wV=md.votes[wi]||0,lV=md.votes[1-wi]||0,tot=wV+lV;
-      const pw=document.createElement('button');pw.className='bv3-pill';pw.textContent='Publish winner';
-      pw.onclick=()=>{showVoteResultCelebration({winnerName:wP.name,loserName:lP.name,winVotes:wV,loseVotes:lV,winPct:tot>0?Math.round(wV/tot*100):100});};
-      pills.appendChild(pw);
     }
     body.appendChild(pills);
   }
