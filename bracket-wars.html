@@ -3632,7 +3632,7 @@ function renderBv3Right(){
     const port=document.createElement('div');port.className='bv3-portrait';
     if(poem){
       const rp=ROSTER_POEMS.find(p=>p.num===poem.seed);
-      if(rp&&rp.svg){const img=document.createElement('img');img.src=rp.svg;img.alt='';img.loading='lazy';const z=rp.cropZoom||1,cx=rp.cropX||0,cy=rp.cropY||0;img.style.cssText='transform:scale('+z+') translate('+cx+'px,'+cy+'px);transform-origin:center top;';port.appendChild(img);}
+      if(rp&&rp.svg){const img=document.createElement('img');img.src=rp.svg;img.alt='';img.loading='lazy';const z=rp.cropZoom||1.6,cx=rp.cropX!=null?rp.cropX:50,cy=rp.cropY!=null?rp.cropY:12;img.style.cssText='width:100%;height:100%;object-fit:cover;transform:scale('+z+');transform-origin:'+cx+'% '+cy+'%;';port.appendChild(img);}
       const sd=document.createElement('div');sd.className='bv3-seed';sd.textContent=poem.seed;port.appendChild(sd);
       if(isD){const bd=document.createElement('div');bd.className='bv3-state-badge '+(isW?'bv3-crown-b':'bv3-x-b');bd.textContent=isW?'👑':'✕';port.appendChild(bd);}
     }
