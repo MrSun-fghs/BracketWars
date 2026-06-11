@@ -1106,15 +1106,17 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .setup-avail-pill span{opacity:.65;font-size:.65rem;}
 .setup-avail-pill.avail-used{background:var(--md-surface-container-high);color:var(--md-on-surface-variant);opacity:.55;}
 .setup-avail-pill.avail-used strong{text-decoration:line-through;}
-.setup-poem-row{display:flex;align-items:center;gap:5px;padding:3px 0 3px 0;position:relative;}
-.setup-seed-lbl{font-size:.6rem;font-weight:700;color:var(--md-on-surface-variant);opacity:.4;width:16px;flex-shrink:0;text-align:right;}
-.setup-name-cell{flex:1.6;position:relative;display:flex;align-items:center;}
-.setup-name-label{flex:1;padding:6px 10px;border:1.5px solid var(--md-outline-variant);border-radius:6px;font-size:.79rem;font-family:inherit;background:var(--md-surface-container-low);color:var(--md-on-surface-variant);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;}
-.setup-author-cell{flex:1;position:relative;display:flex;}
-.setup-field-input{width:100%;padding:6px 8px;border:1.5px solid var(--md-outline);border-radius:6px;font-size:.79rem;font-family:inherit;background:var(--md-surface);color:var(--md-on-surface);outline:none;transition:border-color .15s;}
+.setup-matchup-row{display:flex;align-items:flex-start;gap:5px;padding:5px 0;}
+.setup-matchup-side{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+.setup-matchup-swap{display:flex;align-items:center;justify-content:center;padding-top:20px;flex-shrink:0;}
+.setup-seed-lbl{font-size:.58rem;font-weight:700;color:var(--md-on-surface-variant);opacity:.4;text-align:left;}
+.setup-name-cell{position:relative;display:flex;align-items:center;width:100%;}
+.setup-name-label{flex:1;padding:5px 24px 5px 8px;border:1.5px solid var(--md-outline-variant);border-radius:6px;font-size:.76rem;font-family:inherit;background:var(--md-surface-container-low);color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;cursor:pointer;}
+.setup-name-label:hover{border-color:var(--md-primary);background:var(--md-surface);}
+.setup-author-cell{position:relative;display:flex;}
+.setup-field-input{width:100%;padding:5px 8px;border:1.5px solid var(--md-outline);border-radius:6px;font-size:.76rem;font-family:inherit;background:var(--md-surface);color:var(--md-on-surface);outline:none;transition:border-color .15s;}
 .setup-field-input:focus{border-color:var(--md-primary);}
 .setup-field-input.conflict{border-color:#ef4444;background:#fff5f5;}
-.setup-author-cell .setup-field-input{padding-right:24px;}
 .setup-pick-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:11px;padding:2px 4px;border-radius:3px;line-height:1;color:var(--md-on-surface-variant);transition:color .1s;}
 .setup-pick-btn:hover{color:var(--md-primary);}
 .setup-lib-drop{position:absolute;top:calc(100% + 3px);left:0;z-index:60;background:var(--md-surface-container-high);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.2);min-width:230px;max-height:210px;overflow-y:auto;border:1px solid var(--md-outline-variant);}
@@ -4052,7 +4054,7 @@ function openSetup() {
   availWrap.className = 'setup-avail-wrap';
   const availLbl = document.createElement('div');
   availLbl.className = 'setup-avail-label';
-  availLbl.textContent = 'Author pool';
+  availLbl.textContent = 'Poem library';
   availWrap.appendChild(availLbl);
   const availPills = document.createElement('div');
   availPills.id = 'setupAvailPills';
@@ -4088,10 +4090,15 @@ function openSetup() {
     copyBtn.onclick = () => {
       const src = app.classes.find(cl => cl.id === copySelect.value);
       if (!src) return;
+      const sp = src.bracket.poems || [...DEFAULT_POEMS];
       const sa = src.bracket.authors || [...DEFAULT_AUTHORS];
       for (let si = 0; si < 16; si++) {
+        const nI = c.querySelector(`input[data-si="${si}"][data-field="name"]`);
         const aI = c.querySelector(`input[data-si="${si}"][data-field="author"]`);
+        const lbl = c.querySelector(`[data-name-lbl="${si}"]`);
+        if (nI) nI.value = sp[si] || '';
         if (aI) aI.value = sa[si] || '';
+        if (lbl) { lbl.textContent = sp[si] || ''; lbl.title = sp[si] || ''; }
       }
       _setupRefreshPills(c);
       _setupCheckConflicts(c);
@@ -4102,7 +4109,7 @@ function openSetup() {
     c.appendChild(copyWrap);
   }
 
-  // ── Seed rows ──
+  // ── Matchup rows ──
   CATEGORIES.forEach(cat => {
     const hdr = document.createElement('div');
     hdr.className = 'setup-cat-header';
@@ -4111,112 +4118,67 @@ function openSetup() {
     hdrName.textContent = cat.name;
     hdr.appendChild(hdrName);
 
-    // Section action buttons
-    const hdrBtns = document.createElement('div');
-    hdrBtns.style.cssText = 'display:flex;gap:4px;';
-
     const resetBtn = document.createElement('button');
     resetBtn.type = 'button';
     resetBtn.className = 'setup-reset-cat';
     resetBtn.textContent = '↺ Reset';
     resetBtn.onclick = () => {
       cat.seeds.forEach(si => {
+        const nInp = c.querySelector(`input[data-si="${si}"][data-field="name"]`);
         const aInp = c.querySelector(`input[data-si="${si}"][data-field="author"]`);
+        const lbl  = c.querySelector(`[data-name-lbl="${si}"]`);
+        if (nInp) nInp.value = DEFAULT_POEMS[si];
         if (aInp) aInp.value = DEFAULT_AUTHORS[si];
+        if (lbl)  { lbl.textContent = DEFAULT_POEMS[si]; lbl.title = DEFAULT_POEMS[si]; }
       });
       _setupRefreshPills(c);
       _setupCheckConflicts(c);
     };
-
-    const clearAuthBtn = document.createElement('button');
-    clearAuthBtn.type = 'button';
-    clearAuthBtn.className = 'setup-reset-cat';
-    clearAuthBtn.textContent = '✕ Clear authors';
-    clearAuthBtn.onclick = () => {
-      cat.seeds.forEach(si => {
-        const aInp = c.querySelector(`input[data-si="${si}"][data-field="author"]`);
-        if (aInp) aInp.value = '';
-      });
-      _setupRefreshPills(c);
-      _setupCheckConflicts(c);
-    };
-
-    hdrBtns.appendChild(resetBtn);
-    hdrBtns.appendChild(clearAuthBtn);
-    hdr.appendChild(hdrBtns);
+    hdr.appendChild(resetBtn);
     c.appendChild(hdr);
 
-    cat.seeds.forEach((si, localIdx) => {
-      const row = document.createElement('div');
-      row.className = 'setup-poem-row';
-      row.dataset.si = si;
+    // Two matchup pairs per category: seeds[0] vs seeds[1], seeds[2] vs seeds[3]
+    const matchupPairs = [
+      [cat.seeds[0], cat.seeds[1]],
+      [cat.seeds[2], cat.seeds[3]],
+    ];
 
-      // Seed number label
-      const seedLbl = document.createElement('span');
-      seedLbl.className = 'setup-seed-lbl';
-      seedLbl.textContent = si + 1;
-      row.appendChild(seedLbl);
+    matchupPairs.forEach(([siA, siB], mIdx) => {
+      const mRow = document.createElement('div');
+      mRow.className = 'setup-matchup-row';
 
-      // ── Name cell — read-only label ──
-      const nameCell = document.createElement('div');
-      nameCell.className = 'setup-name-cell';
-      const nameLbl = document.createElement('div');
-      nameLbl.className = 'setup-name-label';
-      nameLbl.textContent = DEFAULT_POEMS[si] || poems[si] || '';
-      nameLbl.title = DEFAULT_POEMS[si] || poems[si] || '';
-      // Hidden input so saveSetup() can still read it
-      const nameInp = document.createElement('input');
-      nameInp.type = 'hidden';
-      nameInp.value = DEFAULT_POEMS[si] || poems[si] || '';
-      nameInp.dataset.si = si;
-      nameInp.dataset.field = 'name';
-      nameCell.appendChild(nameLbl);
-      nameCell.appendChild(nameInp);
-      row.appendChild(nameCell);
+      mRow.appendChild(_buildMatchupSide(siA, poems, authors, c));
 
-      // ── Author cell — picker only ──
-      const authCell = document.createElement('div');
-      authCell.className = 'setup-author-cell';
+      // ⇄ swap within this matchup
+      const swapWrap = document.createElement('div');
+      swapWrap.className = 'setup-matchup-swap';
+      const swapInnerBtn = document.createElement('button');
+      swapInnerBtn.type = 'button';
+      swapInnerBtn.className = 'setup-swap-btn';
+      swapInnerBtn.title = 'Swap poems within this matchup';
+      swapInnerBtn.textContent = '⇄';
+      swapInnerBtn.style.opacity = '.5';
+      swapInnerBtn.onclick = () => _swapSlots(c, siA, siB);
+      swapWrap.appendChild(swapInnerBtn);
+      mRow.appendChild(swapWrap);
 
-      const authInp = document.createElement('input');
-      authInp.type = 'text';
-      authInp.value = authors[si] || '';
-      authInp.readOnly = true;
-      authInp.placeholder = 'Author';
-      authInp.className = 'setup-field-input';
-      authInp.style.cursor = 'pointer';
-      authInp.dataset.si = si;
-      authInp.dataset.field = 'author';
-      authInp.onclick = e => { e.stopPropagation(); _setupToggleAuthorDrop(si, authCell, c); };
+      mRow.appendChild(_buildMatchupSide(siB, poems, authors, c));
+      c.appendChild(mRow);
 
-      const pickBtn = document.createElement('button');
-      pickBtn.type = 'button';
-      pickBtn.className = 'setup-pick-btn';
-      pickBtn.title = 'Pick author';
-      pickBtn.textContent = '▾';
-      pickBtn.onclick = e => { e.stopPropagation(); _setupToggleAuthorDrop(si, authCell, c); };
-
-      authCell.appendChild(authInp);
-      authCell.appendChild(pickBtn);
-      row.appendChild(authCell);
-      c.appendChild(row);
-
-      // ⇅ swap authors between adjacent seeds
-      if (localIdx < cat.seeds.length - 1) {
-        const nextSi = cat.seeds[localIdx + 1];
+      // ⇅ swap entire matchup pairs (only after first row)
+      if (mIdx === 0) {
         const swapRow = document.createElement('div');
         swapRow.className = 'setup-swap-row';
         const swapBtn = document.createElement('button');
         swapBtn.type = 'button';
         swapBtn.className = 'setup-swap-btn';
-        swapBtn.title = `Swap authors: Seed ${si + 1} ↕ Seed ${nextSi + 1}`;
-        swapBtn.textContent = '⇅';
+        swapBtn.textContent = '⇅ swap matchups';
+        swapBtn.title = 'Swap both matchup pairs in this section';
+        swapBtn.style.cssText = 'font-size:.63rem;padding:0 8px;height:16px;line-height:16px;opacity:.4;';
         swapBtn.onclick = () => {
-          const aA = c.querySelector(`input[data-si="${si}"][data-field="author"]`);
-          const aB = c.querySelector(`input[data-si="${nextSi}"][data-field="author"]`);
-          [aA.value, aB.value] = [aB.value, aA.value];
-          _setupRefreshPills(c);
-          _setupCheckConflicts(c);
+          const siC = matchupPairs[1][0], siD = matchupPairs[1][1];
+          _swapSlots(c, siA, siC);
+          _swapSlots(c, siB, siD);
         };
         swapRow.appendChild(swapBtn);
         c.appendChild(swapRow);
@@ -4229,40 +4191,117 @@ function openSetup() {
   document.getElementById('setupDialog').classList.add('open');
 }
 
-// Author-only picker dropdown
-function _setupToggleAuthorDrop(si, anchorEl, container) {
+// Build one side of a matchup row
+function _buildMatchupSide(si, poems, authors, container) {
+  const side = document.createElement('div');
+  side.className = 'setup-matchup-side';
+
+  const seedLbl = document.createElement('div');
+  seedLbl.className = 'setup-seed-lbl';
+  seedLbl.textContent = `Seed ${si + 1}`;
+  side.appendChild(seedLbl);
+
+  // Poem picker
+  const nameCell = document.createElement('div');
+  nameCell.className = 'setup-name-cell';
+
+  const nameLbl = document.createElement('div');
+  nameLbl.className = 'setup-name-label';
+  nameLbl.dataset.nameLbl = si;
+  const curName = poems[si] || DEFAULT_POEMS[si] || '';
+  nameLbl.textContent = curName;
+  nameLbl.title = curName;
+  nameLbl.onclick = e => { e.stopPropagation(); _setupTogglePoemDrop(si, nameCell, container); };
+
+  const nameInp = document.createElement('input');
+  nameInp.type = 'hidden';
+  nameInp.value = curName;
+  nameInp.dataset.si = si;
+  nameInp.dataset.field = 'name';
+
+  const pickBtn = document.createElement('button');
+  pickBtn.type = 'button';
+  pickBtn.className = 'setup-pick-btn';
+  pickBtn.title = 'Pick poem';
+  pickBtn.textContent = '▾';
+  pickBtn.onclick = e => { e.stopPropagation(); _setupTogglePoemDrop(si, nameCell, container); };
+
+  nameCell.appendChild(nameLbl);
+  nameCell.appendChild(nameInp);
+  nameCell.appendChild(pickBtn);
+  side.appendChild(nameCell);
+
+  // Author (editable, auto-fills from picker)
+  const authInp = document.createElement('input');
+  authInp.type = 'text';
+  authInp.value = authors[si] || '';
+  authInp.placeholder = 'Author';
+  authInp.className = 'setup-field-input';
+  authInp.dataset.si = si;
+  authInp.dataset.field = 'author';
+  authInp.addEventListener('input', () => _setupCheckConflicts(container));
+  side.appendChild(authInp);
+
+  return side;
+}
+
+// Swap poem+author between two seed slots and update visible labels
+function _swapSlots(container, siA, siB) {
+  const nA = container.querySelector(`input[data-si="${siA}"][data-field="name"]`);
+  const aA = container.querySelector(`input[data-si="${siA}"][data-field="author"]`);
+  const lA = container.querySelector(`[data-name-lbl="${siA}"]`);
+  const nB = container.querySelector(`input[data-si="${siB}"][data-field="name"]`);
+  const aB = container.querySelector(`input[data-si="${siB}"][data-field="author"]`);
+  const lB = container.querySelector(`[data-name-lbl="${siB}"]`);
+  [nA.value, nB.value] = [nB.value, nA.value];
+  [aA.value, aB.value] = [aB.value, aA.value];
+  if (lA) { lA.textContent = nA.value; lA.title = nA.value; }
+  if (lB) { lB.textContent = nB.value; lB.title = nB.value; }
+  _setupRefreshPills(container);
+  _setupCheckConflicts(container);
+}
+
+// Poem picker dropdown (sets name + author)
+function _setupTogglePoemDrop(si, anchorEl, container) {
   if (_libDropEl) { _libDropEl.remove(); _libDropEl = null; if (_libDropSi === si) { _libDropSi = null; return; } }
   _libDropSi = si;
 
-  const usedAuthors = _setupGetAuthors(container);
+  const names = _setupGetNames(container);
   const drop = document.createElement('div');
   drop.className = 'setup-lib-drop';
 
-  const avail = POEM_LIBRARY.filter(p => !usedAuthors.some((a, i) => i !== si && a === p.author.toLowerCase()));
-  const used  = POEM_LIBRARY.filter(p =>  usedAuthors.some((a, i) => i !== si && a === p.author.toLowerCase()));
+  const assignPoem = p => {
+    const nInp = container.querySelector(`input[data-si="${si}"][data-field="name"]`);
+    const aInp = container.querySelector(`input[data-si="${si}"][data-field="author"]`);
+    const lbl  = container.querySelector(`[data-name-lbl="${si}"]`);
+    if (nInp) nInp.value = p.name;
+    if (aInp) aInp.value = p.author;
+    if (lbl)  { lbl.textContent = p.name; lbl.title = p.name; }
+    drop.remove(); _libDropEl = null; _libDropSi = null;
+    _setupRefreshPills(container);
+    _setupCheckConflicts(container);
+  };
+
+  const avail = POEM_LIBRARY.filter(p => !names.some((n, i) => i !== si && n === p.name.toLowerCase()));
+  const used  = POEM_LIBRARY.filter(p =>  names.some((n, i) => i !== si && n === p.name.toLowerCase()));
 
   avail.forEach(p => {
     const item = document.createElement('div');
     item.className = 'setup-lib-item';
-    item.innerHTML = `<span class="setup-lib-item-name">${esc(p.author)}</span><span class="setup-lib-item-auth">${esc(p.name)}</span>`;
-    item.onclick = () => {
-      container.querySelector(`input[data-si="${si}"][data-field="author"]`).value = p.author;
-      drop.remove(); _libDropEl = null; _libDropSi = null;
-      _setupRefreshPills(container);
-      _setupCheckConflicts(container);
-    };
+    item.innerHTML = `<span class="setup-lib-item-name">${esc(p.name)}</span><span class="setup-lib-item-auth">${esc(p.author)}</span>`;
+    item.onclick = () => assignPoem(p);
     drop.appendChild(item);
   });
 
   if (used.length) {
     const sep = document.createElement('div');
     sep.className = 'setup-lib-sep';
-    sep.textContent = 'Already assigned';
+    sep.textContent = 'Already placed';
     drop.appendChild(sep);
     used.forEach(p => {
       const item = document.createElement('div');
       item.className = 'setup-lib-item lib-used';
-      item.innerHTML = `<span class="setup-lib-item-name">${esc(p.author)}</span><span class="setup-lib-item-auth">${esc(p.name)}</span>`;
+      item.innerHTML = `<span class="setup-lib-item-name">${esc(p.name)}</span><span class="setup-lib-item-auth">${esc(p.author)}</span>`;
       drop.appendChild(item);
     });
   }
@@ -4278,23 +4317,18 @@ function _setupGetNames(container) {
   return arr;
 }
 
-function _setupGetAuthors(container) {
-  const arr = new Array(16).fill('');
-  container.querySelectorAll('input[data-field="author"]').forEach(inp => { arr[parseInt(inp.dataset.si)] = inp.value.trim().toLowerCase(); });
-  return arr;
-}
 
 function _setupRefreshPills(container) {
   const pillsEl = document.getElementById('setupAvailPills');
   if (!pillsEl) return;
-  const usedAuthors = _setupGetAuthors(container);
+  const names = _setupGetNames(container);
   pillsEl.innerHTML = '';
   POEM_LIBRARY.forEach(p => {
-    const assigned = usedAuthors.some(a => a === p.author.toLowerCase());
+    const placed = names.some(n => n === p.name.toLowerCase());
     const pill = document.createElement('div');
-    pill.className = 'setup-avail-pill' + (assigned ? ' avail-used' : '');
-    pill.title = assigned ? `${p.author} is assigned` : `${p.author} is available`;
-    pill.innerHTML = `<strong>${esc(p.author)}</strong><span>${esc(p.name)}</span>`;
+    pill.className = 'setup-avail-pill' + (placed ? ' avail-used' : '');
+    pill.title = placed ? `${p.name} is placed` : `${p.name} — available`;
+    pill.innerHTML = `<strong>${esc(p.name)}</strong><span>${esc(p.author)}</span>`;
     pillsEl.appendChild(pill);
   });
 }
