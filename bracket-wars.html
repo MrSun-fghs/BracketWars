@@ -473,14 +473,15 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .bv3-st-decided{color:var(--md-primary);}
 .bv3-st-open{color:#2E7D32;}
 .bv3-st-tbd{color:var(--md-on-surface-variant);}
-.bv3-body{padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:1rem;}
+.bv3-panel-hdr{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--md-on-surface);padding:.9rem .75rem .3rem;}
+.bv3-body{padding:1.5rem 2.5rem;display:flex;flex-direction:column;gap:1.25rem;max-width:860px;margin:0 auto;width:100%;box-sizing:border-box;}
 .bv3-versus{display:grid;grid-template-columns:1fr 40px 1fr;align-items:start;}
-.bv3-vs-mid{display:flex;align-items:center;justify-content:center;padding-top:55px;font-size:.85rem;font-weight:600;color:var(--md-on-surface-variant);}
+.bv3-vs-mid{display:flex;align-items:center;justify-content:center;padding-top:65px;font-size:.85rem;font-weight:600;color:var(--md-on-surface-variant);}
 .bv3-card{border:1.5px solid var(--md-outline-variant);border-radius:12px;overflow:hidden;background:var(--md-surface-container-lowest);}
 .bv3-card.win{border-color:var(--md-primary);}
-.bv3-card.lose{opacity:.42;}
+.bv3-card.lose{opacity:.65;}
 .bv3-card.live{border-color:#2E7D32;}
-.bv3-portrait{height:110px;position:relative;overflow:hidden;background:var(--md-surface-container);}
+.bv3-portrait{height:160px;position:relative;overflow:hidden;background:var(--md-surface-container);}
 .bv3-portrait img{position:absolute;width:100%;height:100%;object-fit:cover;}
 .bv3-card.win .bv3-portrait{background:var(--md-primary-container);}
 .bv3-card.lose .bv3-portrait{filter:grayscale(1);}
@@ -503,15 +504,11 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .bv3-vfill{height:100%;background:var(--md-primary);border-radius:99px;}
 .bv3-card.lose .bv3-vfill{background:var(--md-on-surface-variant);opacity:.4;}
 .bv3-vcnt{font-size:.68rem;color:var(--md-on-surface-variant);width:46px;text-align:right;flex-shrink:0;}
-.bv3-pills{display:flex;gap:.5rem;flex-wrap:wrap;padding-top:.25rem;}
-.bv3-pill{font-size:.78rem;font-weight:500;padding:.38rem .9rem;border-radius:99px;border:1px solid var(--md-outline-variant);background:transparent;color:var(--md-on-surface);cursor:pointer;}
-.bv3-pill:hover{background:var(--md-surface-container);}
-.bv3-pill.amber{background:#B45309;color:#fff;border-color:#B45309;}
-.bv3-pill.amber:hover{background:#92400E;}
-.bv3-pill.green{background:#2E7D32;color:#fff;border-color:#2E7D32;}
-.bv3-pill.green:hover{background:#1B5E20;}
-.bv3-pill.ghost{color:var(--md-on-surface-variant);border-color:transparent;}
-.bv3-pill.ghost:hover{background:var(--md-surface-container);}
+.bv3-pills{display:flex;gap:.75rem;flex-wrap:wrap;padding-top:.25rem;}
+.bv3-pill{font-size:.88rem;font-weight:500;padding:.6rem 1.5rem;border-radius:99px;border:1.5px solid var(--md-outline-variant);background:transparent;color:var(--md-on-surface);cursor:pointer;}
+.bv3-pill:hover,.bv3-pill.amber:hover,.bv3-pill.green:hover,.bv3-pill.ghost:hover{background:var(--md-surface-container);}
+.bv3-pill.amber,.bv3-pill.green{background:transparent;color:var(--md-on-surface);border-color:var(--md-outline-variant);}
+.bv3-pill.ghost{color:var(--md-on-surface);border-color:var(--md-outline-variant);}
 .bv3-empty{padding:2.5rem;font-size:.85rem;color:var(--md-on-surface-variant);text-align:center;}
 /* Projection mode */
 body.projection .app-bar{display:none!important;}
@@ -1440,7 +1437,7 @@ body.projection #sectionNav{display:none!important;}
 <div id="homeView" style="display:none"><div class="home-view" id="homeContent"></div></div>
 <div id="leaderboardView" style="display:none"><div class="leaderboard-view" id="lbContent"></div></div>
 <div id="listView" style="display:none"><div class="list-view" id="listContent"></div></div>
-<div id="bracketView" style="display:none"><div id="bracket" style="display:none"></div><div class="bv3-shell"><div class="bv3-left" id="bv3Left"></div><div class="bv3-right" id="bv3Right"></div></div></div>
+<div id="bracketView" style="display:none"><div id="bracketColToolbar"></div><div class="bracket-scroll" id="bracketScroll" style="display:none"><div class="mm-bracket" id="bracket"></div></div><div class="bv3-shell" id="bv3Shell" style="display:none"><div class="bv3-left" id="bv3Left"></div><div class="bv3-right" id="bv3Right"></div></div></div>
 <div id="rosterView" style="display:none">
   <div class="roster-title-block">
     <div class="roster-title-sub">× Bracket Wars ×</div>
@@ -3497,50 +3494,108 @@ function toggleCrownCol(){
 
 let _bv3Key=null;
 function renderBracket(){
-  const left=document.getElementById('bv3Left'),right=document.getElementById('bv3Right');
-  left.innerHTML='';right.innerHTML='';
-  if(!activeClass())return;
-  const CC=['#1565C0','#6A1B9A','#2E7D32','#C62828'];
-  const AP='var(--md-primary)';
-  // Build matchup groups by round
-  const r16=[];for(let ri=0;ri<4;ri++)for(let mi=0;mi<2;mi++){const k={type:'rR1',ri,mi};r16.push({key:k,col:CC[ri],pA:r1Poem(ri,mi,0),pB:r1Poem(ri,mi,1),md:getMatchData(k)});}
-  const qf=[];for(let ri=0;ri<4;ri++){const k={type:'rQF',ri,mi:2};qf.push({key:k,col:CC[ri],pA:qfPoem(ri,0),pB:qfPoem(ri,1),md:getMatchData(k)});}
-  const sf=[];for(let ri=0;ri<2;ri++){const k={type:'semi',ri};sf.push({key:k,col:AP,pA:semiPoem(ri,0),pB:semiPoem(ri,1),md:getMatchData(k)});}
-  const fk={type:'final'};
-  const sections=[
-    {label:'Round of 16',pairs:r16},
-    {label:'Quarterfinals',pairs:qf},
-    {label:'Semifinals',pairs:sf},
-    {label:'Championship Final',pairs:[{key:fk,col:AP,pA:finalPoem(0),pB:finalPoem(1),md:getMatchData(fk)}]}
-  ];
-  // Build left panel
-  let firstKs=null;
-  sections.forEach(sec=>{
-    const lbl=document.createElement('div');lbl.className='bv3-rnd-lbl';lbl.textContent=sec.label;left.appendChild(lbl);
-    sec.pairs.forEach(({key,col,pA,pB,md})=>{
-      const ks=JSON.stringify(key);if(!firstKs)firstKs=ks;
-      const isD=md.winnerIdx!==null,isAct=_bv3Key===ks;
-      const pair=document.createElement('div');pair.className='bv3-pair';pair.style.borderLeftColor=col;pair.dataset.ks=ks;
-      [[pA,0],[pB,1]].forEach(([poem,slot],idx)=>{
-        if(idx===1){const dv=document.createElement('div');dv.className='bv3-pair-divider';pair.appendChild(dv);}
-        const row=document.createElement('div');row.className='bv3-row'+(isAct?' active':'');row.dataset.ks=ks;row.onclick=()=>selectBv3(ks);
-        const isW=isD&&poem&&md.winnerIdx===slot,isL=isD&&poem&&md.winnerIdx!==slot;
-        const nm=document.createElement('div');nm.className='bv3-pname'+(isL?' strike':'')+(!poem?' tbd':'');nm.textContent=poem?poem.name:'TBD';
-        row.appendChild(nm);
-        if(isW){const c=document.createElement('span');c.className='bv3-crown';c.textContent='👑';row.appendChild(c);}
-        pair.appendChild(row);
+  const shell=document.getElementById('bv3Shell'),scroll=document.getElementById('bracketScroll');
+  if(MODE==='teacher'){
+    if(shell)shell.style.display='grid';if(scroll)scroll.style.display='none';
+    const left=document.getElementById('bv3Left'),right=document.getElementById('bv3Right');
+    left.innerHTML='';right.innerHTML='';
+    if(!activeClass())return;
+    const CC=['#1565C0','#6A1B9A','#2E7D32','#C62828'];
+    const AP='var(--md-primary)';
+    const r16=[];for(let ri=0;ri<4;ri++)for(let mi=0;mi<2;mi++){const k={type:'rR1',ri,mi};r16.push({key:k,col:CC[ri],pA:r1Poem(ri,mi,0),pB:r1Poem(ri,mi,1),md:getMatchData(k)});}
+    const qf=[];for(let ri=0;ri<4;ri++){const k={type:'rQF',ri,mi:2};qf.push({key:k,col:CC[ri],pA:qfPoem(ri,0),pB:qfPoem(ri,1),md:getMatchData(k)});}
+    const sf=[];for(let ri=0;ri<2;ri++){const k={type:'semi',ri};sf.push({key:k,col:AP,pA:semiPoem(ri,0),pB:semiPoem(ri,1),md:getMatchData(k)});}
+    const fk={type:'final'};
+    const sections=[
+      {label:'Round of 16',pairs:r16},
+      {label:'Quarterfinals',pairs:qf},
+      {label:'Semifinals',pairs:sf},
+      {label:'Championship Final',pairs:[{key:fk,col:AP,pA:finalPoem(0),pB:finalPoem(1),md:getMatchData(fk)}]}
+    ];
+    const phdr=document.createElement('div');phdr.className='bv3-panel-hdr';phdr.textContent='All Matchups';left.appendChild(phdr);
+    let firstKs=null;
+    sections.forEach(sec=>{
+      const lbl=document.createElement('div');lbl.className='bv3-rnd-lbl';lbl.textContent=sec.label;left.appendChild(lbl);
+      sec.pairs.forEach(({key,col,pA,pB,md})=>{
+        const ks=JSON.stringify(key);if(!firstKs)firstKs=ks;
+        const isD=md.winnerIdx!==null,isAct=_bv3Key===ks;
+        const pair=document.createElement('div');pair.className='bv3-pair';pair.style.borderLeftColor=col;pair.dataset.ks=ks;
+        [[pA,0],[pB,1]].forEach(([poem,slot],idx)=>{
+          if(idx===1){const dv=document.createElement('div');dv.className='bv3-pair-divider';pair.appendChild(dv);}
+          const row=document.createElement('div');row.className='bv3-row'+(isAct?' active':'');row.dataset.ks=ks;row.onclick=()=>selectBv3(ks);
+          const isW=isD&&poem&&md.winnerIdx===slot,isL=isD&&poem&&md.winnerIdx!==slot;
+          const nm=document.createElement('div');nm.className='bv3-pname'+(isL?' strike':'')+(!poem?' tbd':'');nm.textContent=poem?poem.name:'TBD';
+          row.appendChild(nm);
+          if(isW){const c=document.createElement('span');c.className='bv3-crown';c.textContent='👑';row.appendChild(c);}
+          pair.appendChild(row);
+        });
+        left.appendChild(pair);
       });
-      left.appendChild(pair);
+      const gap=document.createElement('div');gap.className='bv3-section-gap';left.appendChild(gap);
     });
-    const gap=document.createElement('div');gap.className='bv3-section-gap';left.appendChild(gap);
-  });
-  // Category legend at bottom
-  const leg=document.createElement('div');leg.className='bv3-legend';
-  CATEGORIES.forEach((cat,i)=>{const it=document.createElement('div');it.className='bv3-leg-item';const sw=document.createElement('div');sw.className='bv3-leg-swatch';sw.style.background=CC[i];it.appendChild(sw);it.appendChild(document.createTextNode(cat.name));leg.appendChild(it);});
-  left.appendChild(leg);
-  // Auto-select first matchup if none selected
-  if(!_bv3Key&&firstKs)_bv3Key=firstKs;
-  if(_bv3Key)renderBv3Right();else right.innerHTML='<div class="bv3-empty">Select a matchup to view details.</div>';
+    const leg=document.createElement('div');leg.className='bv3-legend';
+    CATEGORIES.forEach((cat,i)=>{const it=document.createElement('div');it.className='bv3-leg-item';const sw=document.createElement('div');sw.className='bv3-leg-swatch';sw.style.background=CC[i];it.appendChild(sw);it.appendChild(document.createTextNode(cat.name));leg.appendChild(it);});
+    left.appendChild(leg);
+    if(!_bv3Key&&firstKs)_bv3Key=firstKs;
+    if(_bv3Key)renderBv3Right();else right.innerHTML='<div class="bv3-empty">Select a matchup to view details.</div>';
+  } else {
+    // Student: original 7-column grid bracket
+    if(shell)shell.style.display='none';if(scroll)scroll.style.display='';
+    const bracket=document.getElementById('bracket');bracket.innerHTML='';if(!activeClass())return;
+    const subs=['4 matchups','2 matchups','','','','2 matchups','4 matchups'];
+    const roundDone={1:isR16Complete(),2:isQFComplete(),3:isSFComplete(),5:isSFComplete(),6:isQFComplete(),7:isR16Complete()};
+    ['Round of 16','Quarterfinals','Semifinals','The Crown','Semifinals','Quarterfinals','Round of 16'].forEach((h,i)=>{
+      const colNum=i+1;
+      const hd=document.createElement('div');hd.className='col-header'+(colNum===4?' crown-col-header':'');hd.style.cssText=`grid-column:${colNum};grid-row:1;`;
+      hd.setAttribute('data-bhdr',String(colNum));
+      const textBlock=document.createElement('div');textBlock.className='col-header-text';
+      const titleEl=document.createElement('span');titleEl.className='col-header-title';titleEl.textContent=h;textBlock.appendChild(titleEl);
+      if(subs[i]){const sub=document.createElement('span');sub.className='col-header-sub';sub.textContent=subs[i];textBlock.appendChild(sub);}
+      const inner=document.createElement('div');inner.className='col-header-inner';
+      const showBtn=colNum!==4&&(roundDone[colNum]||[2,3,5,6].includes(colNum));
+      if(showBtn){
+        const hbtn=document.createElement('button');hbtn.className='col-hide-btn';
+        const isRight=colNum>=5;
+        hbtn.textContent=isRight?'›':'‹';hbtn.title='Collapse this round';
+        hbtn.onclick=(e)=>{e.stopPropagation();manualCollapseCol(colNum);};
+        if(isRight){inner.appendChild(textBlock);inner.appendChild(hbtn);}
+        else{inner.appendChild(hbtn);inner.appendChild(textBlock);}
+      }else{inner.appendChild(textBlock);}
+      hd.appendChild(inner);bracket.appendChild(hd);
+    });
+    function mkStrip(col,label,arrow){const s=document.createElement('div');s.className='bc-strip';s.innerHTML=`<div class="bc-strip-arrow">${arrow}</div><div class="bc-strip-label">${label}</div>`;s.onclick=()=>toggleBracketColExpand(col);return s;}
+    const lR1=mcol('bc left','1','2');lR1.setAttribute('data-bcol','1');
+    lR1.appendChild(catBan(CATEGORIES[0]));lR1.appendChild(bcard('rR1',0,0,false,false));lR1.appendChild(bcard('rR1',0,1,false,false));lR1.appendChild(catBan(CATEGORIES[1]));lR1.appendChild(bcard('rR1',1,0,false,false));lR1.appendChild(bcard('rR1',1,1,false,false));
+    lR1.appendChild(mkStrip(1,'Round of 16','›'));bracket.appendChild(lR1);
+    const lQF=mcol('bc left','2','2');lQF.setAttribute('data-bcol','2');lQF.style.justifyContent='space-around';lQF.style.paddingTop='2.75rem';
+    lQF.appendChild(bcard('rQF',0,2,false,false));lQF.appendChild(bcard('rQF',1,2,false,false));
+    lQF.appendChild(mkStrip(2,'Quarters','›'));bracket.appendChild(lQF);
+    const lS=mcol('bc left','3','2');lS.setAttribute('data-bcol','3');lS.style.justifyContent='center';lS.style.paddingTop='2rem';
+    lS.appendChild(bcard('semi',0,null,false,false));
+    lS.appendChild(mkStrip(3,'Semis','›'));bracket.appendChild(lS);
+    const center=document.createElement('div');center.className='center-col';center.style.cssText='grid-column:4;grid-row:2;';
+    const champ=champion();
+    const cc=document.createElement('div');cc.className='champion-card'+(champ?' crowned':'');
+    cc.innerHTML=`<img src="Corona Crayola.svg" class="champion-trophy" alt="crown"><div class="champion-label">Poetry Champion</div><div class="champion-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div>`;
+    center.appendChild(cc);
+    const conn=document.createElement('div');conn.className='final-to-crown';
+    conn.innerHTML='<div class="final-to-crown-line"></div><div class="final-to-crown-arrow"></div>';
+    center.appendChild(conn);
+    const fl=document.createElement('div');fl.className='final-label';fl.textContent='Championship Final';center.appendChild(fl);
+    const finalWrap=bcard('final',null,null,false,false);finalWrap.classList.add('final-match-wrap');
+    center.appendChild(finalWrap);bracket.appendChild(center);
+    const rS=mcol('bc right','5','2');rS.setAttribute('data-bcol','5');rS.style.justifyContent='center';rS.style.paddingTop='2rem';
+    rS.appendChild(bcard('semi',1,null,true,false));
+    rS.appendChild(mkStrip(5,'Semis','‹'));bracket.appendChild(rS);
+    const rQF=mcol('bc right','6','2');rQF.setAttribute('data-bcol','6');rQF.style.justifyContent='space-around';rQF.style.paddingTop='2.75rem';
+    rQF.appendChild(bcard('rQF',2,2,true,false));rQF.appendChild(bcard('rQF',3,2,true,false));
+    rQF.appendChild(mkStrip(6,'Quarters','‹'));bracket.appendChild(rQF);
+    const rR1=mcol('bc right','7','2');rR1.setAttribute('data-bcol','7');
+    rR1.appendChild(catBan(CATEGORIES[2]));rR1.appendChild(bcard('rR1',2,0,true,false));rR1.appendChild(bcard('rR1',2,1,true,false));rR1.appendChild(catBan(CATEGORIES[3]));rR1.appendChild(bcard('rR1',3,0,true,false));rR1.appendChild(bcard('rR1',3,1,true,false));
+    rR1.appendChild(mkStrip(7,'Round of 16','‹'));bracket.appendChild(rR1);
+    if(!bracketFreshResult)applyBracketCollapse();
+    if(bracketJustSavedKey){setTimeout(()=>{document.querySelectorAll('.seed[data-flip-pending]').forEach(el=>{el.removeAttribute('data-flip-pending');flipSeedBadge(el);});bracketJustSavedKey=null;},120);}
+  }
 }
 function selectBv3(ks){
   _bv3Key=ks;
