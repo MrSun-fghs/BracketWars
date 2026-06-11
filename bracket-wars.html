@@ -550,6 +550,7 @@ body.projection .reaction-count{font-size:.9rem;}
 .fullscreen-btn:hover{background:rgba(74,58,255,.1);color:var(--md-primary);gap:.35rem;padding:.3rem .75rem;}
 .fullscreen-btn:hover .fs-label{max-width:80px;opacity:1;}
 body.projection .fullscreen-btn{display:none;}
+body.projection #ncaa-bar{position:fixed;top:.6rem;right:11rem;z-index:9990;padding:0;background:rgba(255,255,255,.92);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15);backdrop-filter:blur(4px);}
 /* ── Projection scale (Option A) ── */
 body.projection #bracketView{overflow:visible;}
 body.projection #bracketView .bracket-scroll{overflow:visible;display:block;}
@@ -4677,6 +4678,8 @@ function applyProjectionScale() {
     bracketEl.style.transformOrigin = 'top center';
     bracketEl.style.transform = `scale(${scale.toFixed(3)})`;
     bracketEl.style.marginBottom = `${(naturalH * scale - naturalH).toFixed(0)}px`;
+    // Redraw connector lines after scale transform changes visual positions
+    if (bracketEl.classList.contains('ncaa-bracket')) requestAnimationFrame(()=>drawNcaaLines());
   });
 }
 // ── Projection mode ──
