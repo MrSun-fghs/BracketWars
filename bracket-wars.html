@@ -476,23 +476,23 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .bv3-panel-hdr{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--md-on-surface);padding:.9rem .75rem .3rem;}
 .bv3-body{padding:1.5rem 2.5rem;display:flex;flex-direction:column;gap:1.25rem;max-width:860px;margin:0 auto;width:100%;box-sizing:border-box;}
 .bv3-versus{display:grid;grid-template-columns:1fr 40px 1fr;align-items:start;}
-.bv3-vs-mid{display:flex;align-items:center;justify-content:center;padding-top:65px;font-size:.85rem;font-weight:600;color:var(--md-on-surface-variant);}
+.bv3-vs-mid{display:flex;align-items:center;justify-content:center;padding-top:85px;font-size:.85rem;font-weight:600;color:var(--md-on-surface-variant);}
 .bv3-card{border:1.5px solid var(--md-outline-variant);border-radius:12px;overflow:hidden;background:var(--md-surface-container-lowest);}
 .bv3-card.win{border-color:var(--md-primary);}
 .bv3-card.lose{opacity:.65;}
 .bv3-card.live{border-color:#2E7D32;}
-.bv3-portrait{height:160px;position:relative;overflow:hidden;background:var(--md-surface-container);}
+.bv3-portrait{width:130px;height:130px;border-radius:50%;position:relative;overflow:hidden;background:var(--md-surface-container);margin:1.25rem auto .5rem;flex-shrink:0;}
 .bv3-portrait img{position:absolute;width:100%;height:100%;object-fit:cover;}
 .bv3-card.win .bv3-portrait{background:var(--md-primary-container);}
 .bv3-card.lose .bv3-portrait{filter:grayscale(1);}
-.bv3-seed{position:absolute;top:6px;left:6px;font-size:.62rem;font-weight:600;padding:2px 6px;border-radius:99px;background:rgba(0,0,0,.22);color:#fff;}
+.bv3-seed{position:absolute;top:6px;left:6px;font-size:.62rem;font-weight:600;padding:2px 6px;border-radius:99px;background:rgba(0,0,0,.35);color:#fff;}
 .bv3-card.win .bv3-seed{background:var(--md-primary);}
 .bv3-card.live .bv3-seed{background:#2E7D32;}
-.bv3-state-badge{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;}
+.bv3-state-badge{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;}
 .bv3-crown-b{background:var(--md-primary);color:var(--md-on-primary);}
-.bv3-x-b{background:rgba(0,0,0,.18);color:var(--md-on-surface-variant);}
-.bv3-card-info{padding:.6rem .75rem .8rem;}
-.bv3-card-name{font-size:.85rem;font-weight:500;color:var(--md-on-surface);line-height:1.25;margin-bottom:2px;}
+.bv3-x-b{background:rgba(0,0,0,.28);color:var(--md-on-surface-variant);}
+.bv3-card-info{padding:.4rem .75rem .9rem;text-align:center;}
+.bv3-card-name{font-size:.88rem;font-weight:500;color:var(--md-on-surface);line-height:1.25;margin-bottom:2px;}
 .bv3-card-name.strike{text-decoration:line-through;color:var(--md-on-surface-variant);}
 .bv3-card-name.italic{font-style:italic;font-weight:400;color:var(--md-on-surface-variant);}
 .bv3-card.win .bv3-card-name{color:var(--md-on-primary-container);}
@@ -3655,10 +3655,26 @@ function renderBv3Right(){
   body.appendChild(versus);
   if(MODE==='teacher'&&pA&&pB){
     const pills=document.createElement('div');pills.className='bv3-pills';
-    const eb=document.createElement('button');eb.className='bv3-pill amber';eb.textContent='Edit votes';eb.onclick=()=>{activeKey=key;openVoteDialog(key,pA,pB,md);};pills.appendChild(eb);
-    if(isD||tv>0){const rb=document.createElement('button');rb.className='bv3-pill ghost';rb.textContent='Reset matchup';rb.onclick=()=>{activeKey=key;resetMatchup();};pills.appendChild(rb);}
-    if(isLive){const fb=document.createElement('button');fb.className='bv3-pill green';fb.textContent='Finalize votes';fb.onclick=()=>{openVoteDialog(key,pA,pB,md);};pills.appendChild(fb);}
-    else if(!isD){const ob=document.createElement('button');ob.className='bv3-pill green';ob.textContent='Open voting';ob.onclick=()=>{openVotingSetup(key,pA,pB);};pills.appendChild(ob);}
+    // Edit votes — always
+    const eb=document.createElement('button');eb.className='bv3-pill';eb.textContent='Edit votes';eb.onclick=()=>{activeKey=key;openVoteDialog(key,pA,pB,md);};pills.appendChild(eb);
+    // Reset — when decided or has votes
+    if(isD||tv>0){const rb=document.createElement('button');rb.className='bv3-pill';rb.textContent='Reset matchup';rb.onclick=()=>{activeKey=key;resetMatchup();};pills.appendChild(rb);}
+    // Open / Finalize / Close voting
+    if(isLive){
+      const fb=document.createElement('button');fb.className='bv3-pill';fb.textContent='Finalize votes';
+      fb.onclick=()=>{document.getElementById('closeVotingConfirmDialog').classList.add('open');};
+      pills.appendChild(fb);
+    } else {
+      const ob=document.createElement('button');ob.className='bv3-pill';ob.textContent='Open voting';ob.onclick=()=>{openVotingSetup(key,pA,pB);};pills.appendChild(ob);
+    }
+    // Publish winner — when decided
+    if(isD){
+      const wi=md.winnerIdx,wP=wi===0?pA:pB,lP=wi===0?pB:pA;
+      const wV=md.votes[wi]||0,lV=md.votes[1-wi]||0,tot=wV+lV;
+      const pw=document.createElement('button');pw.className='bv3-pill';pw.textContent='Publish winner';
+      pw.onclick=()=>{showVoteResultCelebration({winnerName:wP.name,loserName:lP.name,winVotes:wV,loseVotes:lV,winPct:tot>0?Math.round(wV/tot*100):100});};
+      pills.appendChild(pw);
+    }
     body.appendChild(pills);
   }
   frag.appendChild(body);right.innerHTML='';right.appendChild(frag);
