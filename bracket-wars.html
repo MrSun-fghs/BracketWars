@@ -618,12 +618,11 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .ncaa-m-crown{width:13px;height:13px;object-fit:contain;display:block;flex-shrink:0;}
 @media(max-width:640px){
   .ncaa-m-seed,.ncaa-m-info,.ncaa-m-crown{display:none;}
+  .ncaa-clabel{display:none;}
   .ncaa-m-port{width:28px;height:28px;}
   .ncaa-slot{padding:3px;justify-content:center;}
-  .ncaa-slot[data-tip]{position:relative;}
-  .ncaa-slot[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 5px);transform:translateX(-50%);background:rgba(15,15,15,.88);color:#fff;font-size:.62rem;font-weight:600;white-space:nowrap;padding:.25rem .5rem;border-radius:6px;z-index:200;pointer-events:none;}
-  .ncaa-slot[data-tip]:hover::before{content:'';position:absolute;left:50%;bottom:calc(100% + 1px);transform:translateX(-50%);border:4px solid transparent;border-top-color:rgba(15,15,15,.88);z-index:201;}
 }
+#ncaa-tip{display:none;position:fixed;z-index:9999;background:rgba(15,15,15,.9);color:#fff;font-size:.65rem;font-weight:600;padding:.3rem .55rem;border-radius:6px;pointer-events:none;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;}
 .ncaa-center-col{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:172px;padding:0 10px;gap:8px;flex-shrink:0;}
 .ncaa-center-col .champion-card{width:160px;box-sizing:border-box;}
 .ncaa-final-hdr{font-size:.62rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--md-primary);text-align:center;}
@@ -3608,7 +3607,7 @@ function renderBracket(){
     const fhdr=document.createElement('div');fhdr.className='ncaa-final-hdr';fhdr.textContent='🏆 Championship';center.appendChild(fhdr);
     const fm2=buildNcaaMatch('final',null,null);fm2.classList.add('final-m');center.appendChild(fm2);
     const champ=champion();const cc2=document.createElement('div');cc2.className='champion-card'+(champ?' crowned':'');
-    cc2.innerHTML='<img src="Corona Crayola.png" class="champion-trophy" alt="crown"><div class="champion-label">Poetry Champion</div><div class="champion-name'+(champ?'':' empty')+'">'+(champ?esc(champ.name):'To be decided')+'</div>';
+    cc2.innerHTML='<img src="Corona Crayola.svg" class="champion-trophy" alt="crown"><div class="champion-label">Poetry Champion</div><div class="champion-name'+(champ?'':' empty')+'">'+(champ?esc(champ.name):'To be decided')+'</div>';
     center.appendChild(cc2);bracket.appendChild(center);
     // Right half: SF → QF → R16 (mirrored)
     const rh=document.createElement('div');rh.className='ncaa-half';
@@ -3619,6 +3618,16 @@ function renderBracket(){
     const rp3=mkPair(CC[3],CATEGORIES[3].name.replace(/^[A-D] — /,''));rp3.appendChild(buildNcaaMatch('rR1',3,0));rp3.appendChild(buildNcaaMatch('rR1',3,1));rr16c.appendChild(rp3);
     rh.appendChild(rr16);bracket.appendChild(rh);
     requestAnimationFrame(()=>requestAnimationFrame(()=>drawNcaaLines()));
+    // Compact-mode tooltip (fixed-positioned so it escapes overflow:hidden on cards)
+    let tip=document.getElementById('ncaa-tip');if(!tip){tip=document.createElement('div');tip.id='ncaa-tip';document.body.appendChild(tip);}
+    bracket.addEventListener('mouseover',e=>{
+      if(window.innerWidth>640){tip.style.display='none';return;}
+      const sl=e.target.closest('[data-tip]');if(!sl){tip.style.display='none';return;}
+      tip.textContent=sl.dataset.tip;tip.style.display='block';
+      const r=sl.getBoundingClientRect();
+      requestAnimationFrame(()=>{const w=tip.offsetWidth,h=tip.offsetHeight;const left=Math.min(Math.max(r.left+r.width/2-w/2,6),window.innerWidth-w-6);tip.style.left=left+'px';tip.style.top=Math.max(r.top-h-6,6)+'px';});
+    });
+    bracket.addEventListener('mouseout',e=>{if(!e.relatedTarget||!e.relatedTarget.closest('[data-tip]'))tip.style.display='none';});
   }
 }
 function selectBv3(ks){
