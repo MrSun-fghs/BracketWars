@@ -1086,6 +1086,18 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .setup-cat-header{font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.6rem 0 .25rem;border-top:1px solid var(--md-outline-variant);margin-top:.5rem;color:var(--md-on-surface-variant);display:flex;align-items:center;justify-content:space-between;}
 .setup-reset-cat{font-size:.65rem;font-weight:600;letter-spacing:.02em;text-transform:none;color:var(--md-on-surface-variant);background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;opacity:.55;font-family:inherit;transition:opacity .15s;}
 .setup-reset-cat:hover{opacity:1;background:var(--md-surface-container-high);}
+.setup-copy-wrap{display:flex;align-items:center;gap:8px;padding:.4rem .65rem;background:var(--md-surface-container);border-radius:8px;margin-bottom:.7rem;}
+.setup-copy-lbl{font-size:.78rem;color:var(--md-on-surface-variant);white-space:nowrap;flex-shrink:0;}
+.setup-copy-select{flex:1;min-width:0;padding:5px 8px;border:1.5px solid var(--md-outline);border-radius:6px;font-size:.78rem;font-family:inherit;background:var(--md-surface);color:var(--md-on-surface);outline:none;}
+.setup-copy-btn{padding:5px 12px;background:var(--md-primary);color:#fff;border:none;border-radius:6px;font-size:.78rem;font-family:inherit;cursor:pointer;white-space:nowrap;font-weight:600;transition:opacity .15s;}
+.setup-copy-btn:hover{opacity:.88;}
+.setup-swap-row{display:flex;align-items:center;gap:4px;height:18px;margin:0;}
+.setup-swap-row::before,.setup-swap-row::after{content:'';flex:1;height:1px;background:var(--md-outline-variant);opacity:.35;}
+.setup-swap-btn{background:none;border:1px solid var(--md-outline-variant);border-radius:4px;cursor:pointer;font-size:10px;padding:0 6px;height:14px;line-height:14px;color:var(--md-on-surface-variant);opacity:.5;display:flex;align-items:center;gap:3px;transition:opacity .15s,background .15s;flex-shrink:0;font-family:inherit;}
+.setup-swap-btn:hover{opacity:1;background:var(--md-surface-container);color:var(--md-primary);}
+.setup-apply-all-wrap{display:none;margin:.1rem 0 .8rem;padding:.5rem .65rem;background:var(--md-surface-container);border-radius:8px;}
+.setup-apply-all-wrap label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82rem;color:var(--md-on-surface-variant);}
+.setup-apply-all-wrap input[type=checkbox]{width:15px;height:15px;accent-color:var(--md-primary);cursor:pointer;flex-shrink:0;}
 .setup-avail-wrap{background:var(--md-surface-container);border-radius:8px;padding:.5rem .65rem .55rem;margin-bottom:.7rem;}
 .setup-avail-label{font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:.4rem;}
 .setup-avail-pills{display:flex;flex-wrap:wrap;gap:4px;}
@@ -1620,6 +1632,9 @@ body.projection #sectionNav{display:none!important;}
   <div class="dialog" style="max-width:560px">
     <div class="dialog-headline" id="setupHeadline">Edit Poems</div>
     <div class="setup-grid" id="setupInputs"></div>
+    <div class="setup-apply-all-wrap" id="setupApplyAllWrap">
+      <label><input type="checkbox" id="setupApplyAll"> Apply to all blocks <span style="font-size:.72rem;opacity:.65;">(resets bracket results for other blocks if poems differ)</span></label>
+    </div>
     <div class="dialog-actions">
       <button class="btn-text" onclick="closeSetup()">Cancel</button>
       <button class="btn-filled" onclick="saveSetup()">Save</button>
@@ -4047,6 +4062,51 @@ function openSetup() {
   availWrap.appendChild(availPills);
   c.appendChild(availWrap);
 
+  // ── Copy from another block ──
+  const applyAllWrap = document.getElementById('setupApplyAllWrap');
+  if (applyAllWrap) {
+    applyAllWrap.style.display = app.classes.length > 1 ? '' : 'none';
+    document.getElementById('setupApplyAll').checked = false;
+  }
+  if (app.classes.length > 1) {
+    const copyWrap = document.createElement('div');
+    copyWrap.className = 'setup-copy-wrap';
+    const copyLbl = document.createElement('span');
+    copyLbl.className = 'setup-copy-lbl';
+    copyLbl.textContent = 'Copy from:';
+    const copySelect = document.createElement('select');
+    copySelect.className = 'setup-copy-select';
+    app.classes.forEach(cls => {
+      if (cls.id === app.activeId) return;
+      const opt = document.createElement('option');
+      opt.value = cls.id;
+      opt.textContent = cls.name;
+      copySelect.appendChild(opt);
+    });
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'setup-copy-btn';
+    copyBtn.textContent = 'Apply';
+    copyBtn.onclick = () => {
+      const src = app.classes.find(cl => cl.id === copySelect.value);
+      if (!src) return;
+      const sp = src.bracket.poems;
+      const sa = src.bracket.authors || [...DEFAULT_AUTHORS];
+      for (let si = 0; si < 16; si++) {
+        const nI = c.querySelector(`input[data-si="${si}"][data-field="name"]`);
+        const aI = c.querySelector(`input[data-si="${si}"][data-field="author"]`);
+        if (nI) nI.value = sp[si] || '';
+        if (aI) aI.value = sa[si] || '';
+      }
+      _setupRefreshPills(c);
+      _setupCheckConflicts(c);
+    };
+    copyWrap.appendChild(copyLbl);
+    copyWrap.appendChild(copySelect);
+    copyWrap.appendChild(copyBtn);
+    c.appendChild(copyWrap);
+  }
+
   // ── Seed rows ──
   CATEGORIES.forEach(cat => {
     const hdr = document.createElement('div');
@@ -4072,7 +4132,7 @@ function openSetup() {
     hdr.appendChild(resetBtn);
     c.appendChild(hdr);
 
-    cat.seeds.forEach(si => {
+    cat.seeds.forEach((si, localIdx) => {
       const row = document.createElement('div');
       row.className = 'setup-poem-row';
       row.dataset.si = si;
@@ -4140,6 +4200,30 @@ function openSetup() {
       authCell.appendChild(warnIcon);
       row.appendChild(authCell);
       c.appendChild(row);
+
+      // Swap button between adjacent seeds (not after the last one)
+      if (localIdx < cat.seeds.length - 1) {
+        const nextSi = cat.seeds[localIdx + 1];
+        const swapRow = document.createElement('div');
+        swapRow.className = 'setup-swap-row';
+        const swapBtn = document.createElement('button');
+        swapBtn.type = 'button';
+        swapBtn.className = 'setup-swap-btn';
+        swapBtn.title = `Swap Seed ${si + 1} ↕ Seed ${nextSi + 1}`;
+        swapBtn.textContent = '⇅';
+        swapBtn.onclick = () => {
+          const nA = c.querySelector(`input[data-si="${si}"][data-field="name"]`);
+          const aA = c.querySelector(`input[data-si="${si}"][data-field="author"]`);
+          const nB = c.querySelector(`input[data-si="${nextSi}"][data-field="name"]`);
+          const aB = c.querySelector(`input[data-si="${nextSi}"][data-field="author"]`);
+          [nA.value, nB.value] = [nB.value, nA.value];
+          [aA.value, aB.value] = [aB.value, aA.value];
+          _setupRefreshPills(c);
+          _setupCheckConflicts(c);
+        };
+        swapRow.appendChild(swapBtn);
+        c.appendChild(swapRow);
+      }
     });
   });
 
@@ -4237,18 +4321,24 @@ function _setupCheckConflicts(container) {
 }
 
 function saveSetup() {
-  const np = [...activeClass().bracket.poems];
-  const na = activeClass().bracket.authors ? [...activeClass().bracket.authors] : [...DEFAULT_AUTHORS];
+  const np = new Array(16);
+  const na = new Array(16);
   document.querySelectorAll('#setupInputs input[data-field="name"]').forEach(inp => {
     const i = parseInt(inp.dataset.si); np[i] = inp.value.trim() || `Poem ${i+1}`;
   });
   document.querySelectorAll('#setupInputs input[data-field="author"]').forEach(inp => {
     const i = parseInt(inp.dataset.si); na[i] = inp.value.trim();
   });
-  const pChanged = JSON.stringify(np) !== JSON.stringify(activeClass().bracket.poems);
-  const aChanged = JSON.stringify(na) !== JSON.stringify(activeClass().bracket.authors || DEFAULT_AUTHORS);
-  if (pChanged) { activeClass().bracket = defaultBracket(); activeClass().bracket.poems = np; }
-  activeClass().bracket.authors = na;
+
+  const applyAll = document.getElementById('setupApplyAll')?.checked;
+  const targetClasses = applyAll ? app.classes : [activeClass()];
+
+  targetClasses.forEach(cls => {
+    const pChanged = JSON.stringify(np) !== JSON.stringify(cls.bracket.poems);
+    if (pChanged) { cls.bracket = defaultBracket(); cls.bracket.poems = [...np]; }
+    cls.bracket.authors = [...na];
+  });
+
   saveApp(); closeSetup(); renderAll();
 }
 
