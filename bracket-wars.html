@@ -446,6 +446,73 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .final-match-wrap .matchup.bk-matchup{background:transparent!important;box-shadow:none!important;border:none!important;}
 .final-match-wrap .bk-slot.bk-winner{border:1.5px solid rgba(245,158,11,.7);}
 .bk-slot .seed{display:none!important;}
+/* ── Bracket v3 two-panel layout ── */
+.bv3-shell{display:grid;grid-template-columns:230px 1fr;height:calc(100vh - 112px);overflow:hidden;background:var(--md-surface);}
+.bv3-left{overflow-y:auto;border-right:1px solid var(--md-outline-variant);background:var(--md-surface-container-low);display:flex;flex-direction:column;}
+.bv3-right{overflow-y:auto;background:var(--md-surface);}
+.bv3-rnd-lbl{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);padding:.6rem .75rem .25rem;}
+.bv3-pair{margin:.15rem .5rem;border-radius:6px;overflow:hidden;border-left:3px solid transparent;}
+.bv3-pair-divider{height:1px;background:var(--md-outline-variant);opacity:.4;margin:0 6px;}
+.bv3-pair-gap{height:5px;}
+.bv3-section-gap{height:4px;border-top:1px solid var(--md-outline-variant);margin:.4rem 0;}
+.bv3-row{display:flex;align-items:center;gap:5px;padding:.38rem .55rem;cursor:pointer;transition:background .1s;}
+.bv3-row:hover{background:var(--md-surface-container);}
+.bv3-row.active{background:var(--md-primary-container);}
+.bv3-pname{font-size:.75rem;color:var(--md-on-surface);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+.bv3-pname.strike{text-decoration:line-through;color:var(--md-on-surface-variant);}
+.bv3-pname.tbd{color:var(--md-on-surface-variant);font-style:italic;}
+.bv3-row.active .bv3-pname{color:var(--md-on-primary-container);}
+.bv3-crown{font-size:.7rem;flex-shrink:0;opacity:.8;}
+.bv3-legend{display:flex;flex-wrap:wrap;gap:6px 10px;padding:.55rem .75rem;border-top:1px solid var(--md-outline-variant);margin-top:auto;}
+.bv3-leg-item{display:flex;align-items:center;gap:4px;font-size:.62rem;color:var(--md-on-surface-variant);}
+.bv3-leg-swatch{width:3px;height:12px;border-radius:99px;flex-shrink:0;}
+/* right panel */
+.bv3-hdr{padding:.7rem 1.1rem .6rem;border-bottom:1px solid var(--md-outline-variant);display:flex;align-items:baseline;justify-content:space-between;gap:.5rem;}
+.bv3-rnd-txt{font-size:.7rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.bv3-st{font-size:.72rem;font-weight:500;}
+.bv3-st-decided{color:var(--md-primary);}
+.bv3-st-open{color:#2E7D32;}
+.bv3-st-tbd{color:var(--md-on-surface-variant);}
+.bv3-body{padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:1rem;}
+.bv3-versus{display:grid;grid-template-columns:1fr 40px 1fr;align-items:start;}
+.bv3-vs-mid{display:flex;align-items:center;justify-content:center;padding-top:55px;font-size:.85rem;font-weight:600;color:var(--md-on-surface-variant);}
+.bv3-card{border:1.5px solid var(--md-outline-variant);border-radius:12px;overflow:hidden;background:var(--md-surface-container-lowest);}
+.bv3-card.win{border-color:var(--md-primary);}
+.bv3-card.lose{opacity:.42;}
+.bv3-card.live{border-color:#2E7D32;}
+.bv3-portrait{height:110px;position:relative;overflow:hidden;background:var(--md-surface-container);}
+.bv3-portrait img{position:absolute;width:100%;height:100%;object-fit:cover;}
+.bv3-card.win .bv3-portrait{background:var(--md-primary-container);}
+.bv3-card.lose .bv3-portrait{filter:grayscale(1);}
+.bv3-seed{position:absolute;top:6px;left:6px;font-size:.62rem;font-weight:600;padding:2px 6px;border-radius:99px;background:rgba(0,0,0,.22);color:#fff;}
+.bv3-card.win .bv3-seed{background:var(--md-primary);}
+.bv3-card.live .bv3-seed{background:#2E7D32;}
+.bv3-state-badge{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;}
+.bv3-crown-b{background:var(--md-primary);color:var(--md-on-primary);}
+.bv3-x-b{background:rgba(0,0,0,.18);color:var(--md-on-surface-variant);}
+.bv3-card-info{padding:.6rem .75rem .8rem;}
+.bv3-card-name{font-size:.85rem;font-weight:500;color:var(--md-on-surface);line-height:1.25;margin-bottom:2px;}
+.bv3-card-name.strike{text-decoration:line-through;color:var(--md-on-surface-variant);}
+.bv3-card-name.italic{font-style:italic;font-weight:400;color:var(--md-on-surface-variant);}
+.bv3-card.win .bv3-card-name{color:var(--md-on-primary-container);}
+.bv3-card-auth{font-size:.72rem;color:var(--md-on-surface-variant);}
+.bv3-vbar{display:flex;align-items:center;gap:6px;margin-top:.45rem;}
+.bv3-vpct{font-size:.7rem;font-weight:600;color:var(--md-primary);width:30px;flex-shrink:0;}
+.bv3-card.lose .bv3-vpct{color:var(--md-on-surface-variant);}
+.bv3-vtrack{flex:1;height:4px;background:var(--md-surface-container-high);border-radius:99px;overflow:hidden;}
+.bv3-vfill{height:100%;background:var(--md-primary);border-radius:99px;}
+.bv3-card.lose .bv3-vfill{background:var(--md-on-surface-variant);opacity:.4;}
+.bv3-vcnt{font-size:.68rem;color:var(--md-on-surface-variant);width:46px;text-align:right;flex-shrink:0;}
+.bv3-pills{display:flex;gap:.5rem;flex-wrap:wrap;padding-top:.25rem;}
+.bv3-pill{font-size:.78rem;font-weight:500;padding:.38rem .9rem;border-radius:99px;border:1px solid var(--md-outline-variant);background:transparent;color:var(--md-on-surface);cursor:pointer;}
+.bv3-pill:hover{background:var(--md-surface-container);}
+.bv3-pill.amber{background:#B45309;color:#fff;border-color:#B45309;}
+.bv3-pill.amber:hover{background:#92400E;}
+.bv3-pill.green{background:#2E7D32;color:#fff;border-color:#2E7D32;}
+.bv3-pill.green:hover{background:#1B5E20;}
+.bv3-pill.ghost{color:var(--md-on-surface-variant);border-color:transparent;}
+.bv3-pill.ghost:hover{background:var(--md-surface-container);}
+.bv3-empty{padding:2.5rem;font-size:.85rem;color:var(--md-on-surface-variant);text-align:center;}
 /* Projection mode */
 body.projection .app-bar{display:none!important;}
 body.projection .tabs-surface{display:none!important;}
@@ -1373,7 +1440,7 @@ body.projection #sectionNav{display:none!important;}
 <div id="homeView" style="display:none"><div class="home-view" id="homeContent"></div></div>
 <div id="leaderboardView" style="display:none"><div class="leaderboard-view" id="lbContent"></div></div>
 <div id="listView" style="display:none"><div class="list-view" id="listContent"></div></div>
-<div id="bracketView" style="display:none"><div id="bracketColToolbar"><button class="bracket-expand-btn" onclick="expandAllBracketCols()">↔ Show All Rounds</button></div><div class="bracket-scroll"><div class="mm-bracket" id="bracket"></div></div></div>
+<div id="bracketView" style="display:none"><div id="bracket" style="display:none"></div><div class="bv3-shell"><div class="bv3-left" id="bv3Left"></div><div class="bv3-right" id="bv3Right"></div></div></div>
 <div id="rosterView" style="display:none">
   <div class="roster-title-block">
     <div class="roster-title-sub">× Bracket Wars ×</div>
@@ -3428,84 +3495,118 @@ function toggleCrownCol(){
   }
 }
 
+let _bv3Key=null;
 function renderBracket(){
-  const bracket=document.getElementById('bracket');bracket.innerHTML='';if(!activeClass())return;
-  const isT=MODE==='teacher';
-  const subs=['4 matchups','2 matchups','','','','2 matchups','4 matchups'];
-  // Which rounds are complete (determines if hide btn shows)
-  const roundDone={1:isR16Complete(),2:isQFComplete(),3:isSFComplete(),5:isSFComplete(),6:isQFComplete(),7:isR16Complete()};
-  ['Round of 16','Quarterfinals','Semifinals','The Crown','Semifinals','Quarterfinals','Round of 16'].forEach((h,i)=>{
-    const colNum=i+1;
-    const hd=document.createElement('div');hd.className='col-header'+(colNum===4?' crown-col-header':'');hd.style.cssText=`grid-column:${colNum};grid-row:1;`;
-    hd.setAttribute('data-bhdr',String(colNum));
-    // Text block: title + subtitle stacked and centered
-    const textBlock=document.createElement('div');textBlock.className='col-header-text';
-    const titleEl=document.createElement('span');titleEl.className='col-header-title';titleEl.textContent=h;textBlock.appendChild(titleEl);
-    if(subs[i]){const sub=document.createElement('span');sub.className='col-header-sub';sub.textContent=subs[i];textBlock.appendChild(sub);}
-    // Inner wrapper: button on outer edge, text block centered
-    const inner=document.createElement('div');inner.className='col-header-inner';
-    // Show collapse button on QF (2,6) and SF (3,5) always; other non-crown cols only when round done
-    const showBtn = colNum!==4 && (roundDone[colNum] || [2,3,5,6].includes(colNum));
-    if(showBtn){
-      const hbtn=document.createElement('button');hbtn.className='col-hide-btn';
-      const isRight=colNum>=5;
-      hbtn.textContent=isRight?'›':'‹';hbtn.title='Collapse this round';
-      hbtn.onclick=(e)=>{e.stopPropagation();manualCollapseCol(colNum);};
-      if(isRight){inner.appendChild(textBlock);inner.appendChild(hbtn);}
-      else{inner.appendChild(hbtn);inner.appendChild(textBlock);}
-    } else {
-      inner.appendChild(textBlock);
-    }
-    hd.appendChild(inner);
-    bracket.appendChild(hd);
+  const left=document.getElementById('bv3Left'),right=document.getElementById('bv3Right');
+  left.innerHTML='';right.innerHTML='';
+  if(!activeClass())return;
+  const CC=['#1565C0','#6A1B9A','#2E7D32','#C62828'];
+  const AP='var(--md-primary)';
+  // Build matchup groups by round
+  const r16=[];for(let ri=0;ri<4;ri++)for(let mi=0;mi<2;mi++){const k={type:'rR1',ri,mi};r16.push({key:k,col:CC[ri],pA:r1Poem(ri,mi,0),pB:r1Poem(ri,mi,1),md:getMatchData(k)});}
+  const qf=[];for(let ri=0;ri<4;ri++){const k={type:'rQF',ri,mi:2};qf.push({key:k,col:CC[ri],pA:qfPoem(ri,0),pB:qfPoem(ri,1),md:getMatchData(k)});}
+  const sf=[];for(let ri=0;ri<2;ri++){const k={type:'semi',ri};sf.push({key:k,col:AP,pA:semiPoem(ri,0),pB:semiPoem(ri,1),md:getMatchData(k)});}
+  const fk={type:'final'};
+  const sections=[
+    {label:'Round of 16',pairs:r16},
+    {label:'Quarterfinals',pairs:qf},
+    {label:'Semifinals',pairs:sf},
+    {label:'Championship Final',pairs:[{key:fk,col:AP,pA:finalPoem(0),pB:finalPoem(1),md:getMatchData(fk)}]}
+  ];
+  // Build left panel
+  let firstKs=null;
+  sections.forEach(sec=>{
+    const lbl=document.createElement('div');lbl.className='bv3-rnd-lbl';lbl.textContent=sec.label;left.appendChild(lbl);
+    sec.pairs.forEach(({key,col,pA,pB,md})=>{
+      const ks=JSON.stringify(key);if(!firstKs)firstKs=ks;
+      const isD=md.winnerIdx!==null,isAct=_bv3Key===ks;
+      const pair=document.createElement('div');pair.className='bv3-pair';pair.style.borderLeftColor=col;pair.dataset.ks=ks;
+      [[pA,0],[pB,1]].forEach(([poem,slot],idx)=>{
+        if(idx===1){const dv=document.createElement('div');dv.className='bv3-pair-divider';pair.appendChild(dv);}
+        const row=document.createElement('div');row.className='bv3-row'+(isAct?' active':'');row.dataset.ks=ks;row.onclick=()=>selectBv3(ks);
+        const isW=isD&&poem&&md.winnerIdx===slot,isL=isD&&poem&&md.winnerIdx!==slot;
+        const nm=document.createElement('div');nm.className='bv3-pname'+(isL?' strike':'')+(!poem?' tbd':'');nm.textContent=poem?poem.name:'TBD';
+        row.appendChild(nm);
+        if(isW){const c=document.createElement('span');c.className='bv3-crown';c.textContent='👑';row.appendChild(c);}
+        pair.appendChild(row);
+      });
+      left.appendChild(pair);
+    });
+    const gap=document.createElement('div');gap.className='bv3-section-gap';left.appendChild(gap);
   });
-  // Helper to build a collapse strip
-  function mkStrip(col,label,arrow){
-    const s=document.createElement('div');s.className='bc-strip';
-    s.innerHTML=`<div class="bc-strip-arrow">${arrow}</div><div class="bc-strip-label">${label}</div>`;
-    s.onclick=()=>toggleBracketColExpand(col);return s;
+  // Category legend at bottom
+  const leg=document.createElement('div');leg.className='bv3-legend';
+  CATEGORIES.forEach((cat,i)=>{const it=document.createElement('div');it.className='bv3-leg-item';const sw=document.createElement('div');sw.className='bv3-leg-swatch';sw.style.background=CC[i];it.appendChild(sw);it.appendChild(document.createTextNode(cat.name));leg.appendChild(it);});
+  left.appendChild(leg);
+  // Auto-select first matchup if none selected
+  if(!_bv3Key&&firstKs)_bv3Key=firstKs;
+  if(_bv3Key)renderBv3Right();else right.innerHTML='<div class="bv3-empty">Select a matchup to view details.</div>';
+}
+function selectBv3(ks){
+  _bv3Key=ks;
+  document.querySelectorAll('#bv3Left .bv3-row').forEach(r=>r.classList.toggle('active',r.dataset.ks===ks));
+  renderBv3Right();
+}
+function renderBv3Right(){
+  const right=document.getElementById('bv3Right');if(!right)return;
+  if(!_bv3Key){right.innerHTML='<div class="bv3-empty">Select a matchup to view details.</div>';return;}
+  const key=JSON.parse(_bv3Key);
+  let pA,pB;
+  if(key.type==='rR1'){pA=r1Poem(key.ri,key.mi,0);pB=r1Poem(key.ri,key.mi,1);}
+  else if(key.type==='rQF'){pA=qfPoem(key.ri,0);pB=qfPoem(key.ri,1);}
+  else if(key.type==='semi'){pA=semiPoem(key.ri,0);pB=semiPoem(key.ri,1);}
+  else{pA=finalPoem(0);pB=finalPoem(1);}
+  const md=getMatchData(key);
+  const isD=md.winnerIdx!==null,tv=(md.votes[0]||0)+(md.votes[1]||0);
+  const isLive=!!(app.voting&&app.voting.open&&app.voting.classId===app.activeId&&JSON.stringify(app.voting.matchupKey)===_bv3Key);
+  let stCls='bv3-st-tbd',stTxt='No votes yet';
+  if(isLive){stCls='bv3-st-open';stTxt='Voting open';}
+  else if(isD){stCls='bv3-st-decided';stTxt='Decided';}
+  else if(tv>0){stCls='bv3-st-decided';stTxt=tv+' vote'+(tv!==1?'s':'');}
+  else if(!pA||!pB){stCls='bv3-st-tbd';stTxt='Waiting for poems';}
+  const frag=document.createDocumentFragment();
+  const hdr=document.createElement('div');hdr.className='bv3-hdr';
+  hdr.innerHTML='<span class="bv3-rnd-txt">'+getRoundLabel(key)+'</span><span class="bv3-st '+stCls+'">'+stTxt+'</span>';
+  frag.appendChild(hdr);
+  const body=document.createElement('div');body.className='bv3-body';
+  const versus=document.createElement('div');versus.className='bv3-versus';
+  [pA,pB].forEach((poem,slot)=>{
+    const isW=isD&&md.winnerIdx===slot,isL=isD&&md.winnerIdx!==slot;
+    const vCnt=md.votes[slot]||0,vPct=tv>0?Math.round(vCnt/tv*100):0;
+    const card=document.createElement('div');card.className='bv3-card'+(isW?' win':isL?' lose':isLive?' live':'');
+    const port=document.createElement('div');port.className='bv3-portrait';
+    if(poem){
+      const rp=ROSTER_POEMS.find(p=>p.num===poem.seed);
+      if(rp&&rp.svg){const img=document.createElement('img');img.src=rp.svg;img.alt='';img.loading='lazy';const z=rp.cropZoom||1,cx=rp.cropX||0,cy=rp.cropY||0;img.style.cssText='transform:scale('+z+') translate('+cx+'px,'+cy+'px);transform-origin:center top;';port.appendChild(img);}
+      const sd=document.createElement('div');sd.className='bv3-seed';sd.textContent=poem.seed;port.appendChild(sd);
+      if(isD){const bd=document.createElement('div');bd.className='bv3-state-badge '+(isW?'bv3-crown-b':'bv3-x-b');bd.textContent=isW?'👑':'✕';port.appendChild(bd);}
+    }
+    card.appendChild(port);
+    const info=document.createElement('div');info.className='bv3-card-info';
+    const nm=document.createElement('div');nm.className='bv3-card-name'+(isL?' strike':'')+(!poem?' italic':'');nm.textContent=poem?poem.name:'TBD';
+    info.appendChild(nm);
+    if(poem&&poem.author){const au=document.createElement('div');au.className='bv3-card-auth';au.textContent=poem.author;info.appendChild(au);}
+    if(tv>0||isD){
+      const vbar=document.createElement('div');vbar.className='bv3-vbar';
+      const vp=document.createElement('div');vp.className='bv3-vpct';vp.textContent=vPct+'%';
+      const vt=document.createElement('div');vt.className='bv3-vtrack';
+      const vf=document.createElement('div');vf.className='bv3-vfill';vf.style.width=vPct+'%';vt.appendChild(vf);
+      const vc=document.createElement('div');vc.className='bv3-vcnt';vc.textContent=vCnt+' vote'+(vCnt!==1?'s':'');
+      vbar.appendChild(vp);vbar.appendChild(vt);vbar.appendChild(vc);info.appendChild(vbar);
+    }
+    card.appendChild(info);versus.appendChild(card);
+    if(slot===0){const mid=document.createElement('div');mid.className='bv3-vs-mid';mid.textContent='vs';versus.appendChild(mid);}
+  });
+  body.appendChild(versus);
+  if(MODE==='teacher'&&pA&&pB){
+    const pills=document.createElement('div');pills.className='bv3-pills';
+    const eb=document.createElement('button');eb.className='bv3-pill amber';eb.textContent='Edit votes';eb.onclick=()=>{activeKey=key;openVoteDialog(key,pA,pB,md);};pills.appendChild(eb);
+    if(isD||tv>0){const rb=document.createElement('button');rb.className='bv3-pill ghost';rb.textContent='Reset matchup';rb.onclick=()=>{activeKey=key;resetMatchup();};pills.appendChild(rb);}
+    if(isLive){const fb=document.createElement('button');fb.className='bv3-pill green';fb.textContent='Finalize votes';fb.onclick=()=>{openVoteDialog(key,pA,pB,md);};pills.appendChild(fb);}
+    else if(!isD){const ob=document.createElement('button');ob.className='bv3-pill green';ob.textContent='Open voting';ob.onclick=()=>{openVotingSetup(key,pA,pB);};pills.appendChild(ob);}
+    body.appendChild(pills);
   }
-  const lR1=mcol('bc left','1','2');lR1.setAttribute('data-bcol','1');
-  lR1.appendChild(catBan(CATEGORIES[0]));lR1.appendChild(bcard('rR1',0,0,false,isT));lR1.appendChild(bcard('rR1',0,1,false,isT));lR1.appendChild(catBan(CATEGORIES[1]));lR1.appendChild(bcard('rR1',1,0,false,isT));lR1.appendChild(bcard('rR1',1,1,false,isT));
-  lR1.appendChild(mkStrip(1,'Round of 16','›'));bracket.appendChild(lR1);
-  const lQF=mcol('bc left','2','2');lQF.setAttribute('data-bcol','2');lQF.style.justifyContent='space-around';lQF.style.paddingTop='2.75rem';
-  lQF.appendChild(bcard('rQF',0,2,false,isT));lQF.appendChild(bcard('rQF',1,2,false,isT));
-  lQF.appendChild(mkStrip(2,'Quarters','›'));bracket.appendChild(lQF);
-  const lS=mcol('bc left','3','2');lS.setAttribute('data-bcol','3');lS.style.justifyContent='center';lS.style.paddingTop='2rem';
-  lS.appendChild(bcard('semi',0,null,false,isT));
-  lS.appendChild(mkStrip(3,'Semis','›'));bracket.appendChild(lS);
-  const center=document.createElement('div');center.className='center-col';center.style.cssText='grid-column:4;grid-row:2;';
-  // Champion card (no duplicate title — col-header already shows it)
-  const champ=champion();
-  const cc=document.createElement('div');cc.className='champion-card'+(champ?' crowned':'');
-  cc.innerHTML=`<img src="Corona Crayola.svg" class="champion-trophy" alt="crown"><div class="champion-label">Poetry Champion</div><div class="champion-name${champ?'':' empty'}">${champ?esc(champ.name):'To be decided'}</div>`;
-  center.appendChild(cc);
-  // Visual connector
-  const conn=document.createElement('div');conn.className='final-to-crown';
-  conn.innerHTML='<div class="final-to-crown-line"></div><div class="final-to-crown-arrow"></div>';
-  center.appendChild(conn);
-  // Championship Final label
-  const fl=document.createElement('div');fl.className='final-label';fl.textContent='Championship Final';center.appendChild(fl);
-  // Final matchup with gold border
-  const finalWrap=bcard('final',null,null,false,isT);finalWrap.classList.add('final-match-wrap');
-  center.appendChild(finalWrap);bracket.appendChild(center);
-  const rS=mcol('bc right','5','2');rS.setAttribute('data-bcol','5');rS.style.justifyContent='center';rS.style.paddingTop='2rem';
-  rS.appendChild(bcard('semi',1,null,true,isT));
-  rS.appendChild(mkStrip(5,'Semis','‹'));bracket.appendChild(rS);
-  const rQF=mcol('bc right','6','2');rQF.setAttribute('data-bcol','6');rQF.style.justifyContent='space-around';rQF.style.paddingTop='2.75rem';
-  rQF.appendChild(bcard('rQF',2,2,true,isT));rQF.appendChild(bcard('rQF',3,2,true,isT));
-  rQF.appendChild(mkStrip(6,'Quarters','‹'));bracket.appendChild(rQF);
-  const rR1=mcol('bc right','7','2');rR1.setAttribute('data-bcol','7');
-  rR1.appendChild(catBan(CATEGORIES[2]));rR1.appendChild(bcard('rR1',2,0,true,isT));rR1.appendChild(bcard('rR1',2,1,true,isT));rR1.appendChild(catBan(CATEGORIES[3]));rR1.appendChild(bcard('rR1',3,0,true,isT));rR1.appendChild(bcard('rR1',3,1,true,isT));
-  rR1.appendChild(mkStrip(7,'Round of 16','‹'));bracket.appendChild(rR1);
-  // Apply collapse state (immediate for page-load; delayed timer handles post-result-save animation)
-  if(!bracketFreshResult)applyBracketCollapse();
-  if(bracketJustSavedKey){
-    setTimeout(()=>{
-      document.querySelectorAll('.seed[data-flip-pending]').forEach(el=>{el.removeAttribute('data-flip-pending');flipSeedBadge(el);});
-      bracketJustSavedKey=null;
-    },120);
-  }
+  frag.appendChild(body);right.innerHTML='';right.appendChild(frag);
 }
 function sp(f){const d=document.createElement('div');d.style.flex=f;return d;}
 function mcol(cls,col,row){const d=document.createElement('div');d.className=cls;d.style.cssText=`grid-column:${col};grid-row:${row};`;return d;}
