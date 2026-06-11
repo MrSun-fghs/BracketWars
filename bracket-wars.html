@@ -95,8 +95,8 @@ body{background:#fff;color:var(--md-on-surface);font-family:system-ui,-apple-sys
 .hmenu-block-row{display:flex;align-items:center;justify-content:space-between;}
 .hmenu-chevron{font-size:.85rem;opacity:.5;margin-left:.5rem;transition:transform .2s ease;}
 .hmenu-block-group .hmenu-sub-container{max-height:0;overflow:hidden;transition:max-height .22s cubic-bezier(0,0,0.2,1);}
-.hmenu-block-group:hover .hmenu-sub-container,.hmenu-sub-container.hmenu-sub-visible{max-height:520px;}
-.hmenu-block-group:hover .hmenu-chevron{transform:rotate(90deg);opacity:.8;}
+.hmenu-sub-container.hmenu-sub-visible{max-height:520px;}
+.hmenu-block-group.hmenu-group-open .hmenu-chevron{transform:rotate(90deg);opacity:.8;}
 /* Hamburger always aligned right */
 .hamburger-menu{right:0;left:auto;}
 @media(max-width:680px){
@@ -4793,9 +4793,26 @@ function rebuildHamburgerMenu() {
       };
       groupEl.appendChild(blockEl);
 
-      // Sub-items container — always rendered; CSS controls visibility (hover + pinned)
+      // Sub-items container — always rendered; JS accordion controls visibility
       const subContainer = document.createElement('div');
       subContainer.className = 'hmenu-sub-container' + (isExpanded || isActive ? ' hmenu-sub-visible' : '');
+      if (isExpanded || isActive) { subContainer.dataset.pinned = '1'; groupEl.classList.add('hmenu-group-open'); }
+      groupEl.addEventListener('mouseenter', () => {
+        const _m = document.getElementById('hamburgerMenu');
+        _m.querySelectorAll('.hmenu-sub-container').forEach(c => c.classList.remove('hmenu-sub-visible'));
+        _m.querySelectorAll('.hmenu-block-group').forEach(g => g.classList.remove('hmenu-group-open'));
+        subContainer.classList.add('hmenu-sub-visible');
+        groupEl.classList.add('hmenu-group-open');
+      });
+      groupEl.addEventListener('mouseleave', () => {
+        const _m = document.getElementById('hamburgerMenu');
+        _m.querySelectorAll('.hmenu-sub-container').forEach(c => c.classList.remove('hmenu-sub-visible'));
+        _m.querySelectorAll('.hmenu-block-group').forEach(g => g.classList.remove('hmenu-group-open'));
+        _m.querySelectorAll('.hmenu-sub-container[data-pinned]').forEach(c => {
+          c.classList.add('hmenu-sub-visible');
+          c.closest('.hmenu-block-group')?.classList.add('hmenu-group-open');
+        });
+      });
 
       if (isTeacher) {
         const isHidden = !!cls.hidden;
