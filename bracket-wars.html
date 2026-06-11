@@ -1099,7 +1099,7 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .setup-apply-all-wrap label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82rem;color:var(--md-on-surface-variant);}
 .setup-apply-all-wrap input[type=checkbox]{width:15px;height:15px;accent-color:var(--md-primary);cursor:pointer;flex-shrink:0;}
 .setup-avail-wrap{background:var(--md-surface-container);border-radius:8px;padding:.5rem .65rem .55rem;margin-bottom:.7rem;}
-.setup-avail-label{font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant);margin-bottom:.4rem;}
+.setup-avail-label{font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--md-on-surface-variant);}
 .setup-avail-pills{display:flex;flex-wrap:wrap;gap:4px;}
 .setup-avail-pill{font-size:.72rem;padding:3px 9px;border-radius:99px;background:#ede9fe;color:#4338ca;line-height:1.5;display:flex;gap:5px;align-items:center;}
 .setup-avail-pill strong{font-weight:600;}
@@ -4052,10 +4052,23 @@ function openSetup() {
   // ── Available library panel ──
   const availWrap = document.createElement('div');
   availWrap.className = 'setup-avail-wrap';
+  const availHdr = document.createElement('div');
+  availHdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem;';
   const availLbl = document.createElement('div');
   availLbl.className = 'setup-avail-label';
+  availLbl.style.marginBottom = '0';
   availLbl.textContent = 'Poem library';
-  availWrap.appendChild(availLbl);
+  const clearAuthBtn = document.createElement('button');
+  clearAuthBtn.type = 'button';
+  clearAuthBtn.className = 'setup-reset-cat';
+  clearAuthBtn.textContent = '✕ Clear all authors';
+  clearAuthBtn.onclick = () => {
+    c.querySelectorAll('input[data-field="author"]').forEach(inp => { inp.value = ''; });
+    _setupCheckConflicts(c);
+  };
+  availHdr.appendChild(availLbl);
+  availHdr.appendChild(clearAuthBtn);
+  availWrap.appendChild(availHdr);
   const availPills = document.createElement('div');
   availPills.id = 'setupAvailPills';
   availPills.className = 'setup-avail-pills';
