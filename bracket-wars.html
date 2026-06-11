@@ -3825,7 +3825,7 @@ function buildNcaaMatch(type,ri,mi){
     const port=document.createElement('div');port.className='ncaa-m-port';
     if(poem){const rp=ROSTER_POEMS.find(p=>p.num===poem.seed);if(rp&&rp.svg){const img=document.createElement('img');img.src=rp.svg;img.alt='';img.loading='lazy';const z=rp.cropZoom||1.6,cx=rp.cropX!=null?rp.cropX:50,cy=rp.cropY!=null?rp.cropY:12;img.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scale('+z+');transform-origin:'+cx+'% '+cy+'%;';port.appendChild(img);}}
     portWrap.appendChild(port);
-    if(isW){const b=document.createElement('img');b.src='Small Crown.png';b.alt='winner';b.className='ncaa-m-crown';portWrap.appendChild(b);}
+    if(isW){const b=document.createElement('img');b.src='Small Crown.png';b.alt='';b.className='ncaa-m-crown';b.onerror=function(){this.style.display='none';const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('viewBox','0 0 20 18');s.style.cssText='position:absolute;top:-8px;right:-8px;width:16px;height:16px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));';const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d','M1 16 L3 7 L7.5 11.5 L10 4 L12.5 11.5 L17 7 L19 16 Z');p.setAttribute('fill','#F5A623');p.setAttribute('stroke','#C47D0E');p.setAttribute('stroke-width','1');p.setAttribute('stroke-linejoin','round');s.appendChild(p);this.parentNode.appendChild(s);};portWrap.appendChild(b);}
     s.appendChild(portWrap);
     const info=document.createElement('div');info.className='ncaa-m-info';
     const nm=document.createElement('div');nm.className='ncaa-m-name';nm.textContent=poem?poem.name:'TBD';info.appendChild(nm);
