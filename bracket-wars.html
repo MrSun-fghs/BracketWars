@@ -3629,7 +3629,7 @@ function renderBracket(){
     bracket.appendChild(lh);
     // Center: Final + Champion
     const center=document.createElement('div');center.className='ncaa-center-col';
-    const fhdr=document.createElement('div');fhdr.className='ncaa-final-hdr';fhdr.textContent='🏆 Championship';center.appendChild(fhdr);
+    const fhdr=document.createElement('div');fhdr.className='ncaa-final-hdr';fhdr.textContent='Championship';center.appendChild(fhdr);
     const fm2=buildNcaaMatch('final',null,null);fm2.classList.add('final-m');center.appendChild(fm2);
     const champ=champion();const cc2=document.createElement('div');cc2.className='champion-card'+(champ?' crowned':'');
     cc2.innerHTML='<img src="Corona Crayola.svg" class="champion-trophy" alt="crown"><div class="champion-label">Poetry Champion</div><div class="champion-name'+(champ?'':' empty')+'">'+(champ?esc(champ.name):'To be decided')+'</div>';
@@ -3652,7 +3652,7 @@ function renderBracket(){
       const sl=e.target.closest('[data-tip]');if(!sl){tip.style.display='none';return;}
       tip.textContent=sl.dataset.tip;tip.style.display='block';
       const r=sl.getBoundingClientRect();
-      requestAnimationFrame(()=>{const w=tip.offsetWidth,h=tip.offsetHeight;const left=Math.min(Math.max(r.left+r.width/2-w/2,6),window.innerWidth-w-6);tip.style.left=left+'px';tip.style.top=Math.max(r.top-h-6,6)+'px';});
+      requestAnimationFrame(()=>{const w=tip.offsetWidth,h=tip.offsetHeight;const left=Math.min(Math.max(r.left+r.width/2-w/2,6),window.innerWidth-w-6);tip.style.left=left+'px';tip.style.top=Math.min(r.bottom+8,window.innerHeight-h-6)+'px';});
     });
     bracket.addEventListener('mouseout',e=>{if(!e.relatedTarget||!e.relatedTarget.closest('[data-tip]'))tip.style.display='none';});
   }
