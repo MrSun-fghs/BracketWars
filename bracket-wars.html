@@ -4045,14 +4045,37 @@ function closeVoteDialog(){
 // ── Edit Poems page ──
 let _draftPoems = null;    // [{name,author}×16] while page is open
 let _setupActiveTab = 0;   // 0–3, which section tab is active
+let _setupHistory = [];    // undo/redo snapshots (JSON strings)
+let _setupHistIdx  = -1;   // current position in history
 
 function openSetup() {
   const b = activeClass().bracket;
   const authors = b.authors || [...DEFAULT_AUTHORS];
   _draftPoems = Array.from({length:16}, (_,i) => ({name: b.poems[i]||'', author: authors[i]||''}));
   _setupActiveTab = 0;
+  _setupHistory = [JSON.stringify(_draftPoems)];
+  _setupHistIdx  = 0;
   _buildSetupPage();
   document.getElementById('setupView').style.display = 'flex';
+}
+
+// Push current state onto history stack (call AFTER mutating _draftPoems)
+function _setupPush() {
+  _setupHistory = _setupHistory.slice(0, _setupHistIdx + 1);
+  _setupHistory.push(JSON.stringify(_draftPoems));
+  _setupHistIdx = _setupHistory.length - 1;
+}
+function _setupUndo() {
+  if (_setupHistIdx <= 0) return;
+  _setupHistIdx--;
+  _draftPoems = JSON.parse(_setupHistory[_setupHistIdx]);
+  _buildSetupDialog();
+}
+function _setupRedo() {
+  if (_setupHistIdx >= _setupHistory.length - 1) return;
+  _setupHistIdx++;
+  _draftPoems = JSON.parse(_setupHistory[_setupHistIdx]);
+  _buildSetupDialog();
 }
 
 function _buildSetupPage() {
@@ -4128,18 +4151,37 @@ function _buildSetupDialog() {
   const catIdx = _setupActiveTab;
   const cat = CATEGORIES[catIdx];
 
-  // ── Utility bar: reset section + copy from + clear all ──
+  // ── Utility bar ──
   const utilBar = document.createElement('div');
   utilBar.className = 'setup-util-bar';
+
+  // Left group: Reset + Undo + Redo
+  const leftUtil = document.createElement('div');
+  leftUtil.style.cssText = 'display:flex;align-items:center;gap:4px;';
 
   const resetBtn = document.createElement('button');
   resetBtn.type = 'button'; resetBtn.className = 'setup-reset-cat'; resetBtn.textContent = '↺ Reset section';
   resetBtn.onclick = () => {
     cat.seeds.forEach(si => { _draftPoems[si] = {name: DEFAULT_POEMS[si], author: DEFAULT_AUTHORS[si]}; });
-    _buildSetupDialog();
+    _setupPush(); _buildSetupDialog();
   };
-  utilBar.appendChild(resetBtn);
+  leftUtil.appendChild(resetBtn);
 
+  const undoBtn = document.createElement('button');
+  undoBtn.type = 'button'; undoBtn.className = 'setup-reset-cat';
+  undoBtn.textContent = '↩ Undo'; undoBtn.disabled = _setupHistIdx <= 0;
+  undoBtn.onclick = _setupUndo;
+  leftUtil.appendChild(undoBtn);
+
+  const redoBtn = document.createElement('button');
+  redoBtn.type = 'button'; redoBtn.className = 'setup-reset-cat';
+  redoBtn.textContent = '↪ Redo'; redoBtn.disabled = _setupHistIdx >= _setupHistory.length - 1;
+  redoBtn.onclick = _setupRedo;
+  leftUtil.appendChild(redoBtn);
+
+  utilBar.appendChild(leftUtil);
+
+  // Right group: Copy from + Clear section
   const rightUtil = document.createElement('div');
   rightUtil.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
 
@@ -4164,19 +4206,20 @@ function _buildSetupDialog() {
       const sp = src.bracket.poems || [...DEFAULT_POEMS];
       const sa = src.bracket.authors || [...DEFAULT_AUTHORS];
       for (let i = 0; i < 16; i++) _draftPoems[i] = {name: sp[i]||'', author: sa[i]||''};
-      _buildSetupDialog();
+      _setupPush(); _buildSetupDialog();
     };
     copyWrap.appendChild(copyLbl); copyWrap.appendChild(copySelect); copyWrap.appendChild(copyBtn);
     rightUtil.appendChild(copyWrap);
   }
 
-  const clearAllBtn = document.createElement('button');
-  clearAllBtn.type = 'button'; clearAllBtn.className = 'setup-reset-cat'; clearAllBtn.textContent = '✕ Clear all slots';
-  clearAllBtn.onclick = () => {
-    for (let i = 0; i < 16; i++) _draftPoems[i] = {name:'', author:''};
-    _buildSetupDialog();
+  const clearSectionBtn = document.createElement('button');
+  clearSectionBtn.type = 'button'; clearSectionBtn.className = 'setup-reset-cat';
+  clearSectionBtn.textContent = '✕ Clear section';
+  clearSectionBtn.onclick = () => {
+    cat.seeds.forEach(si => { _draftPoems[si] = {name:'', author:''}; });
+    _setupPush(); _buildSetupDialog();
   };
-  rightUtil.appendChild(clearAllBtn);
+  rightUtil.appendChild(clearSectionBtn);
   utilBar.appendChild(rightUtil);
   c.appendChild(utilBar);
 
@@ -4221,7 +4264,7 @@ function _buildSetupDialog() {
     swapBtn.title = 'Swap poems within this matchup';
     swapBtn.onclick = () => {
       [_draftPoems[siA], _draftPoems[siB]] = [_draftPoems[siB], _draftPoems[siA]];
-      _buildSetupDialog();
+      _setupPush(); _buildSetupDialog();
     };
     swapDiv.appendChild(swapBtn);
     mRow.appendChild(swapDiv);
@@ -4238,7 +4281,7 @@ function _buildSetupDialog() {
       swapMatchupsBtn.onclick = () => {
         [_draftPoems[cat.seeds[0]], _draftPoems[cat.seeds[2]]] = [_draftPoems[cat.seeds[2]], _draftPoems[cat.seeds[0]]];
         [_draftPoems[cat.seeds[1]], _draftPoems[cat.seeds[3]]] = [_draftPoems[cat.seeds[3]], _draftPoems[cat.seeds[1]]];
-        _buildSetupDialog();
+        _setupPush(); _buildSetupDialog();
       };
       swapRow.appendChild(swapMatchupsBtn);
       c.appendChild(swapRow);
@@ -4279,7 +4322,7 @@ function _buildSetupSlot(si, catIdx) {
     clearBtn.onclick = e => {
       e.stopPropagation();
       _draftPoems[si] = {name:'', author:''};
-      _buildSetupDialog();
+      _setupPush(); _buildSetupDialog();
     };
     slot.appendChild(seedLbl);
     slot.appendChild(content);
@@ -4306,6 +4349,7 @@ function _buildSetupSlot(si, catIdx) {
       const srcSi = data.si;
       if (srcSi !== targetSi) [_draftPoems[srcSi], _draftPoems[targetSi]] = [_draftPoems[targetSi], _draftPoems[srcSi]];
     }
+    _setupPush();
     requestAnimationFrame(() => _buildSetupDialog());
   });
 
