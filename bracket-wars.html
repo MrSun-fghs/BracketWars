@@ -1121,6 +1121,26 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .setup-slot-seed{font-size:.52rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--md-on-surface-variant);opacity:.4;margin-bottom:1px;}
 .setup-slot-clear{position:absolute;top:3px;right:3px;background:none;border:none;cursor:pointer;font-size:9px;padding:3px;line-height:1;color:var(--md-on-surface-variant);opacity:.35;border-radius:3px;}
 .setup-slot-clear:hover{opacity:1;color:#ef4444;background:#fef2f2;}
+/* ── Setup full-page view ──────────────────────────────────────── */
+#setupView{position:fixed;inset:0;z-index:500;background:var(--md-surface);flex-direction:column;overflow:hidden;}
+.setup-page-hdr{background:var(--md-primary);color:#fff;display:flex;align-items:center;gap:10px;padding:0 12px;height:56px;flex-shrink:0;}
+.setup-page-back{background:none;border:none;color:rgba(255,255,255,.85);font-size:.82rem;cursor:pointer;padding:5px 10px;border-radius:6px;white-space:nowrap;font-family:inherit;font-weight:600;}
+.setup-page-back:hover{background:rgba(255,255,255,.15);}
+.setup-page-title{flex:1;font-size:.95rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.setup-page-save-hdr{background:rgba(255,255,255,.18)!important;color:#fff!important;border:1.5px solid rgba(255,255,255,.35)!important;white-space:nowrap;font-size:.82rem!important;padding:6px 14px!important;}
+.setup-page-save-hdr:hover{background:rgba(255,255,255,.28)!important;}
+.setup-page-tabs{display:flex;background:var(--md-surface-container);border-bottom:1px solid var(--md-outline-variant);flex-shrink:0;overflow-x:auto;}
+.setup-page-tab{flex:1;min-width:70px;padding:10px 6px 8px;border:none;border-bottom:3px solid transparent;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .15s,background .12s;font-family:inherit;}
+.setup-page-tab:hover{background:var(--md-surface-container-high);}
+.setup-page-tab.active{border-bottom-color:var(--tab-color,var(--md-primary));}
+.setup-tab-letter{font-size:.75rem;font-weight:800;letter-spacing:.06em;color:var(--tab-color,var(--md-primary));opacity:.45;}
+.setup-page-tab.active .setup-tab-letter{opacity:1;}
+.setup-tab-name{font-size:.7rem;font-weight:500;color:var(--md-on-surface-variant);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.setup-page-tab.active .setup-tab-name{color:var(--tab-color,var(--md-primary));font-weight:600;}
+.setup-page-body{flex:1;overflow-y:auto;padding:16px;max-width:680px;width:100%;margin:0 auto;box-sizing:border-box;}
+.setup-page-footer{padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--md-outline-variant);background:var(--md-surface);flex-shrink:0;}
+.setup-util-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;gap:8px;flex-wrap:wrap;}
+/* ── end setup page ─────────────────────────────────────────────── */
 .pw-lock{font-size:3rem;text-align:center;margin-bottom:.75rem;}
 #confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
 .m3-snackbar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--md-on-surface);color:var(--md-surface);font-size:.875rem;padding:.75rem 1.25rem;border-radius:var(--shape-sm);box-shadow:var(--elev-3);z-index:300;opacity:0;transition:transform .3s var(--motion-decel),opacity .3s;white-space:nowrap;pointer-events:none;display:flex;align-items:center;}
@@ -1622,20 +1642,8 @@ body.projection #sectionNav{display:none!important;}
   </div>
 </div>
 
-<!-- SETUP DIALOG -->
-<div class="dialog-scrim" id="setupDialog">
-  <div class="dialog" style="max-width:560px">
-    <div class="dialog-headline" id="setupHeadline">Edit Poems</div>
-    <div class="setup-grid" id="setupInputs"></div>
-    <div class="setup-apply-all-wrap" id="setupApplyAllWrap">
-      <label><input type="checkbox" id="setupApplyAll"> Apply to all blocks <span style="font-size:.72rem;opacity:.65;">(resets bracket results for other blocks if poems differ)</span></label>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn-text" onclick="closeSetup()">Cancel</button>
-      <button class="btn-filled" onclick="saveSetup()">Save</button>
-    </div>
-  </div>
-</div>
+<!-- SETUP PAGE -->
+<div id="setupView" style="display:none;"></div>
 
 <!-- RENAME DIALOG -->
 <div class="dialog-scrim" id="renameDialog">
@@ -4034,42 +4042,112 @@ function closeVoteDialog(){
   activeKey=null;selectedWinner=null;
 }
 
-// ── Edit Poems dialog ──
-let _draftPoems = null; // [{name,author}×16] while dialog is open
+// ── Edit Poems page ──
+let _draftPoems = null;    // [{name,author}×16] while page is open
+let _setupActiveTab = 0;   // 0–3, which section tab is active
 
 function openSetup() {
   const b = activeClass().bracket;
   const authors = b.authors || [...DEFAULT_AUTHORS];
   _draftPoems = Array.from({length:16}, (_,i) => ({name: b.poems[i]||'', author: authors[i]||''}));
+  _setupActiveTab = 0;
+  _buildSetupPage();
+  document.getElementById('setupView').style.display = 'flex';
+}
+
+function _buildSetupPage() {
+  const sv = document.getElementById('setupView');
+  sv.innerHTML = '';
+
+  // ── Header ──
+  const hdr = document.createElement('div');
+  hdr.className = 'setup-page-hdr';
+  const backBtn = document.createElement('button');
+  backBtn.className = 'setup-page-back'; backBtn.textContent = '← Back'; backBtn.onclick = closeSetup;
+  const titleEl = document.createElement('div');
+  titleEl.className = 'setup-page-title';
+  titleEl.textContent = `Edit Poems — ${activeClass().name}`;
+  const saveHdrBtn = document.createElement('button');
+  saveHdrBtn.className = 'btn-filled setup-page-save-hdr'; saveHdrBtn.textContent = 'Save'; saveHdrBtn.onclick = saveSetup;
+  hdr.appendChild(backBtn); hdr.appendChild(titleEl); hdr.appendChild(saveHdrBtn);
+  sv.appendChild(hdr);
+
+  // ── Tab bar ──
+  const tabBar = document.createElement('div');
+  tabBar.className = 'setup-page-tabs'; tabBar.id = 'setupPageTabs';
+  CATEGORIES.forEach((cat, i) => {
+    const tab = document.createElement('button');
+    tab.className = 'setup-page-tab' + (i === _setupActiveTab ? ' active' : '');
+    tab.style.setProperty('--tab-color', cat.bg);
+    const parts = cat.name.split(' — ');
+    const letter = parts[0] || cat.name;
+    const name = parts.slice(1).join(' — ') || '';
+    tab.innerHTML = `<span class="setup-tab-letter">${esc(letter)}</span><span class="setup-tab-name">${esc(name)}</span>`;
+    tab.onclick = () => { _setupActiveTab = i; _buildSetupTabs(); _buildSetupDialog(); };
+    tabBar.appendChild(tab);
+  });
+  sv.appendChild(tabBar);
+
+  // ── Scrollable body ──
+  const body = document.createElement('div');
+  body.className = 'setup-page-body'; body.id = 'setupPageBody';
+  sv.appendChild(body);
+
+  // ── Footer ──
+  const footer = document.createElement('div');
+  footer.className = 'setup-page-footer';
+  const applyWrap = document.createElement('div');
+  if (app.classes.length > 1) {
+    applyWrap.innerHTML = `<label style="font-size:.8rem;display:flex;align-items:center;gap:7px;cursor:pointer;"><input type="checkbox" id="setupApplyAll"> Apply to all blocks <span style="opacity:.6;font-size:.72rem;">(resets results if poems differ)</span></label>`;
+  }
+  footer.appendChild(applyWrap);
+  const acts = document.createElement('div');
+  acts.style.cssText = 'display:flex;gap:8px;';
+  const cancelBtn2 = document.createElement('button');
+  cancelBtn2.className = 'btn-text'; cancelBtn2.textContent = 'Cancel'; cancelBtn2.onclick = closeSetup;
+  const saveBtn2 = document.createElement('button');
+  saveBtn2.className = 'btn-filled'; saveBtn2.textContent = 'Save'; saveBtn2.onclick = saveSetup;
+  acts.appendChild(cancelBtn2); acts.appendChild(saveBtn2);
+  footer.appendChild(acts);
+  sv.appendChild(footer);
+
   _buildSetupDialog();
-  document.getElementById('setupDialog').classList.add('open');
+}
+
+function _buildSetupTabs() {
+  document.querySelectorAll('#setupPageTabs .setup-page-tab').forEach((tab, i) => {
+    tab.className = 'setup-page-tab' + (i === _setupActiveTab ? ' active' : '');
+  });
 }
 
 function _buildSetupDialog() {
-  document.getElementById('setupHeadline').textContent = `Edit Poems — ${activeClass().name}`;
-  const c = document.getElementById('setupInputs');
+  const c = document.getElementById('setupPageBody');
+  if (!c) return;
   c.innerHTML = '';
 
-  // ── Top bar: clear all + copy from block ──
-  const topBar = document.createElement('div');
-  topBar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;gap:8px;';
+  const catIdx = _setupActiveTab;
+  const cat = CATEGORIES[catIdx];
 
-  const clearAllBtn = document.createElement('button');
-  clearAllBtn.type = 'button';
-  clearAllBtn.className = 'setup-reset-cat';
-  clearAllBtn.textContent = '✕ Clear all slots';
-  clearAllBtn.onclick = () => {
-    for (let i = 0; i < 16; i++) _draftPoems[i] = {name:'', author:''};
+  // ── Utility bar: reset section + copy from + clear all ──
+  const utilBar = document.createElement('div');
+  utilBar.className = 'setup-util-bar';
+
+  const resetBtn = document.createElement('button');
+  resetBtn.type = 'button'; resetBtn.className = 'setup-reset-cat'; resetBtn.textContent = '↺ Reset section';
+  resetBtn.onclick = () => {
+    cat.seeds.forEach(si => { _draftPoems[si] = {name: DEFAULT_POEMS[si], author: DEFAULT_AUTHORS[si]}; });
     _buildSetupDialog();
   };
-  topBar.appendChild(clearAllBtn);
+  utilBar.appendChild(resetBtn);
+
+  const rightUtil = document.createElement('div');
+  rightUtil.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
 
   if (app.classes.length > 1) {
     const copyWrap = document.createElement('div');
     copyWrap.style.cssText = 'display:flex;align-items:center;gap:5px;';
     const copyLbl = document.createElement('span');
-    copyLbl.className = 'setup-copy-lbl';
-    copyLbl.textContent = 'Copy from:';
+    copyLbl.className = 'setup-copy-lbl'; copyLbl.textContent = 'Copy from:';
     const copySelect = document.createElement('select');
     copySelect.className = 'setup-copy-select';
     app.classes.forEach(cls => {
@@ -4089,99 +4167,82 @@ function _buildSetupDialog() {
       _buildSetupDialog();
     };
     copyWrap.appendChild(copyLbl); copyWrap.appendChild(copySelect); copyWrap.appendChild(copyBtn);
-    topBar.appendChild(copyWrap);
-  }
-  c.appendChild(topBar);
-
-  // Apply-all checkbox visibility
-  const applyAllWrap = document.getElementById('setupApplyAllWrap');
-  if (applyAllWrap) {
-    applyAllWrap.style.display = app.classes.length > 1 ? '' : 'none';
-    document.getElementById('setupApplyAll').checked = false;
+    rightUtil.appendChild(copyWrap);
   }
 
-  // ── One section per category ──
-  CATEGORIES.forEach((cat, catIdx) => {
-    // Section header
-    const hdr = document.createElement('div');
-    hdr.className = 'setup-cat-header';
-    hdr.style.color = cat.bg;
-    const hdrName = document.createElement('span');
-    hdrName.textContent = cat.name;
-    hdr.appendChild(hdrName);
-    const resetBtn = document.createElement('button');
-    resetBtn.type = 'button'; resetBtn.className = 'setup-reset-cat'; resetBtn.textContent = '↺ Reset';
-    resetBtn.onclick = () => {
-      cat.seeds.forEach(si => { _draftPoems[si] = {name: DEFAULT_POEMS[si], author: DEFAULT_AUTHORS[si]}; });
+  const clearAllBtn = document.createElement('button');
+  clearAllBtn.type = 'button'; clearAllBtn.className = 'setup-reset-cat'; clearAllBtn.textContent = '✕ Clear all slots';
+  clearAllBtn.onclick = () => {
+    for (let i = 0; i < 16; i++) _draftPoems[i] = {name:'', author:''};
+    _buildSetupDialog();
+  };
+  rightUtil.appendChild(clearAllBtn);
+  utilBar.appendChild(rightUtil);
+  c.appendChild(utilBar);
+
+  // ── Bank of poems for this section ──
+  const bankWrap = document.createElement('div');
+  bankWrap.className = 'setup-bank-wrap';
+  const bankLbl = document.createElement('div');
+  bankLbl.className = 'setup-bank-label';
+  bankLbl.textContent = 'Poem bank — drag to a slot';
+  bankWrap.appendChild(bankLbl);
+
+  cat.seeds.forEach(si => {
+    const poem = {name: DEFAULT_POEMS[si], author: DEFAULT_AUTHORS[si]};
+    const isPlaced = cat.seeds.some(s => _draftPoems[s].name === poem.name && _draftPoems[s].name !== '');
+    const card = document.createElement('div');
+    card.className = 'setup-bank-card' + (isPlaced ? ' placed' : '');
+    card.draggable = true;
+    card.innerHTML = `<strong>${esc(poem.name)}</strong><span>${esc(poem.author)}</span>`;
+    card.title = isPlaced ? 'Already placed — drag to move' : 'Drag to a slot';
+    card.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('application/json', JSON.stringify({poem, from:'bank', catIdx}));
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => card.style.opacity = '.3', 0);
+    });
+    card.addEventListener('dragend', () => { card.style.opacity = ''; });
+    bankWrap.appendChild(card);
+  });
+  c.appendChild(bankWrap);
+
+  // ── Two matchup rows ──
+  const matchupPairs = [[cat.seeds[0], cat.seeds[1]], [cat.seeds[2], cat.seeds[3]]];
+  matchupPairs.forEach(([siA, siB], mIdx) => {
+    const mRow = document.createElement('div');
+    mRow.className = 'setup-matchup-row';
+    mRow.appendChild(_buildSetupSlot(siA, catIdx));
+
+    // ⇄ swap within matchup
+    const swapDiv = document.createElement('div');
+    swapDiv.className = 'setup-matchup-swap';
+    const swapBtn = document.createElement('button');
+    swapBtn.type = 'button'; swapBtn.className = 'setup-swap-btn'; swapBtn.textContent = '⇄';
+    swapBtn.title = 'Swap poems within this matchup';
+    swapBtn.onclick = () => {
+      [_draftPoems[siA], _draftPoems[siB]] = [_draftPoems[siB], _draftPoems[siA]];
       _buildSetupDialog();
     };
-    hdr.appendChild(resetBtn);
-    c.appendChild(hdr);
+    swapDiv.appendChild(swapBtn);
+    mRow.appendChild(swapDiv);
+    mRow.appendChild(_buildSetupSlot(siB, catIdx));
+    c.appendChild(mRow);
 
-    // Bank of poems for this section
-    const bankWrap = document.createElement('div');
-    bankWrap.className = 'setup-bank-wrap';
-    const bankLbl = document.createElement('div');
-    bankLbl.className = 'setup-bank-label';
-    bankLbl.textContent = 'Poem bank — drag to a slot';
-    bankWrap.appendChild(bankLbl);
-
-    cat.seeds.forEach(si => {
-      const poem = {name: DEFAULT_POEMS[si], author: DEFAULT_AUTHORS[si]};
-      const isPlaced = cat.seeds.some(s => _draftPoems[s].name === poem.name && _draftPoems[s].name !== '');
-      const card = document.createElement('div');
-      card.className = 'setup-bank-card' + (isPlaced ? ' placed' : '');
-      card.draggable = true;
-      card.innerHTML = `<strong>${esc(poem.name)}</strong><span>${esc(poem.author)}</span>`;
-      card.title = isPlaced ? 'Already placed — drag to move' : 'Drag to a slot';
-      card.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('application/json', JSON.stringify({poem, from:'bank', catIdx}));
-        e.dataTransfer.effectAllowed = 'move';
-        setTimeout(() => card.style.opacity = '.3', 0);
-      });
-      card.addEventListener('dragend', () => { card.style.opacity = ''; });
-      bankWrap.appendChild(card);
-    });
-    c.appendChild(bankWrap);
-
-    // Two matchup rows
-    const matchupPairs = [[cat.seeds[0], cat.seeds[1]], [cat.seeds[2], cat.seeds[3]]];
-    matchupPairs.forEach(([siA, siB], mIdx) => {
-      const mRow = document.createElement('div');
-      mRow.className = 'setup-matchup-row';
-      mRow.appendChild(_buildSetupSlot(siA, catIdx));
-
-      // ⇄ swap within matchup
-      const swapDiv = document.createElement('div');
-      swapDiv.className = 'setup-matchup-swap';
-      const swapBtn = document.createElement('button');
-      swapBtn.type = 'button'; swapBtn.className = 'setup-swap-btn'; swapBtn.textContent = '⇄';
-      swapBtn.title = 'Swap poems within this matchup';
-      swapBtn.onclick = () => {
-        [_draftPoems[siA], _draftPoems[siB]] = [_draftPoems[siB], _draftPoems[siA]];
+    if (mIdx === 0) {
+      const swapRow = document.createElement('div');
+      swapRow.className = 'setup-swap-row';
+      const swapMatchupsBtn = document.createElement('button');
+      swapMatchupsBtn.type = 'button'; swapMatchupsBtn.className = 'setup-swap-btn';
+      swapMatchupsBtn.textContent = '⇅ swap matchups';
+      swapMatchupsBtn.style.cssText = 'font-size:.63rem;padding:0 8px;height:16px;line-height:16px;opacity:.4;';
+      swapMatchupsBtn.onclick = () => {
+        [_draftPoems[cat.seeds[0]], _draftPoems[cat.seeds[2]]] = [_draftPoems[cat.seeds[2]], _draftPoems[cat.seeds[0]]];
+        [_draftPoems[cat.seeds[1]], _draftPoems[cat.seeds[3]]] = [_draftPoems[cat.seeds[3]], _draftPoems[cat.seeds[1]]];
         _buildSetupDialog();
       };
-      swapDiv.appendChild(swapBtn);
-      mRow.appendChild(swapDiv);
-      mRow.appendChild(_buildSetupSlot(siB, catIdx));
-      c.appendChild(mRow);
-
-      if (mIdx === 0) {
-        const swapRow = document.createElement('div');
-        swapRow.className = 'setup-swap-row';
-        const swapMatchupsBtn = document.createElement('button');
-        swapMatchupsBtn.type = 'button'; swapMatchupsBtn.className = 'setup-swap-btn';
-        swapMatchupsBtn.textContent = '⇅ swap matchups';
-        swapMatchupsBtn.style.cssText = 'font-size:.63rem;padding:0 8px;height:16px;line-height:16px;opacity:.4;';
-        swapMatchupsBtn.onclick = () => {
-          [_draftPoems[cat.seeds[0]], _draftPoems[cat.seeds[2]]] = [_draftPoems[cat.seeds[2]], _draftPoems[cat.seeds[0]]];
-          [_draftPoems[cat.seeds[1]], _draftPoems[cat.seeds[3]]] = [_draftPoems[cat.seeds[3]], _draftPoems[cat.seeds[1]]];
-          _buildSetupDialog();
-        };
-        swapRow.appendChild(swapMatchupsBtn);
-        c.appendChild(swapRow);
-      }
-    });
+      swapRow.appendChild(swapMatchupsBtn);
+      c.appendChild(swapRow);
+    }
   });
 }
 
@@ -4270,7 +4331,7 @@ function saveSetup() {
 
 function closeSetup() {
   _draftPoems = null;
-  document.getElementById('setupDialog').classList.remove('open');
+  document.getElementById('setupView').style.display = 'none';
 }
 function openRenameClass(){document.getElementById('renameHeadline').textContent=`Rename "${activeClass().name}"`;document.getElementById('classNameInput').value=activeClass().name;document.getElementById('renameDialog').classList.add('open');setTimeout(()=>document.getElementById('classNameInput').focus(),80);}
 function saveRename(){const v=document.getElementById('classNameInput').value.trim();if(!v)return;activeClass().name=v;saveApp();closeRename();renderAll();}
@@ -5596,8 +5657,8 @@ let snackTimer=null;
 function showSnack(msg){const s=document.getElementById('snackbar');s.textContent=msg;s.classList.add('show');if(snackTimer)clearTimeout(snackTimer);snackTimer=setTimeout(()=>s.classList.remove('show'),2800);}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-['passwordDialog','voteDialog','setupDialog','renameDialog','addClassDialog','resetDialog'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',function(e){if(e.target!==this)return;if(id==='passwordDialog')cancelPassword();else if(id==='voteDialog')closeVoteDialog();else if(id==='setupDialog')closeSetup();else if(id==='renameDialog')closeRename();else if(id==='addClassDialog')closeAddClass();else closeReset();});
+['passwordDialog','voteDialog','renameDialog','addClassDialog','resetDialog'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target!==this)return;if(id==='passwordDialog')cancelPassword();else if(id==='voteDialog')closeVoteDialog();else if(id==='renameDialog')closeRename();else if(id==='addClassDialog')closeAddClass();else closeReset();});
 });
 document.getElementById('classNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')saveRename();});
 document.getElementById('newClassInput').addEventListener('keydown',e=>{if(e.key==='Enter')saveAddClass();});
