@@ -1140,6 +1140,50 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .setup-page-body{flex:1;overflow-y:auto;padding:16px;max-width:680px;width:100%;margin:0 auto;box-sizing:border-box;}
 .setup-page-footer{padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--md-outline-variant);background:var(--md-surface);flex-shrink:0;}
 .setup-util-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;gap:8px;flex-wrap:wrap;}
+/* ── Library tab ─────────────────────────────────────────────────── */
+.lib-section-hdr{display:flex;align-items:center;justify-content:space-between;margin:1rem 0 .5rem;padding-bottom:.35rem;border-bottom:1px solid var(--md-outline-variant);}
+.lib-section-title{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--md-on-surface-variant);}
+.lib-poem-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--md-outline-variant);border-radius:10px;background:var(--md-surface-container-low);margin-bottom:6px;}
+.lib-poem-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.lib-poem-avatar-emoji{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--md-surface-container);flex-shrink:0;}
+.lib-poem-info{flex:1;min-width:0;}
+.lib-poem-title{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lib-poem-author{font-size:.72rem;color:var(--md-on-surface-variant);}
+.lib-poem-actions{display:flex;gap:4px;flex-shrink:0;}
+.lib-icon-btn{background:none;border:1px solid var(--md-outline-variant);border-radius:6px;padding:4px 8px;font-size:.72rem;cursor:pointer;font-family:inherit;transition:background .12s;}
+.lib-icon-btn.primary{color:var(--md-primary);}
+.lib-icon-btn.primary:hover{background:var(--md-primary-container);}
+.lib-icon-btn.danger{color:var(--md-error);}
+.lib-icon-btn.danger:hover{background:var(--md-error-container);}
+.lib-editor{background:var(--md-surface-container);border:1px solid var(--md-outline-variant);border-radius:12px;padding:16px;margin-bottom:12px;}
+.lib-field-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.lib-field{display:flex;flex-direction:column;gap:3px;flex:1;min-width:140px;}
+.lib-field label{font-size:.72rem;font-weight:600;color:var(--md-on-surface-variant);letter-spacing:.04em;}
+.lib-field input,.lib-field textarea{font-family:inherit;font-size:.8rem;padding:6px 9px;border:1px solid var(--md-outline-variant);border-radius:6px;background:var(--md-surface);color:var(--md-on-surface);resize:vertical;outline:none;}
+.lib-field input:focus,.lib-field textarea:focus{border-color:var(--md-primary);}
+.lib-field textarea{min-height:54px;}
+.lib-stat-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.lib-stat-label{font-size:.73rem;color:var(--md-on-surface-variant);min-width:120px;flex-shrink:0;}
+.lib-stars{display:flex;gap:3px;}
+.lib-star{font-size:1.1rem;cursor:pointer;color:#d1d5db;line-height:1;user-select:none;}
+.lib-star.active{color:#f59e0b;}
+.lib-star:hover{color:#fbbf24;}
+.lib-avatar-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px;}
+.lib-avatar-preview{width:64px;height:64px;border-radius:50%;border:2px solid var(--md-outline-variant);background:var(--md-surface-container);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;overflow:hidden;}
+.lib-avatar-preview img{width:100%;height:100%;object-fit:cover;}
+.lib-avatar-controls{display:flex;flex-direction:column;gap:6px;justify-content:center;}
+.lib-avatar-btn{font-size:.75rem;padding:5px 10px;border:1px solid var(--md-outline-variant);border-radius:6px;cursor:pointer;background:var(--md-surface);font-family:inherit;color:var(--md-on-surface);}
+.lib-avatar-btn:hover{background:var(--md-surface-container);}
+.lib-avatar-btn.danger{color:var(--md-error);}
+.lib-colors-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+.lib-color-label{font-size:.72rem;color:var(--md-on-surface-variant);flex-shrink:0;}
+.lib-color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;flex-shrink:0;transition:transform .1s,border-color .1s;}
+.lib-color-swatch.selected{border-color:var(--md-on-surface);transform:scale(1.2);}
+.lib-stats-hdr{font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--md-on-surface-variant);margin:12px 0 8px;}
+.lib-editor-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px;padding-top:10px;border-top:1px solid var(--md-outline-variant);}
+.setup-bank-card.custom{border-color:#7c3aed;background:rgba(124,58,237,.06);}
+.setup-bank-card.custom strong{color:#7c3aed;}
+.roster-avatar-emoji{font-size:2.2rem;display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
 /* ── end setup page ─────────────────────────────────────────────── */
 .pw-lock{font-size:3rem;text-align:center;margin-bottom:.75rem;}
 #confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
@@ -1981,6 +2025,7 @@ async function submitPassword() {
   teacherUnlocked = true;
   document.getElementById('passwordDialog').classList.remove('open');
   setMode('teacher');
+  loadCustomPoems();
 }
 async function signOutTeacher() {
   await db.auth.signOut();
@@ -4044,9 +4089,69 @@ function closeVoteDialog(){
 
 // ── Edit Poems page ──
 let _draftPoems = null;    // [{name,author}×16] while page is open
-let _setupActiveTab = 0;   // 0–3, which section tab is active
+let _setupActiveTab = 0;   // 0–4 (0-3 = section tabs, 4 = Library tab)
 let _setupHistory = [];    // undo/redo snapshots (JSON strings)
 let _setupHistIdx  = -1;   // current position in history
+// ── Poem Library ──
+let _customPoems = [];         // [{id,title,author,...}] from bw_poems table
+let _libEditing  = null;       // null=list, 'new'=new form, uuid=editing existing
+let _libSaving   = false;      // prevent double-save
+let _libPendingAvatar = null;  // {file, previewUrl} before Supabase upload
+
+// ── Poem Library data helpers ──────────────────────────────────────
+async function loadCustomPoems() {
+  try {
+    const { data } = await db.from('bw_poems').select('*').order('created_at', { ascending: false });
+    _customPoems = data || [];
+    _rosterStateKey = null; // force roster rebuild
+  } catch(e) { console.warn('loadCustomPoems:', e); }
+}
+
+function findPoemData(title, slotIdx) {
+  if (!title) return _makePoemFallback('', slotIdx);
+  const rp = ROSTER_POEMS.find(p => p.title === title);
+  if (rp) return rp;
+  const cp = _customPoems.find(p => p.title === title);
+  if (cp) return _normalizeCustomPoem(cp, slotIdx);
+  return _makePoemFallback(title, slotIdx);
+}
+
+function _normalizeCustomPoem(cp, slotIdx) {
+  return {
+    num: slotIdx + 1, title: cp.title, author: cp.author,
+    svg: cp.avatar_url || null, avatarEmoji: cp.avatar_emoji || '📝',
+    color: cp.color || 'blue', accentColor: cp.accent_color || '#64748b',
+    born: cp.born||'', birthplace: cp.birthplace||'',
+    nationality: cp.nationality||'', genre: cp.genre||'',
+    knownFor: cp.known_for||'', superpower: cp.superpower||'',
+    readingLens: cp.reading_lens||'', scoutingReport: cp.scouting_report||'',
+    whyMatters: cp.why_matters||'',
+    stats:{
+      accessibility:      cp.stat_accessibility||3,
+      relatability:       cp.stat_relatability||3,
+      emotionalImpact:    cp.stat_emotional_impact||3,
+      imageryPower:       cp.stat_imagery_power||3,
+      literaryDevicePower:cp.stat_literary_device_power||3,
+      themeStrength:      cp.stat_theme_strength||3
+    },
+    isCustom: true, customId: cp.id
+  };
+}
+
+function _makePoemFallback(title, slotIdx) {
+  const b = bkt();
+  return {
+    num: slotIdx + 1,
+    title: title || `Poem ${slotIdx + 1}`,
+    author: b.authors?.[slotIdx] || '',
+    svg: null, avatarEmoji: '📝',
+    color: 'blue', accentColor: '#64748b',
+    born:'', birthplace:'', nationality:'', genre:'',
+    knownFor:'', superpower:'', readingLens:'', scoutingReport:'', whyMatters:'',
+    stats:{accessibility:3,relatability:3,emotionalImpact:3,imageryPower:3,literaryDevicePower:3,themeStrength:3},
+    isFallback: true
+  };
+}
 
 function openSetup() {
   const b = activeClass().bracket;
@@ -4109,6 +4214,13 @@ function _buildSetupPage() {
     tab.onclick = () => { _setupActiveTab = i; _buildSetupTabs(); _buildSetupDialog(); };
     tabBar.appendChild(tab);
   });
+  // Library tab (index 4)
+  const libTab = document.createElement('button');
+  libTab.className = 'setup-page-tab' + (_setupActiveTab === 4 ? ' active' : '');
+  libTab.style.setProperty('--tab-color', '#7c3aed');
+  libTab.innerHTML = `<span class="setup-tab-letter" style="font-size:.58rem">📚</span><span class="setup-tab-name">Library</span>`;
+  libTab.onclick = () => { _setupActiveTab = 4; _buildSetupTabs(); _buildSetupDialog(); };
+  tabBar.appendChild(libTab);
   sv.appendChild(tabBar);
 
   // ── Scrollable body ──
@@ -4142,11 +4254,303 @@ function _buildSetupTabs() {
     tab.className = 'setup-page-tab' + (i === _setupActiveTab ? ' active' : '');
   });
 }
+function _buildLibraryTab(c) {
+  if (_libEditing !== null) { _buildLibraryEditor(c); return; }
+  _buildLibraryList(c);
+}
+
+function _buildLibraryList(c) {
+  // ── Add New Poem button ──
+  const addBtn = document.createElement('button');
+  addBtn.className = 'btn-filled';
+  addBtn.style.cssText = 'width:100%;margin-bottom:14px;';
+  addBtn.textContent = '+ Add New Poem';
+  addBtn.onclick = () => { _libEditing = 'new'; _libPendingAvatar = null; _buildSetupDialog(); };
+  c.appendChild(addBtn);
+
+  // ── Custom poems ──
+  if (_customPoems.length > 0) {
+    const hdr = document.createElement('div');
+    hdr.className = 'lib-section-hdr';
+    hdr.innerHTML = `<span class="lib-section-title">Your Poems (${_customPoems.length})</span>`;
+    c.appendChild(hdr);
+    _customPoems.forEach(cp => {
+      const card = document.createElement('div');
+      card.className = 'lib-poem-card';
+      // Avatar
+      const av = document.createElement('div');
+      if (cp.avatar_url) {
+        const img = document.createElement('img');
+        img.src = cp.avatar_url; img.className = 'lib-poem-avatar';
+        av.appendChild(img);
+      } else {
+        av.className = 'lib-poem-avatar-emoji';
+        av.textContent = cp.avatar_emoji || '📝';
+      }
+      const info = document.createElement('div');
+      info.className = 'lib-poem-info';
+      info.innerHTML = `<div class="lib-poem-title">${esc(cp.title)}</div><div class="lib-poem-author">${esc(cp.author)}</div>`;
+      const acts = document.createElement('div');
+      acts.className = 'lib-poem-actions';
+      const editBtn = document.createElement('button');
+      editBtn.className = 'lib-icon-btn primary'; editBtn.textContent = '✏ Edit';
+      editBtn.onclick = e => { e.stopPropagation(); _libEditing = cp.id; _libPendingAvatar = null; _buildSetupDialog(); };
+      const shareBtn = document.createElement('button');
+      shareBtn.className = 'lib-icon-btn primary'; shareBtn.textContent = '🔗';
+      shareBtn.title = 'Share with another teacher';
+      shareBtn.onclick = e => { e.stopPropagation(); _sharePoem(cp); };
+      acts.appendChild(editBtn); acts.appendChild(shareBtn);
+      card.appendChild(av); card.appendChild(info); card.appendChild(acts);
+      c.appendChild(card);
+    });
+  } else {
+    const empty = document.createElement('p');
+    empty.style.cssText = 'font-size:.8rem;color:var(--md-on-surface-variant);text-align:center;margin:1rem 0 1.5rem;';
+    empty.textContent = 'No custom poems yet. Add one above.';
+    c.appendChild(empty);
+  }
+
+  // ── Default poems (read-only) ──
+  const defHdr = document.createElement('div');
+  defHdr.className = 'lib-section-hdr';
+  defHdr.innerHTML = `<span class="lib-section-title">Default Poems</span><span style="font-size:.7rem;color:var(--md-on-surface-variant)">Built-in, read-only</span>`;
+  c.appendChild(defHdr);
+  ROSTER_POEMS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'lib-poem-card';
+    card.style.opacity = '.7';
+    const av = document.createElement('div');
+    if (p.svg) {
+      const img = document.createElement('img');
+      img.src = p.svg; img.className = 'lib-poem-avatar';
+      av.appendChild(img);
+    } else {
+      av.className = 'lib-poem-avatar-emoji'; av.textContent = '📖';
+    }
+    const info = document.createElement('div');
+    info.className = 'lib-poem-info';
+    info.innerHTML = `<div class="lib-poem-title">${esc(p.title)}</div><div class="lib-poem-author">${esc(p.author)}</div>`;
+    card.appendChild(av); card.appendChild(info);
+    c.appendChild(card);
+  });
+}
+
+function _buildLibraryEditor(c) {
+  const isNew = _libEditing === 'new';
+  const cp = isNew ? null : _customPoems.find(p => p.id === _libEditing);
+
+  // Default empty data for a new poem
+  const data = cp ? {...cp} : {
+    title:'', author:'', avatar_url:null, avatar_emoji:'📝',
+    color:'blue', accent_color:'#4f46e5',
+    born:'', birthplace:'', nationality:'', genre:'',
+    known_for:'', superpower:'', reading_lens:'', scouting_report:'', why_matters:'',
+    stat_accessibility:3, stat_relatability:3, stat_emotional_impact:3,
+    stat_imagery_power:3, stat_literary_device_power:3, stat_theme_strength:3
+  };
+
+  // ── Header ──
+  const hdr = document.createElement('div');
+  hdr.className = 'lib-section-hdr';
+  hdr.innerHTML = `<span class="lib-section-title">${isNew ? 'Add New Poem' : 'Edit Poem'}</span>`;
+  const backLnk = document.createElement('button');
+  backLnk.className = 'lib-icon-btn primary'; backLnk.textContent = '← Back to list';
+  backLnk.onclick = () => { _libEditing = null; _libPendingAvatar = null; _buildSetupDialog(); };
+  hdr.appendChild(backLnk);
+  c.appendChild(hdr);
+
+  const ed = document.createElement('div');
+  ed.className = 'lib-editor';
+
+  // ── Avatar row ──
+  const avatarRow = document.createElement('div');
+  avatarRow.className = 'lib-avatar-row';
+  const previewDiv = document.createElement('div');
+  previewDiv.className = 'lib-avatar-preview';
+  previewDiv.id = 'libAvatarPreview';
+  if (_libPendingAvatar) {
+    const img = document.createElement('img'); img.src = _libPendingAvatar.previewUrl;
+    previewDiv.appendChild(img);
+  } else if (data.avatar_url) {
+    const img = document.createElement('img'); img.src = data.avatar_url;
+    previewDiv.appendChild(img);
+  } else {
+    previewDiv.textContent = data.avatar_emoji || '📝';
+  }
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file'; fileInput.accept = 'image/*'; fileInput.style.display = 'none';
+  fileInput.id = 'libAvatarInput';
+  fileInput.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    _libPendingAvatar = {file, previewUrl: url};
+    previewDiv.innerHTML = ''; const img = document.createElement('img'); img.src = url; previewDiv.appendChild(img);
+  };
+  const avatarCtrl = document.createElement('div');
+  avatarCtrl.className = 'lib-avatar-controls';
+  const uploadBtn = document.createElement('button');
+  uploadBtn.type='button'; uploadBtn.className='lib-avatar-btn'; uploadBtn.textContent='📷 Upload image';
+  uploadBtn.onclick = () => fileInput.click();
+  const emojiBtn = document.createElement('button');
+  emojiBtn.type='button'; emojiBtn.className='lib-avatar-btn'; emojiBtn.textContent='😊 Use emoji';
+  emojiBtn.onclick = () => {
+    const em = prompt('Enter an emoji for the avatar:', data.avatar_emoji || '📝');
+    if (!em) return;
+    _libPendingAvatar = null;
+    data.avatar_emoji = em;
+    data.avatar_url = null;
+    previewDiv.innerHTML = ''; previewDiv.textContent = em;
+  };
+  avatarCtrl.appendChild(fileInput); avatarCtrl.appendChild(uploadBtn); avatarCtrl.appendChild(emojiBtn);
+  if (data.avatar_url || _libPendingAvatar) {
+    const clearBtn = document.createElement('button');
+    clearBtn.type='button'; clearBtn.className='lib-avatar-btn danger'; clearBtn.textContent='✕ Remove image';
+    clearBtn.onclick = () => {
+      _libPendingAvatar = null; data.avatar_url = null;
+      previewDiv.innerHTML = ''; previewDiv.textContent = data.avatar_emoji || '📝';
+      clearBtn.remove();
+    };
+    avatarCtrl.appendChild(clearBtn);
+  }
+  avatarRow.appendChild(previewDiv); avatarRow.appendChild(avatarCtrl);
+  ed.appendChild(avatarRow);
+
+  // ── Field builder helper ──
+  function mkField(label, id, value, multi) {
+    const wrap = document.createElement('div'); wrap.className = 'lib-field';
+    const lbl = document.createElement('label'); lbl.htmlFor = id; lbl.textContent = label;
+    const input = multi ? document.createElement('textarea') : document.createElement('input');
+    if (!multi) input.type = 'text';
+    input.id = id; input.value = value || '';
+    wrap.appendChild(lbl); wrap.appendChild(input);
+    return wrap;
+  }
+
+  // ── Core fields ──
+  const r1 = document.createElement('div'); r1.className = 'lib-field-row';
+  r1.appendChild(mkField('Title *', 'libTitle', data.title));
+  r1.appendChild(mkField('Author *', 'libAuthor', data.author));
+  ed.appendChild(r1);
+
+  const r2 = document.createElement('div'); r2.className = 'lib-field-row';
+  r2.appendChild(mkField('Born', 'libBorn', data.born));
+  r2.appendChild(mkField('Birthplace', 'libBirthplace', data.birthplace));
+  r2.appendChild(mkField('Nationality', 'libNationality', data.nationality));
+  ed.appendChild(r2);
+
+  const r3 = document.createElement('div'); r3.className = 'lib-field-row';
+  r3.appendChild(mkField('Genre', 'libGenre', data.genre));
+  r3.appendChild(mkField('Known For', 'libKnownFor', data.known_for));
+  ed.appendChild(r3);
+
+  const r4 = document.createElement('div'); r4.className = 'lib-field-row';
+  r4.appendChild(mkField('Superpower (what this poem does best)', 'libSuperpower', data.superpower));
+  ed.appendChild(r4);
+
+  const r5 = document.createElement('div'); r5.className = 'lib-field-row';
+  r5.appendChild(mkField('Reading Lens (focus question for students)', 'libReadingLens', data.reading_lens));
+  ed.appendChild(r5);
+
+  const r6 = document.createElement('div'); r6.className = 'lib-field-row';
+  r6.appendChild(mkField('Scouting Report', 'libScoutingReport', data.scouting_report, true));
+  ed.appendChild(r6);
+
+  const r7 = document.createElement('div'); r7.className = 'lib-field-row';
+  r7.appendChild(mkField('Why This Poem Matters', 'libWhyMatters', data.why_matters, true));
+  ed.appendChild(r7);
+
+  // ── Accent color swatches ──
+  const COLOR_SWATCHES = [
+    {label:'Orange',value:'#f97316'},{label:'Rose',value:'#e11d48'},
+    {label:'Purple',value:'#7c3aed'},{label:'Blue',value:'#0476e4'},
+    {label:'Teal',value:'#0d9488'},{label:'Gold',value:'#d97706'},
+    {label:'Green',value:'#16a34a'},{label:'Gray',value:'#64748b'},
+  ];
+  const colorRow = document.createElement('div'); colorRow.className = 'lib-colors-row';
+  const colorLbl = document.createElement('span'); colorLbl.className = 'lib-color-label'; colorLbl.textContent = 'Accent color:';
+  colorRow.appendChild(colorLbl);
+  COLOR_SWATCHES.forEach(sw => {
+    const sw_el = document.createElement('div');
+    sw_el.className = 'lib-color-swatch' + (data.accent_color === sw.value ? ' selected' : '');
+    sw_el.style.background = sw.value; sw_el.title = sw.label;
+    sw_el.dataset.value = sw.value;
+    sw_el.onclick = () => {
+      document.querySelectorAll('.lib-color-swatch').forEach(s => s.classList.remove('selected'));
+      sw_el.classList.add('selected');
+    };
+    colorRow.appendChild(sw_el);
+  });
+  ed.appendChild(colorRow);
+
+  // ── Stats (star ratings) ──
+  const statsHdr = document.createElement('div'); statsHdr.className = 'lib-stats-hdr';
+  statsHdr.textContent = 'Stats (click to rate 1–5 ★)';
+  ed.appendChild(statsHdr);
+
+  const STAT_DEFS = [
+    {id:'libStatAccess',  label:'Readability',       field:'stat_accessibility'},
+    {id:'libStatRelate',  label:'Relatability',       field:'stat_relatability'},
+    {id:'libStatEmotion', label:'Emotional Impact',   field:'stat_emotional_impact'},
+    {id:'libStatImagery', label:'Imagery Power',      field:'stat_imagery_power'},
+    {id:'libStatLitDev',  label:'Literary Devices',   field:'stat_literary_device_power'},
+    {id:'libStatTheme',   label:'Theme Strength',     field:'stat_theme_strength'},
+  ];
+  STAT_DEFS.forEach(def => {
+    const row = document.createElement('div'); row.className = 'lib-stat-row';
+    const lbl = document.createElement('span'); lbl.className = 'lib-stat-label'; lbl.textContent = def.label;
+    const stars = document.createElement('div'); stars.className = 'lib-stars';
+    stars.dataset.statId = def.id;
+    const curVal = data[def.field] || 3;
+    stars.dataset.value = curVal;
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement('span');
+      star.className = 'lib-star' + (i <= curVal ? ' active' : '');
+      star.textContent = '★'; star.dataset.value = i;
+      star.onclick = () => {
+        const v = parseInt(star.dataset.value);
+        stars.dataset.value = v;
+        stars.querySelectorAll('.lib-star').forEach((s, idx) => s.classList.toggle('active', idx < v));
+      };
+      stars.appendChild(star);
+    }
+    row.appendChild(lbl); row.appendChild(stars);
+    ed.appendChild(row);
+  });
+
+  // ── Actions ──
+  const acts = document.createElement('div'); acts.className = 'lib-editor-actions';
+  const cancelBtn = document.createElement('button');
+  cancelBtn.type='button'; cancelBtn.className='btn-text'; cancelBtn.textContent='Cancel';
+  cancelBtn.onclick = () => { _libEditing = null; _libPendingAvatar = null; _buildSetupDialog(); };
+  acts.appendChild(cancelBtn);
+  if (!isNew && cp) {
+    const delBtn = document.createElement('button');
+    delBtn.type='button'; delBtn.className='btn-text'; delBtn.style.color='var(--md-error)'; delBtn.textContent='🗑 Delete';
+    delBtn.onclick = () => _deleteCustomPoem(cp.id);
+    acts.appendChild(delBtn);
+    const shrBtn = document.createElement('button');
+    shrBtn.type='button'; shrBtn.className='btn-text'; shrBtn.textContent='🔗 Share';
+    shrBtn.onclick = () => _sharePoem(cp);
+    acts.appendChild(shrBtn);
+  }
+  const saveBtn = document.createElement('button');
+  saveBtn.type='button'; saveBtn.className='btn-filled';
+  saveBtn.textContent = _libSaving ? 'Saving…' : (isNew ? 'Add Poem' : 'Save Changes');
+  saveBtn.disabled = _libSaving;
+  saveBtn.onclick = () => _saveCustomPoem(cp?.id || null);
+  acts.appendChild(saveBtn);
+  ed.appendChild(acts);
+  c.appendChild(ed);
+}
 
 function _buildSetupDialog() {
   const c = document.getElementById('setupPageBody');
   if (!c) return;
   c.innerHTML = '';
+
+  // Library tab (index 4) — bypass section tab logic
+  if (_setupActiveTab === 4) { _buildLibraryTab(c); return; }
 
   const catIdx = _setupActiveTab;
   const cat = CATEGORIES[catIdx];
@@ -4248,6 +4652,33 @@ function _buildSetupDialog() {
     bankWrap.appendChild(card);
   });
   c.appendChild(bankWrap);
+
+  // ── Custom poem bank (if teacher has custom poems) ──
+  if (_customPoems.length > 0) {
+    const customWrap = document.createElement('div');
+    customWrap.className = 'setup-bank-wrap';
+    const customLbl = document.createElement('div');
+    customLbl.className = 'setup-bank-label';
+    customLbl.innerHTML = '<span style="color:#7c3aed;font-weight:700;">📚 Your library</span> — drag to a slot';
+    customWrap.appendChild(customLbl);
+    _customPoems.forEach(cp => {
+      const poem = {name: cp.title, author: cp.author};
+      const isPlaced = _draftPoems.some(p => p.name === poem.name && p.name !== '');
+      const ccard = document.createElement('div');
+      ccard.className = 'setup-bank-card custom' + (isPlaced ? ' placed' : '');
+      ccard.draggable = true;
+      ccard.innerHTML = `<strong>${esc(poem.name)}</strong><span>${esc(poem.author)}</span>`;
+      ccard.title = isPlaced ? 'Already placed — drag to move' : 'Drag to a slot';
+      ccard.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('application/json', JSON.stringify({poem, from:'bank', catIdx}));
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => ccard.style.opacity = '.3', 0);
+      });
+      ccard.addEventListener('dragend', () => { ccard.style.opacity = ''; });
+      customWrap.appendChild(ccard);
+    });
+    c.appendChild(customWrap);
+  }
 
   // ── Two matchup rows ──
   const matchupPairs = [[cat.seeds[0], cat.seeds[1]], [cat.seeds[2], cat.seeds[3]]];
@@ -4375,7 +4806,140 @@ function saveSetup() {
 
 function closeSetup() {
   _draftPoems = null;
+  _libEditing = null;
+  _libPendingAvatar = null;
   document.getElementById('setupView').style.display = 'none';
+}
+
+// ── Poem Library CRUD ──────────────────────────────────────────────
+async function _saveCustomPoem(id) {
+  if (_libSaving) return;
+  const title  = document.getElementById('libTitle')?.value.trim();
+  const author = document.getElementById('libAuthor')?.value.trim();
+  if (!title || !author) { showSnack('Title and Author are required.'); return; }
+  _libSaving = true;
+  const saveBtn = document.querySelector('#setupPageBody .btn-filled');
+  if (saveBtn) { saveBtn.textContent = 'Saving…'; saveBtn.disabled = true; }
+  try {
+    // Upload avatar to Supabase Storage if a new file was selected
+    let avatar_url = id ? (_customPoems.find(p => p.id === id)?.avatar_url || null) : null;
+    if (_libPendingAvatar?.file) {
+      const { data: { user } } = await db.auth.getUser();
+      const ext = _libPendingAvatar.file.name.split('.').pop() || 'jpg';
+      const path = `${user.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await db.storage.from('poem-avatars').upload(path, _libPendingAvatar.file, {upsert:true});
+      if (upErr) throw upErr;
+      avatar_url = db.storage.from('poem-avatars').getPublicUrl(path).data.publicUrl;
+    }
+    // If avatar was cleared by the user
+    if (!_libPendingAvatar && !document.getElementById('libAvatarPreview')?.querySelector('img')) {
+      if (id && !_customPoems.find(p => p.id === id)?.avatar_emoji) {/* keep existing */}
+      else avatar_url = null;
+    }
+    // Collect accent color
+    const accent_color = document.querySelector('.lib-color-swatch.selected')?.dataset.value || '#4f46e5';
+    // Collect avatar emoji (text content of preview div if no image)
+    const previewDiv = document.getElementById('libAvatarPreview');
+    const avatar_emoji = (!avatar_url && previewDiv && !previewDiv.querySelector('img'))
+      ? (previewDiv.textContent.trim() || '📝') : (id ? _customPoems.find(p=>p.id===id)?.avatar_emoji : '📝');
+    // Collect stat values
+    function getStatVal(statId) {
+      return parseInt(document.querySelector(`.lib-stars[data-stat-id="${statId}"]`)?.dataset.value) || 3;
+    }
+    const payload = {
+      title, author, avatar_url, avatar_emoji,
+      color: 'blue', accent_color,
+      born:             document.getElementById('libBorn')?.value.trim()||null,
+      birthplace:       document.getElementById('libBirthplace')?.value.trim()||null,
+      nationality:      document.getElementById('libNationality')?.value.trim()||null,
+      genre:            document.getElementById('libGenre')?.value.trim()||null,
+      known_for:        document.getElementById('libKnownFor')?.value.trim()||null,
+      superpower:       document.getElementById('libSuperpower')?.value.trim()||null,
+      reading_lens:     document.getElementById('libReadingLens')?.value.trim()||null,
+      scouting_report:  document.getElementById('libScoutingReport')?.value.trim()||null,
+      why_matters:      document.getElementById('libWhyMatters')?.value.trim()||null,
+      stat_accessibility:       getStatVal('libStatAccess'),
+      stat_relatability:        getStatVal('libStatRelate'),
+      stat_emotional_impact:    getStatVal('libStatEmotion'),
+      stat_imagery_power:       getStatVal('libStatImagery'),
+      stat_literary_device_power: getStatVal('libStatLitDev'),
+      stat_theme_strength:      getStatVal('libStatTheme'),
+      updated_at: new Date().toISOString(),
+    };
+    if (id) {
+      const { error } = await db.from('bw_poems').update(payload).eq('id', id);
+      if (error) throw error;
+      const idx = _customPoems.findIndex(p => p.id === id);
+      if (idx !== -1) _customPoems[idx] = {..._customPoems[idx], ...payload};
+    } else {
+      const { data: { user } } = await db.auth.getUser();
+      payload.teacher_id = user.id;
+      const { data: newRow, error } = await db.from('bw_poems').insert(payload).select().single();
+      if (error) throw error;
+      _customPoems.unshift(newRow);
+    }
+    _libEditing = null; _libPendingAvatar = null; _rosterStateKey = null;
+    showSnack(id ? 'Poem updated.' : 'Poem added to your library.');
+  } catch(e) {
+    console.error('_saveCustomPoem:', e);
+    showSnack('Error saving poem — see console.');
+  } finally {
+    _libSaving = false;
+    _buildSetupDialog();
+  }
+}
+
+async function _deleteCustomPoem(id) {
+  if (!confirm('Delete this poem from your library? This cannot be undone.')) return;
+  const { error } = await db.from('bw_poems').delete().eq('id', id);
+  if (error) { showSnack('Error deleting poem.'); return; }
+  _customPoems = _customPoems.filter(p => p.id !== id);
+  _libEditing = null; _libPendingAvatar = null; _rosterStateKey = null;
+  showSnack('Poem deleted.');
+  _buildSetupDialog();
+}
+
+async function _sharePoem(cp) {
+  // Generate share token if one doesn't exist
+  if (!cp.share_token) {
+    const token = Array.from({length:12}, () => Math.random().toString(36)[2]).join('');
+    const { error } = await db.from('bw_poems').update({share_token: token}).eq('id', cp.id);
+    if (error) { showSnack('Error generating share link.'); return; }
+    cp.share_token = token;
+    const idx = _customPoems.findIndex(p => p.id === cp.id);
+    if (idx !== -1) _customPoems[idx].share_token = token;
+  }
+  const link = `https://bracketwars.org/?import_poem=${cp.share_token}`;
+  const sub  = encodeURIComponent(`Bracket Wars poem: ${cp.title}`);
+  const body = encodeURIComponent(`Here is a custom poem I made for Bracket Wars:\n\n"${cp.title}" by ${cp.author}\n\nClick to add it to your library:\n${link}\n\n— Sent via bracketwars.org`);
+  window.open(`mailto:?subject=${sub}&body=${body}`, '_self');
+  // Also copy to clipboard for convenience
+  navigator.clipboard?.writeText(link).catch(()=>{});
+  showSnack('Share link copied & email app opened.');
+}
+
+// ── Import shared poem from URL ?import_poem=TOKEN ─────────────────
+(async function _checkImportPoem() {
+  const token = new URLSearchParams(location.search).get('import_poem');
+  if (!token) return;
+  const { data, error } = await db.from('bw_poems').select('*').eq('share_token', token).single();
+  if (error || !data) return;
+  // Wait briefly for teacher auth to settle
+  await new Promise(r => setTimeout(r, 800));
+  if (!teacherUnlocked) { showSnack(`Shared poem ready: "${data.title}". Sign in as teacher to import.`); return; }
+  _importSharedPoem(data);
+})();
+
+async function _importSharedPoem(poem) {
+  if (!confirm(`Add "${poem.title}" by ${poem.author} to your library?`)) return;
+  const { data: { user } } = await db.auth.getUser();
+  const { id: _omit, teacher_id: _omit2, share_token: _omit3, created_at: _omit4, ...fields } = poem;
+  const { error } = await db.from('bw_poems').insert({...fields, teacher_id: user.id, share_token: null});
+  if (error) { showSnack('Error importing poem.'); return; }
+  await loadCustomPoems();
+  showSnack(`"${poem.title}" added to your library!`);
+  // Clean the URL
+  history.replaceState(null, '', location.pathname);
 }
 function openRenameClass(){document.getElementById('renameHeadline').textContent=`Rename "${activeClass().name}"`;document.getElementById('classNameInput').value=activeClass().name;document.getElementById('renameDialog').classList.add('open');setTimeout(()=>document.getElementById('classNameInput').focus(),80);}
 function saveRename(){const v=document.getElementById('classNameInput').value.trim();if(!v)return;activeClass().name=v;saveApp();closeRename();renderAll();}
@@ -6004,33 +6568,36 @@ function setRosterHeight() {
 function renderRoster() {
   setRosterHeight();
   const b = bkt();
-  const stateKey = app.activeId + '|' + JSON.stringify(b);
+  const stateKey = app.activeId + '|' + JSON.stringify(b) + '|' + _customPoems.length;
   const grid = document.getElementById('rosterGrid');
-  // Skip full rebuild if bracket state is unchanged (avoids re-loading all 16 SVGs)
+  // Skip full rebuild if bracket state is unchanged (avoids re-loading all 16 images)
   if (_rosterStateKey === stateKey && grid.children.length > 0) return;
   _rosterStateKey = stateKey;
   grid.innerHTML = '';
   _rosterRowCards.forEach(r=>r.length=0); _rosterExpPanels.length=0;
   _rosterActiveRow=null; _rosterActiveCard=null;
 
-  const sorted = [...ROSTER_POEMS].sort((a,b)=>a.num-b.num);
-
   for (let row=0; row<4; row++) {
-    const rowPoems = sorted.slice(row*4, row*4+4);
+    const slotIndices = CATEGORIES[row].seeds; // e.g. [0,1,2,3]
 
     const rowLabel = document.createElement('div');
     rowLabel.className = 'roster-row-label';
     rowLabel.innerHTML = `<span class="roster-row-letter">${ROSTER_ROWS[row].letter}</span><span class="roster-row-name">${ROSTER_ROWS[row].label}</span>`;
     grid.appendChild(rowLabel);
 
-    rowPoems.forEach(p => {
-      const status = computePoemStatus(p.num - 1, b);
+    slotIndices.forEach(slotIdx => {
+      const pTitle = b.poems[slotIdx];
+      const p = findPoemData(pTitle, slotIdx);
+      const status = computePoemStatus(slotIdx, b);
       const isElim = status.status === 'eliminated';
       const card = document.createElement('div');
       card.className = 'roster-card' + (isElim ? ' eliminated' : '');
       card.dataset.color = p.color;
       card.style.cssText = `--r-accent:${p.accentColor};`;
-      card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}<div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap"><img src="${p.svg}" alt="${p.author}" loading="lazy" decoding="async"></div><div class="roster-author-name" style="color:${p.accentColor}">${p.author}</div><div class="roster-poem-title">${p.title}</div>`;
+      const avatarHtml = p.svg
+        ? `<img src="${esc(p.svg)}" alt="${esc(p.author)}" loading="lazy" decoding="async">`
+        : `<span class="roster-avatar-emoji">${esc(p.avatarEmoji||'📝')}</span>`;
+      card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}<div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap">${avatarHtml}</div><div class="roster-author-name" style="color:${p.accentColor}">${esc(p.author)}</div><div class="roster-poem-title">${esc(p.title)}</div>`;
       card.addEventListener('click', ()=>{
         trackEvent('poem_tap',{poem:p.title,author:p.author,seed:p.num,view:'roster'});
         if (_rosterActiveCard===card) { _rosterPlayClose(); _rosterCloseActive(); return; }
