@@ -5533,8 +5533,8 @@ let _reactionBatchTimer = null;
 function launchReaction(emoji, btn) {
   if (MODE === 'teacher') return;
   try { getAudio(); } catch(e) {}
-  const x = 0.05 + Math.random() * 0.15;
-  const y = 0.75 + Math.random() * 0.15;
+  const x = 0.05 + Math.random() * 0.9;
+  const y = 0.6 + Math.random() * 0.3;
   spawnReactionFloat(emoji, x, y); // always show locally, instant feedback
   // Queue this reaction; flush as a batch every 100ms to Supabase
   _reactionQueue.push({ emoji, x, y });
