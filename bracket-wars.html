@@ -5503,6 +5503,12 @@ reactionChannel
     spawnReactionFloat(payload.emoji, payload.x, payload.y);
     incrementReactionCount(payload.emoji);
   })
+  .on('broadcast', { event: 'react_batch' }, ({ payload }) => {
+    (payload.reactions || []).forEach(r => {
+      spawnReactionFloat(r.emoji, r.x, r.y);
+      incrementReactionCount(r.emoji);
+    });
+  })
   .on('broadcast', { event: 'sync_request' }, () => {
     if (Object.keys(reactionCounts).length > 0) {
       reactionChannel.send({ type:'broadcast', event:'sync_response', payload:{ counts: reactionCounts } });
@@ -5522,19 +5528,25 @@ reactionChannel
   .subscribe();
 function requestReactionSync(){ reactionChannel.send({ type:'broadcast', event:'sync_request', payload:{} }); }
 
-let _lastReactionBroadcast = 0;
+let _reactionQueue = [];
+let _reactionBatchTimer = null;
 function launchReaction(emoji, btn) {
   if (MODE === 'teacher') return;
   try { getAudio(); } catch(e) {}
-  // Always spawn on the left side
-  const x = 0.05 + Math.random() * 0.15; // 5–20% from left, normalized
-  const y = 0.75 + Math.random() * 0.15; // near bottom
+  const x = 0.05 + Math.random() * 0.15;
+  const y = 0.75 + Math.random() * 0.15;
   spawnReactionFloat(emoji, x, y); // always show locally, instant feedback
-  // Throttle broadcast to Supabase: max one per 300ms per student
-  const now = Date.now();
-  if (now - _lastReactionBroadcast < 300) return;
-  _lastReactionBroadcast = now;
-  reactionChannel.send({ type: 'broadcast', event: 'react', payload: { emoji, x, y } });
+  // Queue this reaction; flush as a batch every 100ms to Supabase
+  _reactionQueue.push({ emoji, x, y });
+  if (!_reactionBatchTimer) {
+    _reactionBatchTimer = setTimeout(() => {
+      const batch = _reactionQueue.splice(0);
+      _reactionBatchTimer = null;
+      if (batch.length) {
+        reactionChannel.send({ type: 'broadcast', event: 'react_batch', payload: { reactions: batch } });
+      }
+    }, 100);
+  }
 }
 
 function spawnReactionFloat(emoji, x, y) {
