@@ -4109,7 +4109,9 @@ async function loadCustomPoems() {
 
 function findPoemData(title, slotIdx) {
   if (!title) return _makePoemFallback('', slotIdx);
-  const rp = ROSTER_POEMS.find(p => p.title === title);
+  const rp = ROSTER_POEMS.find(p => p.title === title) ||
+             ROSTER_POEMS.find(p => p.title.toLowerCase() === title.toLowerCase()) ||
+             ROSTER_POEMS.find(p => p.title.toLowerCase().replace(/s$/,'') === title.toLowerCase().replace(/s$/,''));
   if (rp) return rp;
   const cp = _customPoems.find(p => p.title === title);
   if (cp) return _normalizeCustomPoem(cp, slotIdx);
