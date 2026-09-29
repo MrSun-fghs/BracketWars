@@ -6119,7 +6119,7 @@ function renderVoteView() {
 
   // ── Header ──
   const timerPill=v.timerEndsAt?`<div class="v2-timer-pill voting-timer-display${isUrgent?' urgent':''}">⏱ ${remaining>0?formatTimer(remaining):'0:00'}</div>`:'';
-  const codePill=MODE==='teacher'&&v.joinCode?`<div class="v2-code-pill">🔑 ${esc(v.joinCode)}</div>`:'';
+  const codePill=v.joinCode?`<div class="v2-code-pill">🔑 ${esc(v.joinCode)}</div>`:'';
   const popoutPill=MODE==='teacher'?`<button class="v2-popout-btn" onclick="popoutVoteProjector()" title="Open projector window">📺 Pop Out</button>`:'';
   const hdr=document.createElement('div'); hdr.className='v2-header';
   hdr.innerHTML=`<span class="v2-round-label">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</span><div class="v2-pills">${timerPill}${codePill}${popoutPill}<div class="v2-count-pill" id="v2CountPill">👥 ${sc>0?total+' of '+sc:total+' votes'}</div></div>`;
