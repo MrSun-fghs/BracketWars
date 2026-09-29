@@ -5518,13 +5518,18 @@ reactionChannel
   .subscribe();
 function requestReactionSync(){ reactionChannel.send({ type:'broadcast', event:'sync_request', payload:{} }); }
 
+let _lastReactionBroadcast = 0;
 function launchReaction(emoji, btn) {
   if (MODE === 'teacher') return;
   try { getAudio(); } catch(e) {}
   // Always spawn on the left side
   const x = 0.05 + Math.random() * 0.15; // 5–20% from left, normalized
   const y = 0.75 + Math.random() * 0.15; // near bottom
-  spawnReactionFloat(emoji, x, y);
+  spawnReactionFloat(emoji, x, y); // always show locally, instant feedback
+  // Throttle broadcast to Supabase: max one per 300ms per student
+  const now = Date.now();
+  if (now - _lastReactionBroadcast < 300) return;
+  _lastReactionBroadcast = now;
   reactionChannel.send({ type: 'broadcast', event: 'react', payload: { emoji, x, y } });
 }
 
