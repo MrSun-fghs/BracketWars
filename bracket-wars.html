@@ -5966,7 +5966,7 @@ async function startVotingSession() {
   const timerEndsAt = timerMins > 0 ? Date.now() + timerMins * 60000 : null;
   ensureVoting(app);
   const _jc = app.voting.joinCode; // preserve join code across state overwrite
-  app.voting = {open:true,sessionId,joinCode:_jc,classId:app.activeId,matchupKey:key,poemA:{name:pA.name,seed:pA.seed},poemB:{name:pB.name,seed:pB.seed},studentCount:count,timerEndsAt};
+  app.voting = {open:true,sessionId,joinCode:_jc,classId:app.activeId,matchupKey:key,poemA:{name:pA.name,seed:pA.seed},poemB:{name:pB.name,seed:pB.seed},studentCount:count,timerEndsAt,openedAt:Date.now()};
   closeOpenVotingDialog();
   autoCloseTriggered = false;
   await saveApp();
@@ -6309,6 +6309,16 @@ async function boot() {
   })();
 
   app = await loadApp();
+  // Auto-expire stale voting sessions (open > 4 hours = leftover from a previous class)
+  if (app.voting && app.voting.open) {
+    const age = app.voting.openedAt ? Date.now() - app.voting.openedAt : Infinity;
+    const timerExpired = app.voting.timerEndsAt && Date.now() > app.voting.timerEndsAt + 60000;
+    if (age > 4 * 60 * 60 * 1000 || timerExpired) {
+      app.voting.open = false;
+      app.voting.joinCode = null;
+      saveApp().catch(()=>{});
+    }
+  }
   restoreStudentPrefs();
   buildAppBar();
   buildSecondaryToolbar();
