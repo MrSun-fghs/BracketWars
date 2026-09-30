@@ -6313,7 +6313,7 @@ async function boot() {
   if (app.voting && app.voting.open) {
     const age = app.voting.openedAt ? Date.now() - app.voting.openedAt : Infinity;
     const timerExpired = app.voting.timerEndsAt && Date.now() > app.voting.timerEndsAt + 60000;
-    if (age > 4 * 60 * 60 * 1000 || timerExpired) {
+    if (age > 2 * 60 * 60 * 1000 || timerExpired) {
       app.voting.open = false;
       app.voting.joinCode = null;
       saveApp().catch(()=>{});
