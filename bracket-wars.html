@@ -871,6 +871,8 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .v2-code-pill{display:inline-flex;align-items:center;gap:8px;background:#4A3AFF;color:#fff;padding:.55rem 1.5rem;border-radius:var(--shape-full);font-size:30px;font-weight:800;letter-spacing:.22em;font-family:monospace;box-shadow:0 0 16px rgba(74,58,255,.5);}
 .v2-popout-btn{display:inline-flex;align-items:center;gap:5px;background:var(--md-surface-container-lowest);color:var(--md-on-surface-variant);border:1px solid var(--md-outline-variant);padding:.25rem .7rem;border-radius:var(--shape-full);font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;}
 .v2-popout-btn:hover{background:var(--md-surface-container);}
+.v2-close-vote-btn{display:inline-flex;align-items:center;gap:5px;background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;padding:.25rem .7rem;border-radius:var(--shape-full);font-size:11px;font-weight:700;cursor:pointer;transition:background .15s,color .15s;letter-spacing:.04em;}
+.v2-close-vote-btn:hover{background:#dc2626;color:#fff;}
 .v2-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;min-width:0;}
 .v2-card{border-radius:var(--shape-xl);padding:.85rem .75rem;transition:transform .18s ease,box-shadow .18s ease;min-width:0;overflow:hidden;}
 .v2-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
@@ -5955,6 +5957,17 @@ function showVoteResultCelebration(r) {
   setTimeout(launchConfetti, 200);
 }
 function closeOpenVotingDialog() { document.getElementById('openVotingDialog').classList.remove('open'); pendingVotingKey=null; }
+async function closeVoteNow() {
+  if (MODE !== 'teacher') return;
+  if (!confirm('Close this vote for all students now?')) return;
+  app.voting.open = false;
+  app.voting.joinCode = null;
+  stopVotePolling();
+  liveVoteCounts = [0, 0];
+  await saveApp();
+  renderAll();
+  showSnack('Vote closed ✓');
+}
 
 async function startVotingSession() {
   const key = pendingVotingKey; if (!key) return;
@@ -6121,8 +6134,9 @@ function renderVoteView() {
   const timerPill=v.timerEndsAt?`<div class="v2-timer-pill voting-timer-display${isUrgent?' urgent':''}">⏱ ${remaining>0?formatTimer(remaining):'0:00'}</div>`:'';
   const codePill=v.joinCode?`<div class="v2-code-pill">🔑 ${esc(v.joinCode)}</div>`:'';
   const popoutPill=MODE==='teacher'?`<button class="v2-popout-btn" onclick="popoutVoteProjector()" title="Open projector window">📺 Pop Out</button>`:'';
+  const closeVotePill=MODE==='teacher'?`<button class="v2-close-vote-btn" onclick="closeVoteNow()" title="Close voting immediately">✕ Close Vote</button>`:'';
   const hdr=document.createElement('div'); hdr.className='v2-header';
-  hdr.innerHTML=`<span class="v2-round-label">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</span><div class="v2-pills">${timerPill}${codePill}${popoutPill}<div class="v2-count-pill" id="v2CountPill">👥 ${sc>0?total+' of '+sc:total+' votes'}</div></div>`;
+  hdr.innerHTML=`<span class="v2-round-label">${esc(cls?.name||'')} · ${esc(getRoundLabel(v.matchupKey))}</span><div class="v2-pills">${timerPill}${codePill}${popoutPill}${closeVotePill}<div class="v2-count-pill" id="v2CountPill">👥 ${sc>0?total+' of '+sc:total+' votes'}</div></div>`;
   view.appendChild(hdr);
 
   // ── Cards grid ──
