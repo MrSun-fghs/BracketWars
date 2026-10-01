@@ -6323,16 +6323,18 @@ async function boot() {
   })();
 
   app = await loadApp();
-  // Auto-expire stale voting sessions (open > 4 hours = leftover from a previous class)
-  if (app.voting && app.voting.open) {
-    const age = app.voting.openedAt ? Date.now() - app.voting.openedAt : Infinity;
-    const timerExpired = app.voting.timerEndsAt && Date.now() > app.voting.timerEndsAt + 60000;
-    if (age > 2 * 60 * 60 * 1000 || timerExpired) {
-      app.voting.open = false;
-      app.voting.joinCode = null;
-      saveApp().catch(()=>{});
+  // Auto-expire stale voting sessions (open > 2 hours = leftover from a previous class)
+  try {
+    if (app.voting && app.voting.open && app.voting.openedAt) {
+      const age = Date.now() - app.voting.openedAt;
+      const timerExpired = app.voting.timerEndsAt && Date.now() > app.voting.timerEndsAt + 60000;
+      if (age > 2 * 60 * 60 * 1000 || timerExpired) {
+        app.voting.open = false;
+        app.voting.joinCode = null;
+        saveApp().catch(()=>{});
+      }
     }
-  }
+  } catch(e) {}
   restoreStudentPrefs();
   buildAppBar();
   buildSecondaryToolbar();
