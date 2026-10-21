@@ -1512,6 +1512,11 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .roster-card.eliminated:hover .roster-card-inner{filter:grayscale(.5) opacity(.75);}
 .roster-card.eliminated:hover .roster-elim-badge{background:#ef4444;color:#fff;box-shadow:0 0 16px rgba(239,68,68,.6);transform:translate(-50%,-50%) scale(1.08);}
 .roster-elim-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#7f1d1d;border-radius:7px;font-size:14px;font-weight:800;letter-spacing:1.5px;color:#fca5a5;text-transform:uppercase;padding:6px 15px;white-space:nowrap;z-index:2;font-family:sans-serif;transition:background .2s,box-shadow .2s,transform .2s;}
+.roster-champ-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#78350f;border-radius:7px;font-size:14px;font-weight:800;letter-spacing:1.5px;color:#fde68a;text-transform:uppercase;padding:6px 15px;white-space:nowrap;z-index:2;font-family:sans-serif;box-shadow:0 0 16px rgba(251,191,36,.4);transition:background .2s,box-shadow .2s,transform .2s;}
+.roster-card.champion{border-color:#f59e0b;}
+.roster-card.champion .roster-card-inner{filter:none;}
+.roster-card.champion:hover{transform:translateY(-8px) scale(1.03);border-color:#fbbf24;box-shadow:0 16px 40px rgba(251,191,36,.45);}
+.roster-card.champion:hover .roster-champ-badge{background:#d97706;color:#fff;box-shadow:0 0 20px rgba(251,191,36,.7);transform:translate(-50%,-50%) scale(1.08);}
 @keyframes rosterCardSettle{0%{transform:translateY(16px) scale(.97)}50%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
 .roster-card.bounce{animation:rosterCardSettle .7s cubic-bezier(.34,1.56,.64,1) var(--bounce-delay,.1s) both;}
 @media(max-width:960px){.roster-grid{grid-template-columns:repeat(4,1fr);max-width:100%;gap:10px;}.roster-stats-inner{grid-template-columns:130px 1fr;}.roster-stats-name{font-size:22px;}}
@@ -2642,10 +2647,9 @@ function renderHome() {
     card.appendChild(body);
 
     // Footer — podium only for champion cards
-    if (champPoem && (runnerUp || thirdPlaces.length)) {
+    if (champPoem && runnerUp) {
       const footer = document.createElement('div'); footer.className = 'home-podium-footer';
-      if (runnerUp) footer.innerHTML += `<div class="home-podium-item"><span class="home-podium-medal">🥈</span><div class="home-podium-place">2nd Place</div><div class="home-podium-name">${esc(runnerUp.name)}</div></div>`;
-      thirdPlaces.slice(0,2).forEach(p => { footer.innerHTML += `<div class="home-podium-item"><span class="home-podium-medal">🥉</span><div class="home-podium-place">3rd Place</div><div class="home-podium-name">${esc(p.name)}</div></div>`; });
+      footer.innerHTML += `<div class="home-podium-item"><span class="home-podium-medal">🥈</span><div class="home-podium-place">2nd Place</div><div class="home-podium-name">${esc(runnerUp.name)}</div></div>`;
       card.appendChild(footer);
     }
 
@@ -6659,14 +6663,15 @@ function renderRoster() {
       const p = findPoemData(pTitle, slotIdx);
       const status = computePoemStatus(slotIdx, b);
       const isElim = status.status === 'eliminated';
+      const isChamp = status.status === 'champion';
       const card = document.createElement('div');
-      card.className = 'roster-card' + (isElim ? ' eliminated' : '');
+      card.className = 'roster-card' + (isElim ? ' eliminated' : '') + (isChamp ? ' champion' : '');
       card.dataset.color = p.color;
       card.style.cssText = `--r-accent:${p.accentColor};`;
       const avatarHtml = p.svg
         ? `<img src="${esc(p.svg)}" alt="${esc(p.author)}" loading="lazy" decoding="async">`
         : `<span class="roster-avatar-emoji">${esc(p.avatarEmoji||'📝')}</span>`;
-      card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}<div class="roster-card-inner"><div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap">${avatarHtml}</div><div class="roster-author-name" style="color:${p.accentColor}">${esc(p.author)}</div><div class="roster-poem-title">${esc(p.title)}</div></div>`;
+      card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}${isChamp ? '<div class="roster-champ-badge">👑 Champion</div>' : ''}<div class="roster-card-inner"><div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap">${avatarHtml}</div><div class="roster-author-name" style="color:${p.accentColor}">${esc(p.author)}</div><div class="roster-poem-title">${esc(p.title)}</div></div>`;
       card.addEventListener('click', ()=>{
         trackEvent('poem_tap',{poem:p.title,author:p.author,seed:p.num,view:'roster'});
         if (_rosterActiveCard===card) { _rosterPlayClose(); _rosterCloseActive(); return; }
