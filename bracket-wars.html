@@ -1986,7 +1986,30 @@ let app = defaultAppState();
 async function saveApp() { _rosterStateKey = null; // invalidate roster cache on bracket change
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(app)); } catch(e) {}
   try {
-    await db.from('bracket_state').upsert({ id: STORAGE_KEY, data: app, updated_at: new Date().toISOString() });
+    // Read-merge-write: pull latest state first so concurrent teachers don't overwrite each other
+    let payload = app;
+    try {
+      const { data: latest } = await db.from('bracket_state').select('data').eq('id', STORAGE_KEY).single();
+      if (latest?.data?.classes?.length) {
+        const merged = { ...latest.data };
+        // Start from latest classes, overlay our own class data by id
+        const mergedClasses = latest.data.classes.map(lc => {
+          const ours = app.classes.find(c => c.id === lc.id);
+          return ours || lc;
+        });
+        // Add any new classes we have that weren't in latest
+        app.classes.forEach(ours => {
+          if (!mergedClasses.find(c => c.id === ours.id)) mergedClasses.push(ours);
+        });
+        merged.classes = mergedClasses;
+        merged.voting = app.voting;
+        merged.activeId = app.activeId;
+        payload = merged;
+        app = payload; // keep local state in sync
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(app)); } catch(e) {}
+      }
+    } catch(e) { /* merge failed — fall back to full overwrite */ }
+    await db.from('bracket_state').upsert({ id: STORAGE_KEY, data: payload, updated_at: new Date().toISOString() });
   } catch(e) { console.error('Supabase save:', e); }
 }
 async function loadApp() {
