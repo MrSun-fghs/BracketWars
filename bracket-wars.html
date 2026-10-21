@@ -2477,7 +2477,7 @@ function renderHome() {
       totalVotes += qfm.votes[mi]||0; totalMatchVotes += (qfm.votes[0]||0)+(qfm.votes[1]||0);
       if (qfm.winnerIdx !== mi) return {name:b.poems[idx],status:'eliminated',roundsWon,totalVotes,totalMatchVotes};
       roundsWon = 2;
-      const semiIdx = ri<=1?0:1, semiSlot = ri===0||ri===2?0:1, sm = b.semis[semiIdx];
+      const semiIdx = ri%2, semiSlot = ri<=1?0:1, sm = b.semis[semiIdx];
       if (sm.winnerIdx === null) return {name:b.poems[idx],status:'alive',roundsWon,totalVotes,totalMatchVotes};
       totalVotes += sm.votes[semiSlot]||0; totalMatchVotes += (sm.votes[0]||0)+(sm.votes[1]||0);
       if (sm.winnerIdx !== semiSlot) return {name:b.poems[idx],status:'eliminated',roundsWon,totalVotes,totalMatchVotes};
