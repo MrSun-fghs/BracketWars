@@ -1512,7 +1512,8 @@ body{background:#fff;}#bracketView{display:block!important;}.matchup{page-break-
 .roster-card.eliminated:hover .roster-card-inner{filter:grayscale(.5) opacity(.75);}
 .roster-card.eliminated:hover .roster-elim-badge{background:#ef4444;color:#fff;box-shadow:0 0 16px rgba(239,68,68,.6);transform:translate(-50%,-50%) scale(1.08);}
 .roster-elim-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#7f1d1d;border-radius:7px;font-size:14px;font-weight:800;letter-spacing:1.5px;color:#fca5a5;text-transform:uppercase;padding:6px 15px;white-space:nowrap;z-index:2;font-family:sans-serif;transition:background .2s,box-shadow .2s,transform .2s;}
-.roster-champ-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#78350f;border-radius:7px;font-size:14px;font-weight:800;letter-spacing:1.5px;color:#fde68a;text-transform:uppercase;padding:6px 15px;white-space:nowrap;z-index:2;font-family:sans-serif;box-shadow:0 0 16px rgba(251,191,36,.4);transition:background .2s,box-shadow .2s,transform .2s;}
+.roster-champ-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#78350f;border-radius:7px;font-size:14px;font-weight:800;letter-spacing:1.5px;color:#fde68a;text-transform:uppercase;padding:6px 15px;white-space:nowrap;z-index:2;font-family:sans-serif;box-shadow:0 0 16px rgba(251,191,36,.4);transition:background .2s,box-shadow .2s,transform .2s;display:flex;align-items:center;gap:6px;}
+.roster-champ-crown{width:20px;height:20px;object-fit:contain;display:block;filter:drop-shadow(0 0 4px rgba(251,191,36,.6));}
 .roster-card.champion{border-color:#f59e0b;}
 .roster-card.champion .roster-card-inner{filter:none;}
 .roster-card.champion:hover{transform:translateY(-8px) scale(1.03);border-color:#fbbf24;box-shadow:0 16px 40px rgba(251,191,36,.45);}
@@ -6671,7 +6672,7 @@ function renderRoster() {
       const avatarHtml = p.svg
         ? `<img src="${esc(p.svg)}" alt="${esc(p.author)}" loading="lazy" decoding="async">`
         : `<span class="roster-avatar-emoji">${esc(p.avatarEmoji||'📝')}</span>`;
-      card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}${isChamp ? '<div class="roster-champ-badge">👑 Champion</div>' : ''}<div class="roster-card-inner"><div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap">${avatarHtml}</div><div class="roster-author-name" style="color:${p.accentColor}">${esc(p.author)}</div><div class="roster-poem-title">${esc(p.title)}</div></div>`;
+      card.innerHTML = `${isElim ? '<div class="roster-elim-badge">Eliminated</div>' : ''}${isChamp ? '<div class="roster-champ-badge"><img src="Corona Crayola.svg" alt="crown" class="roster-champ-crown"> Champion</div>' : ''}<div class="roster-card-inner"><div class="roster-card-num">#${p.num}</div><div class="roster-avatar-wrap">${avatarHtml}</div><div class="roster-author-name" style="color:${p.accentColor}">${esc(p.author)}</div><div class="roster-poem-title">${esc(p.title)}</div></div>`;
       card.addEventListener('click', ()=>{
         trackEvent('poem_tap',{poem:p.title,author:p.author,seed:p.num,view:'roster'});
         if (_rosterActiveCard===card) { _rosterPlayClose(); _rosterCloseActive(); return; }
